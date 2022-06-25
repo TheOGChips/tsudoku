@@ -1,4 +1,4 @@
-#include "../include/Column.hpp"
+#include "Column.hpp"
 #include <cstdint>
 
 Column::Column ()

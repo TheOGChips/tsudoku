@@ -1,5 +1,5 @@
 //#include "../include/Matrix_9x9.hpp"
-#include "../include/sudoku.hpp"
+#include "sudoku.hpp"
 
 int main ()
 {

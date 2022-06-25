@@ -1,6 +1,8 @@
 COMPILER = clang++
-COMPILE = $(COMPILER) -c
-LINK = $(COMPILER) -o
+INCLUDE = -I include/
+COMPILE = $(COMPILER) -c $(INCLUDE)
+LIBS = lib
+LINK = $(COMPILER) $(LIBS)/*.o -o
 SRC = src
 MAIN = main
 SUDOKU = sudoku
@@ -14,7 +16,9 @@ TGT = $(SUDOKU).exe
 .PHONY: all run clean
 
 all:	$(OBJ)
-		$(LINK) $(TGT) $^
+		mkdir $(LIBS)
+		mv $^ $(LIBS)/
+		$(LINK) $(TGT)
 
 $(MAIN).o:	$(SRC)/$(MAIN).cpp
 			$(COMPILE) $<
@@ -38,4 +42,5 @@ run: $(TGT)
 	 ./$<
 
 clean:	$(TGT)
-		rm $< $(OBJ)
+		rm $< $(LIBS)/*.o
+		rmdir $(LIBS)
