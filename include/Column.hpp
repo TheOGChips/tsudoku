@@ -9,7 +9,7 @@ class Column {
 
     public:
         Column();
-        ~Column();
+        ~Column() {}
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "../include/Row.hpp"
+#include <cstdint>
 
 Row::Row ()
 {

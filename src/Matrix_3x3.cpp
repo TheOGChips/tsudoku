@@ -1,4 +1,5 @@
 #include "../include/Matrix_3x3.hpp"
+#include <cstdint>
 
 Matrix_3x3::Matrix_3x3 ()
 {

@@ -1,4 +1,5 @@
-
+//#include "../include/Matrix_9x9.hpp"
+#include "../include/sudoku.hpp"
 
 int main ()
 {
@@ -8,5 +9,7 @@ int main ()
         //Every row must contain the numbers 1-9 with no repeats
         //Every column must contain the numbers 1-9 with no repeats
         //Every sub-matrix (3x3) must contain the numbers 1-9 with no repeats
+    
+    Matrix_9x9 puzzle = sudoku_init();  //initialize a sudoku puzzle
     return 0;
 }
