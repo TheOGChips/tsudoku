@@ -11,30 +11,31 @@ MATRIX_9X9 = Matrix_9x9
 OBJ = $(MAIN).o $(SUDOKU).o $(ROW).o $(COLUMN).o $(MATRIX_3X3).o $(MATRIX_9X9).o
 TGT = $(SUDOKU).exe
 
+.PHONY: all run clean
+
 all:	$(OBJ)
-		$(LINK) $(TGT) $(OBJ)
+		$(LINK) $(TGT) $^
 
 $(MAIN).o:	$(SRC)/$(MAIN).cpp
-			$(COMPILE) $(SRC)/$(MAIN).cpp
+			$(COMPILE) $<
 
 $(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
-				$(COMPILE) $(SRC)/$(SUDOKU).cpp
+				$(COMPILE) $<
 
 $(ROW).o:	$(SRC)/$(ROW).cpp
-			$(COMPILE) $(SRC)/$(ROW).cpp
+			$(COMPILE) $<
 
 $(COLUMN).o:	$(SRC)/$(COLUMN).cpp
-				$(COMPILE) $(SRC)/$(COLUMN).cpp
+				$(COMPILE) $<
 
 $(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
-					$(COMPILE) $(SRC)/$(MATRIX_3X3).cpp
+					$(COMPILE) $<
 
 $(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
-					$(COMPILE) $(SRC)/$(MATRIX_9X9).cpp
+					$(COMPILE) $<
 
-.PHONY: run clean
 run: $(TGT)
-	 ./$(TGT)
+	 ./$<
 
 clean:	$(TGT)
-		rm $(TGT) $(OBJ)
+		rm $< $(OBJ)
