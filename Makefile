@@ -10,33 +10,33 @@ ROW = Row
 COLUMN = Column
 MATRIX_3X3 = Matrix_3x3
 MATRIX_9X9 = Matrix_9x9
-OBJ = $(MAIN).o $(SUDOKU).o $(ROW).o $(COLUMN).o $(MATRIX_3X3).o $(MATRIX_9X9).o
+OBJ = $(LIBS)/$(MAIN).o $(LIBS)/$(SUDOKU).o $(LIBS)/$(ROW).o $(LIBS)/$(COLUMN).o $(LIBS)/$(MATRIX_3X3).o $(LIBS)/$(MATRIX_9X9).o
 TGT = $(SUDOKU).exe
 
 .PHONY: all run clean
 
 all:	$(OBJ)
-		mkdir $(LIBS)
-		mv $^ $(LIBS)/
+		mkdir -p $(LIBS)
+		-mv $(?F) $(LIBS)/
 		$(LINK) $(TGT)
 
-$(MAIN).o:	$(SRC)/$(MAIN).cpp
-			$(COMPILE) $<
-
-$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
-				$(COMPILE) $<
-
-$(ROW).o:	$(SRC)/$(ROW).cpp
-			$(COMPILE) $<
-
-$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
-				$(COMPILE) $<
-
-$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
+$(LIBS)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 					$(COMPILE) $<
 
-$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
+$(LIBS)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
+						$(COMPILE) $<
+
+$(LIBS)/$(ROW).o:	$(SRC)/$(ROW).cpp
 					$(COMPILE) $<
+
+$(LIBS)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
+						$(COMPILE) $<
+
+$(LIBS)/$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
+							$(COMPILE) $<
+
+$(LIBS)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
+							$(COMPILE) $<
 
 run: $(TGT)
 	 ./$<
