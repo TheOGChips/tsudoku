@@ -5,6 +5,9 @@
 #include "Matrix_3x3.hpp"
 #include "Row.hpp"
 #include "Column.hpp"
+#include <iostream>
+
+using namespace std;
 
 class Matrix_9x9 {
     private:
@@ -24,6 +27,11 @@ class Matrix_9x9 {
     public:
         Matrix_9x9();
         ~Matrix_9x9() {}
+        Matrix_3x3 submatrix (uint8_t) const;
+        Row row (uint8_t);
+        Column column (uint8_t);
+        void print() const;
+        friend ostream& operator << (ostream&, Matrix_9x9);
 };
 
 #endif
