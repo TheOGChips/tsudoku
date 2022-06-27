@@ -21,7 +21,7 @@ Matrix_9x9 sudoku_init()
 
     Matrix_9x9 mat;
     cout << endl
-         << "Printing empty puzzle..." << endl
+         << "Printing test puzzle..." << endl
          << mat << endl;
 
     return mat;
@@ -30,12 +30,10 @@ Matrix_9x9 sudoku_init()
 map<uint8_t, cell> create_map()
 {
     map<uint8_t, cell> m;
-    //uint8_t count = 0;
 
     for (uint8_t i = 0; i < 9; i++) {
         for (uint8_t j = 0; j < 9; j++) {
-            m[i*9+j] = pair<uint8_t, uint8_t>(i, j);
-            //count++;
+            m[i * 9 + j] = pair<uint8_t, uint8_t>(i, j);
         }
     }
 

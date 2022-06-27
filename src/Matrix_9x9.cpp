@@ -15,9 +15,9 @@ ostream& operator << (ostream& os, const Matrix_9x9 mat)
 
 void Matrix_9x9::print () const
 {
-    const bool SUBMATRIX_PRINTING = true,
+    const bool SUBMATRIX_PRINTING = false,
                ROW_PRINTING = false,
-               COLUMN_PRINTING = false;
+               COLUMN_PRINTING = true;
     /*
         00 01 02 | 10 11 12 | 20 21 22
         03 04 05 | 13 14 15 | 23 24 25
@@ -59,10 +59,26 @@ void Matrix_9x9::print () const
         }
     }
 
+    //TODO: 
     if (ROW_PRINTING) {
     }
 
-    if (COLUMN_PRINTING) {}
+    //TODO: 
+    if (COLUMN_PRINTING) {
+        for (uint8_t i = 0; i < 9; i++) {
+            for (uint8_t j = 0; j < 9; j++) {
+                cout << column(j)[i];
+                if (j == 2 or j == 5) {
+                    cout << "|";
+                }
+            }
+
+            cout << endl;
+            if (i == 2 or i == 5) {
+                cout << "---|---|---" << endl;
+            }
+        }
+    }
 }
 
 Matrix_3x3 Matrix_9x9::submatrix (uint8_t index) const
@@ -75,7 +91,7 @@ Row Matrix_9x9::row (uint8_t index)
     return rows[index];
 }
 
-Column Matrix_9x9::column (uint8_t index)
+Column Matrix_9x9::column (uint8_t index) const
 {
     return cols[index];
 }
