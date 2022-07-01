@@ -28,7 +28,7 @@ class Matrix_9x9 {
         Matrix_9x9();
         ~Matrix_9x9() {}
         Matrix_3x3 submatrix (uint8_t) const;
-        Row row (uint8_t);
+        Row row (uint8_t) const;
         Column column (uint8_t) const;
         void print() const;
         friend ostream& operator << (ostream&, Matrix_9x9);

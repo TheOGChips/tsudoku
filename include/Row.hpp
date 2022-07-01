@@ -2,6 +2,7 @@
 #define ROW_HPP
 
 #include "values.hpp"
+#include <cstdint>
 
 class Row {
     private:
@@ -10,6 +11,7 @@ class Row {
     public:
         Row();
         ~Row() {}
+        const uint8_t operator [] (uint8_t);
 };
 
 #endif
