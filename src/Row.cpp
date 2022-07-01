@@ -16,6 +16,5 @@ uint8_t Row::at (uint8_t index) const
 
 uint8_t Row::operator [] (uint8_t index) const
 {
-    //return row[index];
     return at(index);
 }

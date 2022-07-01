@@ -31,9 +31,7 @@ void Matrix_9x9::print () const
         63 64 65 | 73 74 75 | 83 84 85
         66 67 68 | 76 77 78 | 86 87 88
     */
-    if (SUBMATRIX_PRINTING) {
-        //for printing from a submatrix
-        
+    if (SUBMATRIX_PRINTING) {   //for printing from a submatrix
         for (uint8_t i = 0; i < 9; i += 3) {
             uint8_t count = 0,
                     offset = 0;
