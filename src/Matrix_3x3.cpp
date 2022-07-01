@@ -26,9 +26,15 @@ map<uint8_t, cell> Matrix_3x3::create_map()
     return m;
 }
 
-const uint8_t Matrix_3x3::operator [] (uint8_t index)
+const uint8_t Matrix_3x3::at (uint8_t index)
 {
     return mat[m[index].first][m[index].second];
+}
+
+const uint8_t Matrix_3x3::operator [] (uint8_t index)
+{
+    //return mat[m[index].first][m[index].second];
+    return at(index);
 }
 
 void Matrix_3x3::print_map()

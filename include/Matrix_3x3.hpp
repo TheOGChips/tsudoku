@@ -19,7 +19,7 @@ class Matrix_3x3 {
     public:
         Matrix_3x3 ();
         ~Matrix_3x3 () {}
-        //TODO: Overload bracket operators using a map-and-pair combo
+        const uint8_t at (uint8_t);
         const uint8_t operator [] (uint8_t);
         void print_map();
 };
