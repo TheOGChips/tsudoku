@@ -1,10 +1,17 @@
 #include "Matrix_9x9.hpp"
 #include <cstdlib>
+#include <ctime>
+
 using namespace std;
 
 Matrix_9x9::Matrix_9x9 ()
 {
-
+    init_positions();
+    time_t seed = time(nullptr);
+    position_generator = mt19937(seed);
+    position_dist = uniform_int_distribution<uint8_t>(0, 80);
+    generator = mt19937(seed);
+    dist = uniform_int_distribution<uint8_t>(0, 8);
 }
 
 ostream& operator << (ostream& os, const Matrix_9x9 mat)
@@ -93,4 +100,16 @@ Row Matrix_9x9::row (uint8_t index) const
 Column Matrix_9x9::column (uint8_t index) const
 {
     return cols[index];
+}
+
+void Matrix_9x9::init_positions()
+{
+    for (uint8_t i = 0; i < 81; i++) {
+        positions[i] = false;
+    }
+}
+
+uint8_t Matrix_9x9::next()
+{
+    return dist(generator);
 }

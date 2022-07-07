@@ -3,6 +3,8 @@
 
 using namespace std;
 
+const bool DEBUG = true;
+
 Matrix_9x9 sudoku_init()
 {
     //TODO: Randomly create a sudoku puzzle
@@ -10,19 +12,33 @@ Matrix_9x9 sudoku_init()
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
     //TODO: Randomly fill in sudoku puzzle
-        //TODO: Need to be able to print out sudoku puzzle (debug version can be 9x9, at least for now)
-        //SOLN: Add overloaded ostream operator as friend function to Matrix_9x9 (and others as necessary) 
+        //TODO: Determine how to randomly fill in sudoku puzzle
+        //SOLN: step 1 -> pick position (on 9x9 grid) <- TODO
+        //      step 2 -> map position to corresponding 3x3 grid, row, and column <- TODO
+        //      step 3 -> pick random character between 1-9 to fill in spot <- TODO
+        //      step 4 -> place random character in appropriate spot in corresponding 3x3 grid, row, and column <- TODO
     map<uint8_t, cell> sudoku_map = create_map();
 
-    cout << "Printing mapping..." << endl;
-    for (uint8_t i = 0; i < sudoku_map.size(); i++) {
-        cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+    if (!DEBUG) {
+        cout << "Printing mapping..." << endl;
+        for (uint8_t i = 0; i < sudoku_map.size(); i++) {
+            cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+        }
     }
 
     Matrix_9x9 mat;
-    cout << endl
-         << "Printing test puzzle..." << endl
-         << mat << endl;
+    if (!DEBUG) {
+        cout << endl
+             << "Printing test puzzle..." << endl
+             << mat << endl;
+    }
+
+    if (!DEBUG) {
+        cout << "Printing out random numbers..." << endl;
+        for (uint8_t i = 0; i < 10; i++) {
+            cout << mat.next()+0 << endl;
+        }
+    }
 
     return mat;
 }

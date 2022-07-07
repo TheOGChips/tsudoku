@@ -6,6 +6,7 @@
 #include "Row.hpp"
 #include "Column.hpp"
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -23,6 +24,14 @@ class Matrix_9x9 {
                /*col1, col2, col3,
                col4, col5, col6,
                col7, col8, col9;*/
+        bool positions[81];
+        //time_t seed;
+        mt19937 position_generator,
+                generator;
+        uniform_int_distribution<uint8_t> position_dist,
+                                          dist;
+
+        void init_positions();
 
     public:
         Matrix_9x9();
@@ -32,6 +41,7 @@ class Matrix_9x9 {
         Column column (uint8_t) const;
         void print() const;
         friend ostream& operator << (ostream&, Matrix_9x9);
+        uint8_t next();
 };
 
 #endif
