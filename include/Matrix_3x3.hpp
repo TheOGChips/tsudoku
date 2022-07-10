@@ -2,9 +2,9 @@
 #define MATRIX_3X3_HPP
 
 #include "values.hpp"
-#include <map>
-#include <utility>  //pair
-#include <cstdint>
+#include <map>      //std::map
+#include <utility>  //std::pair
+#include <cstdint>  //uint8_t
 
 using namespace std;
 
@@ -19,9 +19,11 @@ class Matrix_3x3 {
     public:
         Matrix_3x3 ();
         ~Matrix_3x3 () {}
-        const uint8_t at (uint8_t);
-        const uint8_t operator [] (uint8_t);
+        uint8_t at (uint8_t);
+        uint8_t operator [] (uint8_t);
         void print_map();
+        bool value_exists (uint8_t);
+        void set_value (uint8_t, uint8_t);
 };
 
 #endif

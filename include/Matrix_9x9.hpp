@@ -5,43 +5,39 @@
 #include "Matrix_3x3.hpp"
 #include "Row.hpp"
 #include "Column.hpp"
-#include <iostream>
-#include <random>
+//#include <iostream>
+#include <random>   //mt19937(), uniform_int_distribution<>(),
 
 using namespace std;
 
 class Matrix_9x9 {
     private:
         Matrix_3x3 matrices[9];
-                   /*TL, TM, TR,
-                   L,  M,  R,
-                   BL, BM, BR;*/
         Row rows[9];
-            /*row1, row2, row3,
-            row4, row5, row6,
-            row7, row8, row9;*/
         Column cols[9];
-               /*col1, col2, col3,
-               col4, col5, col6,
-               col7, col8, col9;*/
         bool positions[81];
-        //time_t seed;
         mt19937 position_generator,
                 generator;
         uniform_int_distribution<uint8_t> position_dist,
                                           dist;
 
         void init_positions();
+        void set_starting_positions (uint8_t);
+        uint8_t next_position();
+        uint8_t map_row (const uint8_t);
+        uint8_t map_column (const uint8_t);
+        uint8_t map_submatrix (const uint8_t, const uint8_t);
+        uint8_t next_value();
+        void get_indeces (const uint8_t, uint8_t&, uint8_t&, uint8_t&);
 
     public:
         Matrix_9x9();
         ~Matrix_9x9() {}
-        Matrix_3x3 submatrix (uint8_t) const;
-        Row row (uint8_t) const;
-        Column column (uint8_t) const;
-        void print() const;
-        friend ostream& operator << (ostream&, Matrix_9x9);
-        uint8_t next();
+        Matrix_3x3& get_submatrix (uint8_t);
+        Row& get_row (uint8_t);
+        Column& get_column (uint8_t);
+        void print(const bool, const bool);
+        //friend ostream& operator << (ostream&, Matrix_9x9);
 };
 
 #endif

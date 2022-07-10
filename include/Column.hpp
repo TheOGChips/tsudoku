@@ -2,7 +2,7 @@
 #define COLUMN_HPP
 
 #include "values.hpp"
-#include <cstdint>
+#include <cstdint>  //uint8_t
 
 class Column {
     private:
@@ -11,8 +11,10 @@ class Column {
     public:
         Column();
         ~Column() {}
-        uint8_t at (uint8_t) const;
-        uint8_t operator [] (uint8_t) const;
+        uint8_t at (uint8_t);
+        uint8_t operator [] (uint8_t);
+        bool value_exists (uint8_t);
+        void set_value (uint8_t, uint8_t);
 };
 
 #endif

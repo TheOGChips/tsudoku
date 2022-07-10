@@ -1,5 +1,7 @@
 #include "Matrix_3x3.hpp"
-#include <iostream>
+#include <iostream> //std::cout, std::endl
+
+using namespace std;
 
 Matrix_3x3::Matrix_3x3 ()
 {
@@ -26,12 +28,12 @@ map<uint8_t, cell> Matrix_3x3::create_map()
     return m;
 }
 
-const uint8_t Matrix_3x3::at (uint8_t index)
+uint8_t Matrix_3x3::at (uint8_t index)
 {
-    return mat[m[index].first][m[index].second];
+    return mat[m[index].first][m[index].second];    //m is an std::pair object
 }
 
-const uint8_t Matrix_3x3::operator [] (uint8_t index)
+uint8_t Matrix_3x3::operator [] (uint8_t index)
 {
     return at(index);
 }
@@ -42,4 +44,20 @@ void Matrix_3x3::print_map()
     for (uint8_t i = 0; i < m.size(); i++) {
         cout << "m[" << i+0 << "]: (" << m[i].first+0 << ", " << m[i].second+0 << ")" << endl;
     }
+}
+
+bool Matrix_3x3::value_exists (uint8_t value)
+{
+    value += 48;
+    for (uint8_t i = 0; i < 9; i++) {
+        if (at(i) == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Matrix_3x3::set_value (uint8_t index, uint8_t value)
+{
+    mat[m[index].first][m[index].second] = value;
 }

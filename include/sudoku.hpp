@@ -1,8 +1,8 @@
 #ifndef SUDOKU_HPP
 #define SUDOKU_HPP
 
-#include "Matrix_9x9.hpp"   //cell, <map>, <utility>
-#include <cstdint>  //uint8_t
+#include "Matrix_9x9.hpp"   //cell, std::map, std::utility
+#include <cstdint>          //uint8_t
 
 using namespace std;
 
