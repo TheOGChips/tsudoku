@@ -46,7 +46,7 @@ void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTIN
                 for (uint8_t j = i; j < i + 3; j++) {
                     Matrix_3x3 submatrix = get_submatrix(j);
                     for (uint8_t k = 0; k < 3; k++) {
-                        if (submatrix[k + offset] >= '1' and submatrix[k + offset] <= '9') {
+                        if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
                             cout << RED << submatrix[k + offset] << WHITE;
                         }
                         else {
@@ -74,7 +74,7 @@ void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTIN
         for (uint8_t i = 0; i < 9; i++) {
             for (uint8_t j = 0; j < 9; j++) {
                 if (COLUMN_PRINTING) {
-                    if (get_column(j)[i] >= '1' and get_column(j)[i] <= '9') {
+                    if (get_column(j)[i] >= ONE and get_column(j)[i] <= NINE) {
                         cout << RED << get_column(j)[i] << WHITE;
                     }
                     else {
@@ -82,7 +82,7 @@ void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTIN
                     }
                 }
                 else {  //if (ROW_PRINTING)
-                    if (get_row(i)[j] >= '1' and get_row(i)[j] <= '9') {
+                    if (get_row(i)[j] >= ONE and get_row(i)[j] <= NINE) {
                         cout << RED << get_row(i)[j] << WHITE;
                     }
                     else {
