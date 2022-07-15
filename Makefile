@@ -19,7 +19,7 @@ TGT = $(SUDOKU).exe
 all:	$(OBJ)
 		mkdir -p $(LIBS)
 		-mv $(?F) $(LIBS)/
-		$(LINK) $(TGT)
+		$(LINK) $(TGT) -lncurses
 
 $(LIBS)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 					$(COMPILE) $<

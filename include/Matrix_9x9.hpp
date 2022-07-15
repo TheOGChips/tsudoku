@@ -7,6 +7,7 @@
 #include "Column.hpp"
 //#include <iostream>
 #include <random>   //mt19937(), uniform_int_distribution<>(),
+#include "colors.hpp"
 
 using namespace std;
 
@@ -36,7 +37,8 @@ class Matrix_9x9 {
         Matrix_3x3& get_submatrix (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);
-        void print(const bool, const bool);
+        //void print(const bool, const bool);
+        void printw(const bool, const bool);    //the one to call while using ncurses
         //friend ostream& operator << (ostream&, Matrix_9x9);
 };
 

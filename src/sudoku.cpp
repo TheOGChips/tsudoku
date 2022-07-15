@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 Matrix_9x9 sudoku_init()
 {
@@ -12,7 +12,7 @@ Matrix_9x9 sudoku_init()
     //      settings are added later)
     map<uint8_t, cell> sudoku_map = create_map();
 
-    if (!DEBUG) {
+    if (DEBUG) {
         cout << "Printing mapping..." << endl;
         for (uint8_t i = 0; i < sudoku_map.size(); i++) {
             cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
@@ -33,7 +33,7 @@ Matrix_9x9 sudoku_init()
         mat.print(false, false);
     }
 
-    /*if (!DEBUG) {
+    /*if (DEBUG) {
         cout << "Printing out random numbers..." << endl;
         for (uint8_t i = 0; i < 10; i++) {
             cout << mat.next()+0 << endl;
