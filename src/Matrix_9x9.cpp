@@ -14,6 +14,19 @@ Matrix_9x9::Matrix_9x9 ()
     generator = mt19937(seed);
     dist = uniform_int_distribution<uint8_t>(1, 9);
     set_starting_positions(17);
+
+    //Start ncurses
+    initscr();
+    //establish color pairs
+    start_color();  //TODO: These should actually adjust for a terminal that can't show color
+    init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+    init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
+    init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+}
+
+Matrix_9x9::~Matrix_9x9 ()
+{
+    endwin();   //terminate ncurses session
 }
 /*
 ostream& operator << (ostream& os, const Matrix_9x9 mat)
@@ -22,7 +35,8 @@ ostream& operator << (ostream& os, const Matrix_9x9 mat)
     return os;
 }
 */
-void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTING)
+#if false
+void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*
             NUMBERED (ROW x COLUMN)
@@ -102,8 +116,8 @@ void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTIN
         }
     }
 }
-
-void Matrix_9x9::printw (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTING)
+#endif
+void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*
             NUMBERED (ROW x COLUMN)

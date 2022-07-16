@@ -33,7 +33,7 @@ class Matrix_9x9 {
 
     public:
         Matrix_9x9();
-        ~Matrix_9x9() {}
+        ~Matrix_9x9();
         Matrix_3x3& get_submatrix (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);

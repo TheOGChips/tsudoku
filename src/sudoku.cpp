@@ -1,9 +1,10 @@
 #include "sudoku.hpp"
 #include <iostream> //std::cout, std::endl
+#include <ncurses.h>
 
 using namespace std;
 
-const bool DEBUG = false;
+const bool DEBUG = true;
 
 Matrix_9x9 sudoku_init()
 {
@@ -12,7 +13,7 @@ Matrix_9x9 sudoku_init()
     //      settings are added later)
     map<uint8_t, cell> sudoku_map = create_map();
 
-    if (DEBUG) {
+    if (!DEBUG) {
         cout << "Printing mapping..." << endl;
         for (uint8_t i = 0; i < sudoku_map.size(); i++) {
             cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
@@ -21,16 +22,23 @@ Matrix_9x9 sudoku_init()
 
     Matrix_9x9 mat;
     if (DEBUG) {
-        cout << endl
-             << "Printing test puzzle..." << endl;
-        cout << "SUBMATRIX" << endl;
-        mat.print(true, false);
-        cout << endl
-             << "COLUMNS" << endl;
-        mat.print(false, true);
-        cout << endl
-             << "ROWS" << endl;
-        mat.print(false, false);
+        enum print_by {row, column, submatrix};
+        for (uint8_t i = row; i <= submatrix; i++) {
+            printw("Printing by ");
+            if (i == submatrix) {
+                printw("submatrix...\n");
+            }
+            else if (i == column) {
+                printw("column...\n");
+            }
+            else {
+                printw("row...\n");
+            }
+            mat.printw(i & column, i & submatrix);
+            refresh();  //flush output to screen
+            getch();    //wait for user input
+            clear();    //clear the screen
+        }
     }
 
     /*if (DEBUG) {
