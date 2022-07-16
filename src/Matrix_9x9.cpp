@@ -1,5 +1,4 @@
 #include "Matrix_9x9.hpp"
-#include <iostream> //std::cout, std::endl
 #include <ctime>    //time_t, time()
 #include <ncurses.h>
 

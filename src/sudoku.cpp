@@ -1,5 +1,4 @@
 #include "sudoku.hpp"
-#include <iostream> //std::cout, std::endl
 #include <ncurses.h>
 
 using namespace std;
@@ -14,10 +13,16 @@ Matrix_9x9 sudoku_init()
     map<uint8_t, cell> sudoku_map = create_map();
 
     if (!DEBUG) {
-        cout << "Printing mapping..." << endl;
+        //cout <<  << endl;
+        printw("Printing mapping...\n");
         for (uint8_t i = 0; i < sudoku_map.size(); i++) {
-            cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+            //cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+            printw("m[%u]: (%u, %u)", i, sudoku_map[i].first, sudoku_map[i].second);
+            i % 10 ? printw("\t") : printw("\n");
         }
+        refresh();  //TODO: Consider putting these three functions into one if used like this more often
+        getch();
+        clear();
     }
 
     Matrix_9x9 mat;
