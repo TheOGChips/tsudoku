@@ -6,7 +6,6 @@
 #include "Row.hpp"
 #include "Column.hpp"
 #include <random>   //mt19937(), uniform_int_distribution<>(),
-#include "colors.hpp"
 
 using namespace std;
 

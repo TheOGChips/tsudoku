@@ -1,6 +1,7 @@
 #include "Matrix_9x9.hpp"
 #include <ctime>    //time_t, time()
 #include <ncurses.h>
+#include "colors.hpp"
 
 using namespace std;
 
