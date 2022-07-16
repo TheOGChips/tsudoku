@@ -5,7 +5,6 @@
 #include "Matrix_3x3.hpp"
 #include "Row.hpp"
 #include "Column.hpp"
-//#include <iostream>
 #include <random>   //mt19937(), uniform_int_distribution<>(),
 
 using namespace std;
@@ -29,15 +28,16 @@ class Matrix_9x9 {
         uint8_t map_submatrix (const uint8_t, const uint8_t);
         uint8_t next_value();
         void get_indeces (const uint8_t, uint8_t&, uint8_t&, uint8_t&);
+        void set_color_pairs();
 
     public:
         Matrix_9x9();
-        ~Matrix_9x9() {}
+        ~Matrix_9x9();
         Matrix_3x3& get_submatrix (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);
-        void print(const bool, const bool);
-        //friend ostream& operator << (ostream&, Matrix_9x9);
+        //void print(const bool, const bool);
+        void printw(const bool, const bool);    //the one to call while using ncurses
 };
 
 #endif

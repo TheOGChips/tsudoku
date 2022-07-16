@@ -5,9 +5,8 @@
 
 using namespace std;
 
-const string RED = "\033[1;31m",
-             WHITE = "\033[0m";
-
-void set_print_color (const string);
+const uint8_t UNKNOWN = 1,
+              KNOWN = 2,
+              GUESS = 3;
 
 #endif

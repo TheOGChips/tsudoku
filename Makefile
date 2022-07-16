@@ -8,10 +8,9 @@ MAIN = main
 SUDOKU = sudoku
 ROW = Row
 COLUMN = Column
-COLORS = colors
 MATRIX_3X3 = Matrix_3x3
 MATRIX_9X9 = Matrix_9x9
-OBJ = $(LIBS)/$(MAIN).o $(LIBS)/$(SUDOKU).o $(LIBS)/$(ROW).o $(LIBS)/$(COLUMN).o $(LIBS)/$(MATRIX_3X3).o $(LIBS)/$(MATRIX_9X9).o $(LIBS)/$(COLORS).o
+OBJ = $(LIBS)/$(MAIN).o $(LIBS)/$(SUDOKU).o $(LIBS)/$(ROW).o $(LIBS)/$(COLUMN).o $(LIBS)/$(MATRIX_3X3).o $(LIBS)/$(MATRIX_9X9).o
 TGT = $(SUDOKU).exe
 
 .PHONY: all run clean
@@ -19,7 +18,7 @@ TGT = $(SUDOKU).exe
 all:	$(OBJ)
 		mkdir -p $(LIBS)
 		-mv $(?F) $(LIBS)/
-		$(LINK) $(TGT)
+		$(LINK) $(TGT) -lncurses
 
 $(LIBS)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 					$(COMPILE) $<
@@ -38,9 +37,6 @@ $(LIBS)/$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
 
 $(LIBS)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
 							$(COMPILE) $<
-
-$(LIBS)/$(COLORS).o:	$(SRC)/$(COLORS).cpp
-						$(COMPILE) $<
 
 run: $(TGT)
 	 ./$<

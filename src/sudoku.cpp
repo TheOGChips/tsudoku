@@ -1,5 +1,5 @@
 #include "sudoku.hpp"
-#include <iostream> //std::cout, std::endl
+#include <ncurses.h>
 
 using namespace std;
 
@@ -13,27 +13,40 @@ Matrix_9x9 sudoku_init()
     map<uint8_t, cell> sudoku_map = create_map();
 
     if (!DEBUG) {
-        cout << "Printing mapping..." << endl;
+        //cout <<  << endl;
+        printw("Printing mapping...\n");
         for (uint8_t i = 0; i < sudoku_map.size(); i++) {
-            cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+            //cout << "m[" << i+0 << "]: (" << sudoku_map[i].first+0 << ", " << sudoku_map[i].second+0 << ")" << endl;
+            printw("m[%u]: (%u, %u)", i, sudoku_map[i].first, sudoku_map[i].second);
+            i % 10 ? printw("\t") : printw("\n");
         }
+        refresh();  //TODO: Consider putting these three functions into one if used like this more often
+        getch();
+        clear();
     }
 
     Matrix_9x9 mat;
     if (DEBUG) {
-        cout << endl
-             << "Printing test puzzle..." << endl;
-        cout << "SUBMATRIX" << endl;
-        mat.print(true, false);
-        cout << endl
-             << "COLUMNS" << endl;
-        mat.print(false, true);
-        cout << endl
-             << "ROWS" << endl;
-        mat.print(false, false);
+        enum print_by {row, column, submatrix};
+        for (uint8_t i = row; i <= submatrix; i++) {
+            printw("Printing by ");
+            if (i == submatrix) {
+                printw("submatrix...\n");
+            }
+            else if (i == column) {
+                printw("column...\n");
+            }
+            else {
+                printw("row...\n");
+            }
+            mat.printw(i & column, i & submatrix);
+            refresh();  //flush output to screen
+            getch();    //wait for user input
+            clear();    //clear the screen
+        }
     }
 
-    /*if (!DEBUG) {
+    /*if (DEBUG) {
         cout << "Printing out random numbers..." << endl;
         for (uint8_t i = 0; i < 10; i++) {
             cout << mat.next()+0 << endl;

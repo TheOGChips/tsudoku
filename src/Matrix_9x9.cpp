@@ -1,6 +1,6 @@
 #include "Matrix_9x9.hpp"
-#include <iostream> //std::cout, std::endl
 #include <ctime>    //time_t, time()
+#include <ncurses.h>
 #include "colors.hpp"
 
 using namespace std;
@@ -14,15 +14,20 @@ Matrix_9x9::Matrix_9x9 ()
     generator = mt19937(seed);
     dist = uniform_int_distribution<uint8_t>(1, 9);
     set_starting_positions(17);
+
+    //Start ncurses
+    initscr();
+    //establish color support and color pairs
+    set_color_pairs();
 }
-/*
-ostream& operator << (ostream& os, const Matrix_9x9 mat)
+
+Matrix_9x9::~Matrix_9x9 ()
 {
-    mat.print();
-    return os;
+    endwin();   //terminate ncurses session
 }
-*/
-void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTING)
+
+#if false
+void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*
             NUMBERED (ROW x COLUMN)
@@ -98,6 +103,93 @@ void Matrix_9x9::print (const bool SUBMATRIX_PRINTING, const bool COLUMN_PRINTIN
             cout << endl;
             if (i == 2 or i == 5) {
                 cout << "---|---|---" << endl;
+            }
+        }
+    }
+}
+#endif
+
+void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
+{
+    /*
+            NUMBERED (ROW x COLUMN)
+        00 01 02 | 10 11 12 | 20 21 22
+        03 04 05 | 13 14 15 | 23 24 25
+        06 07 08 | 16 17 18 | 26 27 28
+        ---------|----------|---------
+        30 31 32 | 40 41 42 | 50 51 52
+        33 34 35 | 43 44 45 | 53 54 55
+        36 37 38 | 46 47 48 | 56 57 58
+        ---------|----------|---------
+        60 61 62 | 70 71 72 | 80 81 82
+        63 64 65 | 73 74 75 | 83 84 85
+        66 67 68 | 76 77 78 | 86 87 88
+    */
+    if (SUBMATRIX_PRINTING) {   //for printing from a submatrix
+        for (uint8_t i = 0; i < 9; i += 3) {
+            uint8_t count = 0,
+                    offset = 0;
+            while (count < 3) {
+                for (uint8_t j = i; j < i + 3; j++) {
+                    Matrix_3x3 submatrix = get_submatrix(j);
+                    for (uint8_t k = 0; k < 3; k++) {
+                        if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
+                            attron(COLOR_PAIR(KNOWN));
+                            ::printw("%c", submatrix[k + offset]);
+                            attroff(COLOR_PAIR(KNOWN));
+                        }
+                        else {
+                            ::printw("%c", submatrix[k + offset]);
+                        }
+                    }
+
+                    if (j != 2 and j != 5 and j != 8) {
+                        ::printw("|");
+                    }
+                }
+                
+                count++;
+                offset += 3;
+                ::printw("\n");
+            }
+
+            if (i < 6) {
+                ::printw("---|---|---\n");
+            }
+        }
+    }
+    else {  //for printing using either rows or columns
+        for (uint8_t i = 0; i < 9; i++) {
+            for (uint8_t j = 0; j < 9; j++) {
+                if (COLUMN_PRINTING) {
+                    if (get_column(j)[i] >= ONE and get_column(j)[i] <= NINE) {
+                        attron(COLOR_PAIR(KNOWN));
+                        ::printw("%c", get_column(j)[i]);
+                        attroff(COLOR_PAIR(KNOWN));
+                    }
+                    else {
+                        ::printw("%c", get_column(j)[i]);
+                    }
+                }
+                else {  //if (ROW_PRINTING)
+                    if (get_row(i)[j] >= ONE and get_row(i)[j] <= NINE) {
+                        attron(COLOR_PAIR(KNOWN));
+                        ::printw("%c", get_row(i)[j]);
+                        attroff(COLOR_PAIR(KNOWN));
+                    }
+                    else {
+                        ::printw("%c", get_row(i)[j]);
+                    }
+                }
+                
+                if (j == 2 or j == 5) {
+                    ::printw("|");
+                }
+            }
+
+            ::printw("\n");
+            if (i == 2 or i == 5) {
+                ::printw("---|---|---\n");
             }
         }
     }
@@ -275,4 +367,22 @@ void Matrix_9x9::get_indeces (const uint8_t POS, uint8_t& row, uint8_t& column, 
 
     //map submatrix index
     submatrix = 3 * (column % 3) + row % 3;
+}
+
+void Matrix_9x9::set_color_pairs()
+{ 
+    start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
+                    //      terminal to test this out on, and this is the simplest thing to do without adding
+                    //      checks everywhere. If someone else knows or finds that this function doesn't work
+                    //      as intended, feel free to correct it.
+    if (has_colors()) { //color mode
+        init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+        init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
+        init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+    }
+    else {  //monochrome mode
+        init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+    }
 }

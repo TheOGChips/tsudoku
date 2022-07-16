@@ -1,5 +1,5 @@
 #include "Matrix_3x3.hpp"
-#include <iostream> //std::cout, std::endl
+#include <ncurses.h>
 
 using namespace std;
 
@@ -40,10 +40,16 @@ uint8_t Matrix_3x3::operator [] (uint8_t index)
 
 void Matrix_3x3::print_map()
 {
-    cout << m.size() << endl;
+    //cout << m.size() << endl;
+    printw("m.size(): %d", m.size());
     for (uint8_t i = 0; i < m.size(); i++) {
-        cout << "m[" << i+0 << "]: (" << m[i].first+0 << ", " << m[i].second+0 << ")" << endl;
+        //cout << "m[" << i+0 << "]: (" << m[i].first+0 << ", " << m[i].second+0 << ")" << endl;
+        printw("m[%u]: (%u, %u)\t", i, m[i].first, m[i].second);
     }
+    printw("\n");
+    refresh();
+    getch();
+    clear();
 }
 
 bool Matrix_3x3::value_exists (uint8_t value)
