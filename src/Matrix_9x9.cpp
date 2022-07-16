@@ -28,13 +28,7 @@ Matrix_9x9::~Matrix_9x9 ()
 {
     endwin();   //terminate ncurses session
 }
-/*
-ostream& operator << (ostream& os, const Matrix_9x9 mat)
-{
-    mat.print();
-    return os;
-}
-*/
+
 #if false
 void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
@@ -117,6 +111,7 @@ void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTIN
     }
 }
 #endif
+
 void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*

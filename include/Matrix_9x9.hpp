@@ -37,7 +37,6 @@ class Matrix_9x9 {
         Column& get_column (uint8_t);
         //void print(const bool, const bool);
         void printw(const bool, const bool);    //the one to call while using ncurses
-        //friend ostream& operator << (ostream&, Matrix_9x9);
 };
 
 #endif
