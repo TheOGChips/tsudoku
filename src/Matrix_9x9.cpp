@@ -14,16 +14,6 @@ Matrix_9x9::Matrix_9x9 ()
     generator = mt19937(seed);
     dist = uniform_int_distribution<uint8_t>(1, 9);
     set_starting_positions(17);
-
-    //Start ncurses
-    initscr();
-    //establish color support and color pairs
-    set_color_pairs();
-}
-
-Matrix_9x9::~Matrix_9x9 ()
-{
-    endwin();   //terminate ncurses session
 }
 
 #if false
@@ -367,22 +357,4 @@ void Matrix_9x9::get_indeces (const uint8_t POS, uint8_t& row, uint8_t& column, 
 
     //map submatrix index
     submatrix = 3 * (column % 3) + row % 3;
-}
-
-void Matrix_9x9::set_color_pairs()
-{ 
-    start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
-                    //      terminal to test this out on, and this is the simplest thing to do without adding
-                    //      checks everywhere. If someone else knows or finds that this function doesn't work
-                    //      as intended, feel free to correct it.
-    if (has_colors()) { //color mode
-        init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
-        init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
-        init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
-    }
-    else {  //monochrome mode
-        init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
-    }
 }

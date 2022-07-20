@@ -1,5 +1,6 @@
 #include "sudoku.hpp"
 #include <ncurses.h>
+#include "colors.hpp"
 
 using namespace std;
 
@@ -12,6 +13,11 @@ Sudoku::Sudoku ()
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
     map<uint8_t, cell> sudoku_map = create_map();
+
+    //Start ncurses
+    initscr();
+    //establish color support and color pairs
+    set_color_pairs();
 
     if (DEBUG) {
         //cout <<  << endl;
@@ -54,6 +60,11 @@ Sudoku::Sudoku ()
     }*/
 }
 
+Sudoku::~Sudoku()
+{
+    endwin();   //terminate ncurses session
+}
+
 map<uint8_t, cell> Sudoku::create_map()
 {
     map<uint8_t, cell> m;
@@ -65,4 +76,22 @@ map<uint8_t, cell> Sudoku::create_map()
     }
 
     return m;
+}
+
+void Sudoku::set_color_pairs()
+{ 
+    start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
+                    //      terminal to test this out on, and this is the simplest thing to do without adding
+                    //      checks everywhere. If someone else knows or finds that this function doesn't work
+                    //      as intended, feel free to correct it.
+    if (has_colors()) { //color mode
+        init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+        init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
+        init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+    }
+    else {  //monochrome mode
+        init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+    }
 }

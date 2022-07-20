@@ -28,11 +28,10 @@ class Matrix_9x9 {
         uint8_t map_submatrix (const uint8_t, const uint8_t);
         uint8_t next_value();
         void get_indeces (const uint8_t, uint8_t&, uint8_t&, uint8_t&);
-        void set_color_pairs();
 
     public:
         Matrix_9x9();
-        ~Matrix_9x9();
+        ~Matrix_9x9() {}
         Matrix_3x3& get_submatrix (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);

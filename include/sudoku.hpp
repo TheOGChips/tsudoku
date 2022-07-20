@@ -12,10 +12,11 @@ class Sudoku {
         Matrix_9x9 mat;
 
         map<uint8_t, cell> create_map();
+        void set_color_pairs();
         
     public:
         Sudoku();
-        ~Sudoku() {}
+        ~Sudoku();
 };
 
 #endif
