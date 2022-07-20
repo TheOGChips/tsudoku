@@ -6,7 +6,16 @@
 
 using namespace std;
 
-Matrix_9x9 sudoku_init();
-map<uint8_t, cell> create_map();
+class Sudoku {
+    private:
+        uint8_t display_matrix[27][27];
+        Matrix_9x9 mat;
+
+        map<uint8_t, cell> create_map();
+        
+    public:
+        Sudoku();
+        ~Sudoku() {}
+};
 
 #endif
