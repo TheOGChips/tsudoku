@@ -12,7 +12,7 @@ Sudoku::Sudoku ()
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
-    //map<cell, cell> display_map = create_map();
+    _map_ = this->create_map();
 
     //Start ncurses
     initscr();
@@ -25,6 +25,12 @@ Sudoku::Sudoku ()
         for (uint8_t i = 0; i < mat.get_map_size(); i++) {
             //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
             ::printw("m[%u]: (%u, %u)", i, mat.get_map(i).first, mat.get_map(i).second);
+            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+        }
+        ::printw("\n\n");
+        for (uint8_t i = 0; i < _map_.size(); i++) {
+            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
+            ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
             (i+1) % 9 ? ::printw("\t") : ::printw("\n");
         }
         refresh();  //TODO: Consider putting these three functions into one if used like this more often
@@ -65,9 +71,23 @@ Sudoku::~Sudoku()
     endwin();   //terminate ncurses session
 }
 
-/*map<cell, cell> create_map()
+map<uint8_t, cell> Sudoku::create_map()
 {
-}*/
+    map<uint8_t, cell> m;
+    uint8_t row = 1,
+            column = 1;
+
+    for (uint8_t i = 0; i < mat.get_map_size(); i++) {
+        m[i] = cell(row, column);
+        column += 3;
+        if (column / 27) {
+            column %= 27;
+            row += 3;
+        }
+    }
+
+    return m;
+}
 
 void Sudoku::set_color_pairs()
 { 

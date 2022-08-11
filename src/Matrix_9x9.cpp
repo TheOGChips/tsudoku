@@ -366,7 +366,8 @@ map<uint8_t, cell> Matrix_9x9::create_map()
 
     for (uint8_t i = 0; i < 9; i++) {
         for (uint8_t j = 0; j < 9; j++) {
-            m[i * 9 + j] = pair<uint8_t, uint8_t>(i, j);
+            //m[i * 9 + j] = pair<uint8_t, uint8_t>(i, j);
+            m[i * 9 + j] = cell(i, j);
         }
     }
 
