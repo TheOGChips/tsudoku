@@ -8,15 +8,18 @@ using namespace std;
 
 class Sudoku {
     private:
-        uint8_t display_matrix[27][27];
+        uint8_t display_matrix[27][27] = {};
         Matrix_9x9 mat;
+        map<cell, cell> _map_;
 
-        map<uint8_t, cell> create_map();
+        map<cell, cell> create_map();
         void set_color_pairs();
         
     public:
         Sudoku();
         ~Sudoku();
+        void init_display_matrix();
+        void printw(/*const bool, const bool*/);
 };
 
 #endif

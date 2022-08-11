@@ -13,7 +13,7 @@ typedef pair<uint8_t, uint8_t> cell;
 class Matrix_3x3 {
     private:
         char mat[3][3];
-        map<uint8_t, cell> m;
+        map<uint8_t, cell> _map_;
         map<uint8_t, cell> create_map();
 
     public:

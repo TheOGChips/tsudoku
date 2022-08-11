@@ -7,6 +7,7 @@ using namespace std;
 
 Matrix_9x9::Matrix_9x9 ()
 {
+    _map_ = this->create_map();
     init_positions();
     time_t seed = time(nullptr);
     position_generator = mt19937(seed);
@@ -357,4 +358,27 @@ void Matrix_9x9::get_indeces (const uint8_t POS, uint8_t& row, uint8_t& column, 
 
     //map submatrix index
     submatrix = 3 * (column % 3) + row % 3;
+}
+
+map<uint8_t, cell> Matrix_9x9::create_map()
+{
+    map<uint8_t, cell> m;
+
+    for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t j = 0; j < 9; j++) {
+            m[i * 9 + j] = pair<uint8_t, uint8_t>(i, j);
+        }
+    }
+
+    return m;
+}
+
+const cell Matrix_9x9::get_map (uint8_t index)
+{
+    return _map_[index];
+}
+
+uint8_t Matrix_9x9::get_map_size() const
+{
+    return _map_.size();
 }
