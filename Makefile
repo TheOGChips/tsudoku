@@ -1,5 +1,5 @@
 COMPILER = clang++
-INCLUDE = -I include/
+INCLUDE = -I include/ -std=c++11
 COMPILE = $(COMPILER) -c $(INCLUDE)
 LIBS = lib
 LINK = $(COMPILER) $(LIBS)/*.o -o
