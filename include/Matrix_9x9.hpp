@@ -19,7 +19,7 @@ class Matrix_9x9 {
                 generator;
         uniform_int_distribution<uint8_t> position_dist,
                                           dist;
-        map<uint8_t, cell> _map_;
+        map<uint8_t, cell> _map_;   //maps 81 positions to positions on 9x9 matrix
 
         void init_positions();
         void set_starting_positions (uint8_t);
@@ -28,7 +28,9 @@ class Matrix_9x9 {
         uint8_t map_column (const uint8_t);
         uint8_t map_submatrix (const uint8_t, const uint8_t);
         uint8_t next_value();
-        void get_indeces (const uint8_t, uint8_t&, uint8_t&, uint8_t&);
+        uint8_t get_row_index (const uint8_t);
+        uint8_t get_column_index (const uint8_t);
+        uint8_t get_submatrix_index (const uint8_t);
         map<uint8_t, cell> create_map();
 
     public:
@@ -41,6 +43,9 @@ class Matrix_9x9 {
         void printw(const bool, const bool);    //the one to call while using ncurses
         const cell get_map(uint8_t);
         uint8_t get_map_size() const;
+        uint8_t at(uint8_t);
+        uint8_t operator [] (uint8_t);
+        bool is_known (uint8_t);
 };
 
 #endif

@@ -242,7 +242,9 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
         }
 
         //Get indeces for particular row, column, and submatrix
-        get_indeces(pos, index_row, index_column, index_submatrix);
+        index_row = get_row_index(pos);
+        index_column = get_column_index(pos);
+        index_submatrix = get_submatrix_index(pos);
         value += 48;    //convert in order to display proper character
         row.set_value(index_row, value);
         column.set_value(index_column, value);
@@ -334,7 +336,7 @@ uint8_t Matrix_9x9::next_value()
     return dist(generator);
 }
 
-void Matrix_9x9::get_indeces (const uint8_t POS, uint8_t& row, uint8_t& column, uint8_t& submatrix)
+uint8_t Matrix_9x9::get_row_index (const uint8_t POS)
 {
     /*
                 NUMBERED (0-80)                NUMBERED (ROW x COLUMN)
@@ -351,13 +353,21 @@ void Matrix_9x9::get_indeces (const uint8_t POS, uint8_t& row, uint8_t& column, 
         72 73 74 | 75 76 77 | 78 79 80      80 81 82 | 83 84 85 | 86 87 88
     */
     //map row index
-    row = POS % 9;
+    return POS % 9;
+}
 
+uint8_t Matrix_9x9::get_column_index (const uint8_t POS)
+{
     //map column index
-    column = POS / 9;
+    return POS / 9;
+}
 
+uint8_t Matrix_9x9::get_submatrix_index (const uint8_t POS)
+{
+    uint8_t row = get_row_index(POS),
+            column = get_column_index (POS);
     //map submatrix index
-    submatrix = 3 * (column % 3) + row % 3;
+    return 3 * (column % 3) + row % 3;
 }
 
 map<uint8_t, cell> Matrix_9x9::create_map()
@@ -382,4 +392,21 @@ const cell Matrix_9x9::get_map (uint8_t index)
 uint8_t Matrix_9x9::get_map_size() const
 {
     return _map_.size();
+}
+
+uint8_t Matrix_9x9::at(uint8_t index)
+{
+    return get_row(map_row(index))[get_row_index(index)];
+    //return get_column(map_column(index))[get_column_index(index)];
+    //return get_submatrix(map_submatrix_index(index))[get_submatrix_index(index)];
+}
+//TODO: Make parameter const in all classes with this operator
+uint8_t Matrix_9x9::operator [] (uint8_t index)
+{
+    return at(index);
+}
+
+bool Matrix_9x9::is_known (uint8_t index)
+{
+    return positions[index];
 }

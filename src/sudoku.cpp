@@ -64,6 +64,8 @@ Sudoku::Sudoku ()
             cout << mat.next()+0 << endl;
         }
     }*/
+
+    init_display_matrix();
 }
 
 Sudoku::~Sudoku()
@@ -109,7 +111,7 @@ void Sudoku::set_color_pairs()
 
 void Sudoku::init_display_matrix()
 {
-    /*  TODO: Will need a way to map the 9x9 matrix to the special values in the display matrix
+    /*
          0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
          1,0  1,1            1,4            1,7      |       1,10              1,13              1,16       |        1,19              1,22              1,25
          2,0                                         |                                                      |
@@ -140,8 +142,56 @@ void Sudoku::init_display_matrix()
         25,0 25,1           25,4           25,7      |      25,10             25,13             25,16       |       25,19             25,22             25,25
         26,0                                         |                                                      |
     */
+
+    //initialize display matrix with blank spaces
+    for (uint8_t i = 0; i < 27; i++) {
+        for (uint8_t j = 0; j < 27; j++) {
+            display_matrix[i][j] = ' ';
+        }
+    }
+
+    for (uint8_t i = 0; i < _map_.size(); i++) {
+        cell coords = _map_[i];
+        display_matrix[coords.first][coords.second] = mat[i];
+    }
 }
 
 void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
 {
+    if (DEBUG) {
+        ::printw("Printing display matrix...\n");
+    }
+    
+    for (uint8_t i = 0; i < 27; i++) {
+        for (uint8_t j = 0; j < 27; j++) {
+            ::printw("%c", display_matrix[i][j]);
+            if (j == 8 or j == 17) {
+                ::printw("|");
+            }
+        }
+        ::printw("\n");
+        if (i == 8 or i == 17) {
+            ::printw("---------|---------|---------\n");
+        }
+    }
+
+    //TODO: Save cursor position
+    for (uint8_t i = 0; i < _map_.size(); i++) {
+        cell coords = _map_[i];
+        move(coords.first, coords.second);  //Move cursor to position
+        if (mat.is_known(i)) {
+            attron(COLOR_PAIR(KNOWN));  //Turn color scheme on
+            ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
+            attroff(COLOR_PAIR(KNOWN));//Turn color scheme off
+        }
+    }
+    //TODO: Restore cursor position
+}
+
+void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
+{
+    uint8_t total_offsety = YCOORD + INIT_OFFSETY + (YCOORD / 9),
+            total_offsetx = XCOORD + INIT_OFFSETX + (XCOORD / 9);
+
+    ::move(total_offsety, total_offsetx);
 }
