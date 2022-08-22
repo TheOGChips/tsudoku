@@ -161,7 +161,7 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
     if (DEBUG) {
         ::printw("Printing display matrix...\n");
     }
-    
+    //TODO: Move display matrix based on INIT_OFFSETY and INIT_OFFSETX
     for (uint8_t i = 0; i < 27; i++) {
         for (uint8_t j = 0; j < 27; j++) {
             ::printw("%c", display_matrix[i][j]);
@@ -175,7 +175,10 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
         }
     }
 
-    //TODO: Save cursor position
+    //NOTE: Not needed currently, but probably will be later
+    /*uint16_t posx,
+             posy;
+    getyx(stdscr, posy, posx);*/
     for (uint8_t i = 0; i < _map_.size(); i++) {
         cell coords = _map_[i];
         move(coords.first, coords.second);  //Move cursor to position
@@ -185,7 +188,7 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
             attroff(COLOR_PAIR(KNOWN));//Turn color scheme off
         }
     }
-    //TODO: Restore cursor position
+    ::move(INIT_OFFSETY, INIT_OFFSETX); //NOTE: Will probably need to be moved outside this function
 }
 
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
