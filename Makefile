@@ -16,31 +16,31 @@ TGT = $(SUDOKU).exe
 .PHONY: all run clean
 
 all:	$(OBJ)
-		mkdir -p $(LIBS)
-		-mv $(?F) $(LIBS)/
-		$(LINK) $(TGT) -lncurses
+	mkdir -p $(LIBS)
+	-mv $(?F) $(LIBS)/
+	$(LINK) $(TGT) -lncurses
 
 $(LIBS)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
-					$(COMPILE) $<
+			$(COMPILE) $<
 
 $(LIBS)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
-						$(COMPILE) $<
+			$(COMPILE) $<
 
 $(LIBS)/$(ROW).o:	$(SRC)/$(ROW).cpp
-					$(COMPILE) $<
+			$(COMPILE) $<
 
 $(LIBS)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
-						$(COMPILE) $<
+			$(COMPILE) $<
 
 $(LIBS)/$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
-							$(COMPILE) $<
+				$(COMPILE) $<
 
 $(LIBS)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
-							$(COMPILE) $<
+				$(COMPILE) $<
 
-run: $(TGT)
-	 ./$<
+run:	$(TGT)
+	./$<
 
 clean:	$(TGT)
-		rm $< $(LIBS)/*.o
-		rmdir $(LIBS)
+	rm $< $(LIBS)/*.o
+	rmdir $(LIBS)
