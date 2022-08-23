@@ -2,6 +2,8 @@
 #include <ncurses.h>
 #include "colors.hpp"
 
+#undef getch
+
 using namespace std;
 
 const bool DEBUG = true;
@@ -18,6 +20,9 @@ Sudoku::Sudoku ()
     initscr();
     //establish color support and color pairs
     set_color_pairs();
+    cbreak();   //TODO: Will need to account for signal handling
+    noecho();
+    keypad(stdscr, true);
 
     if (DEBUG) {
         //cout <<  << endl;
@@ -70,6 +75,7 @@ Sudoku::Sudoku ()
 
 Sudoku::~Sudoku()
 {
+    nocbreak();
     endwin();   //terminate ncurses session
 }
 
@@ -209,4 +215,24 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
             total_offsetx = XCOORD + ORIGIN.second + (XCOORD / 9);
 
     ::move(total_offsety, total_offsetx);
+}
+
+void Sudoku::refresh ()
+{
+    ::refresh();
+}
+
+int Sudoku::getch()
+{
+    return ::wgetch(stdscr);
+}
+
+void Sudoku::clear()
+{
+    ::clear();
+}
+
+void Sudoku::start_game()
+{
+    getch();
 }

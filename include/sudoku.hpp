@@ -18,6 +18,8 @@ class Sudoku {
 
         map<uint8_t, cell> create_map();
         void set_color_pairs();
+        //TODO: Start menu, accessed from constructor before generating a new puzzle.
+        //      Can resume saved puzzle instead.
         
     public:
         Sudoku();
@@ -25,6 +27,11 @@ class Sudoku {
         void init_display_matrix();
         void printw(/*const bool, const bool*/);
         void move (uint8_t y, uint8_t x);
+        void refresh();
+        int getch();
+        void clear();
+        //TODO: Start the game
+        void start_game();
 };
 
 #endif
