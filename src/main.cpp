@@ -4,7 +4,7 @@
 int main ()
 {
     Sudoku puzzle;  //initialize a sudoku puzzle
-    //TODO: Get 27x27 matrix to print out correctly
+    //TODO: Get user input to work correctly
     puzzle.printw();
     refresh();
     getch();

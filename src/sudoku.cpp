@@ -98,7 +98,8 @@ void Sudoku::set_color_pairs()
                     //      checks everywhere. If someone else knows or finds that this function doesn't work
                     //      as intended, feel free to correct it.
     if (has_colors()) { //color mode
-        init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+        //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+        init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
     }
@@ -161,17 +162,23 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
     if (DEBUG) {
         ::printw("Printing display matrix...\n");
     }
-    //TODO: Move display matrix based on INIT_OFFSETY and INIT_OFFSETX
+
+    //::move(INIT_OFFSETY, INIT_OFFSETX);
     for (uint8_t i = 0; i < 27; i++) {
+        move(i, 0);
         for (uint8_t j = 0; j < 27; j++) {
             ::printw("%c", display_matrix[i][j]);
             if (j == 8 or j == 17) {
                 ::printw("|");
             }
         }
-        ::printw("\n");
+        //::printw("\n");
         if (i == 8 or i == 17) {
-            ::printw("---------|---------|---------\n");
+            //::move(i + INIT_OFFSETY + (i / 9) + 1, INIT_OFFSETX);
+            ::move(i + ORIGIN.first + (i / 9) + 1, ORIGIN.second);
+            //move(i, 0);
+            //::printw("---------|---------|---------\n");
+            ::printw("---------|---------|---------");
         }
     }
 
@@ -187,14 +194,19 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
             ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
             attroff(COLOR_PAIR(KNOWN));//Turn color scheme off
         }
+        else {
+            attron(COLOR_PAIR(UNKNOWN));
+            ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
+            attroff(COLOR_PAIR(UNKNOWN));
+        }
     }
-    ::move(INIT_OFFSETY, INIT_OFFSETX); //NOTE: Will probably need to be moved outside this function
+    ::move(ORIGIN.first, ORIGIN.second); //NOTE: Will probably need to be moved outside this function
 }
 
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
 {
-    uint8_t total_offsety = YCOORD + INIT_OFFSETY + (YCOORD / 9),
-            total_offsetx = XCOORD + INIT_OFFSETX + (XCOORD / 9);
+    uint8_t total_offsety = YCOORD + ORIGIN.first + (YCOORD / 9),
+            total_offsetx = XCOORD + ORIGIN.second + (XCOORD / 9);
 
     ::move(total_offsety, total_offsetx);
 }
