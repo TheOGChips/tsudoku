@@ -2,7 +2,8 @@
 #include <ncurses.h>
 #include "colors.hpp"
 
-#undef getch
+#undef getch        //redefined as Sudoku::getch()
+#undef KEY_ENTER    //redefined in Sudoku::start_game()
 
 using namespace std;
 
@@ -206,7 +207,6 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
             attroff(COLOR_PAIR(UNKNOWN));
         }
     }
-    ::move(ORIGIN.first, ORIGIN.second); //NOTE: Will probably need to be moved outside this function
 }
 
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
@@ -215,6 +215,57 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
             total_offsetx = XCOORD + ORIGIN.second + (XCOORD / 9);
 
     ::move(total_offsety, total_offsetx);
+    getyx(stdscr, cursor_pos.first, cursor_pos.second); //update cursor_pos after moving
+}
+
+void Sudoku::move (const uint16_t KEY)
+{
+    static const uint8_t MAX_YBOUNDARY = ORIGIN.first + 28,
+                         MAX_XBOUNDARY = ORIGIN.second + 28;
+
+    switch (KEY) {
+        case KEY_DOWN:  if (cursor_pos.first < MAX_YBOUNDARY) {
+                            if (is_border(cursor_pos.first + 1, cursor_pos.second)) {
+                                ::move(cursor_pos.first + 2, cursor_pos.second);
+                            }
+                            else {
+                                ::move(cursor_pos.first + 1, cursor_pos.second);
+                            }
+                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
+                        }
+                        break;
+        case KEY_UP:    if (cursor_pos.first > ORIGIN.first) {
+                            if (is_border(cursor_pos.first - 1, cursor_pos.second)) {
+                                ::move(cursor_pos.first - 2, cursor_pos.second);
+                            }
+                            else {
+                                ::move(cursor_pos.first - 1, cursor_pos.second);
+                            }
+                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
+                        }
+                        break;
+        case KEY_LEFT:  if (cursor_pos.second > ORIGIN.second) {
+                            if (is_border(cursor_pos.first, cursor_pos.second - 1)) {
+                                ::move(cursor_pos.first, cursor_pos.second - 2);
+                            }
+                            else {
+                                ::move(cursor_pos.first, cursor_pos.second - 1);
+                            }
+                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
+                        }
+                        break;
+        case KEY_RIGHT: if (cursor_pos.second < MAX_XBOUNDARY) {
+                            if (is_border(cursor_pos.first, cursor_pos.second + 1)) {
+                                ::move(cursor_pos.first, cursor_pos.second + 2);
+                            }
+                            else {
+                                ::move(cursor_pos.first, cursor_pos.second + 1);
+                            }
+                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
+                        }
+                        break;
+        default:;   //This shouldn't ever be run because the of the switch statement in start_game
+    }
 }
 
 void Sudoku::refresh ()
@@ -222,7 +273,7 @@ void Sudoku::refresh ()
     ::refresh();
 }
 
-int Sudoku::getch()
+uint16_t Sudoku::getch()
 {
     return ::wgetch(stdscr);
 }
@@ -232,7 +283,52 @@ void Sudoku::clear()
     ::clear();
 }
 
+bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
+{
+    chtype ch = mvinch(YCOORD, XCOORD);
+    return ((ch == '|') | (ch == '-'));
+}
+
 void Sudoku::start_game()
 {
-    getch();
+    //Load and display the new or saved puzzle
+    printw();
+    ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
+    cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
+    refresh();
+
+    const uint8_t KEY_ENTER = 10;   //NOTE: This is the Enter key on the main keyboard. The original
+    bool quit_game = false;         //      KEY_ENTER refers to the one on the number pad, but that
+                                    //      one doesn't seem to work as expected anyway.
+    do {
+        uint16_t input = getch();
+        //TODO: Finish out all cases in this switch statement
+        switch(input) {
+            case KEY_DOWN: move(KEY_DOWN);
+                           break;
+            case KEY_UP: move(KEY_UP);
+                         break;
+            case KEY_LEFT: move(KEY_LEFT);
+                           break;
+            case KEY_RIGHT: move(KEY_RIGHT);
+                            break;
+            //TODO: Check if current cell is a red number (can't be changed)
+            //      NOTE: Use mvinch to get color attribute
+            //TODO: Place number into display matrix and logical data structures
+            //TODO: Clear 8 surrounding cells if current cell is mapped to 9x9 matrix
+            case '1': break;
+            case '2': break;
+            case '3': break;
+            case '4': break;
+            case '5': break;
+            case '6': break;
+            case '7': break;
+            case '8': break;
+            case '9': break;
+            case 'q': quit_game = true;
+                      break;
+            case KEY_ENTER: break;  //TODO: Check if puzzle is finished and valid (error-free)
+            default:;   //Nothing happens, just continue onto the next loop
+        }
+    } while (!quit_game);
 }
