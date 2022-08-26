@@ -16,8 +16,10 @@ class Sudoku {
         const cell ORIGIN = {INIT_OFFSETY, INIT_OFFSETX};*/
         const cell ORIGIN = {3, 6}; //NOTE: terminal coordinates are in (y,x) format
         cell cursor_pos;
+        map<cell, cell> display_matrix_offset;
 
         map<uint8_t, cell> create_map();
+        void map_display_matrix_offset (const uint8_t, const uint8_t);
         void set_color_pairs();
         //TODO: Start menu, accessed from constructor before generating a new puzzle.
         //      Can resume saved puzzle instead.
@@ -29,6 +31,8 @@ class Sudoku {
         uint16_t getch();
         void clear();
         bool is_border (const uint8_t, const uint8_t);
+        void place_value (const uint8_t);
+        void reset_cursor();
         
     public:
         Sudoku();

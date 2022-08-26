@@ -98,6 +98,16 @@ map<uint8_t, cell> Sudoku::create_map()
     return m;
 }
 
+void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX)
+{
+    uint8_t y,
+            x;
+    getyx(stdscr, y, x);
+    cell display_indeces = {YINDEX, XINDEX},
+         coords = {y, x};
+    display_matrix_offset[coords] = display_indeces;
+}
+
 void Sudoku::set_color_pairs()
 { 
     start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
@@ -174,7 +184,9 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
     for (uint8_t i = 0; i < 27; i++) {
         move(i, 0);
         for (uint8_t j = 0; j < 27; j++) {
+            map_display_matrix_offset(i, j);
             ::printw("%c", display_matrix[i][j]);
+            //TODO: Map display_matrix to offset coordinates
             if (j == 8 or j == 17) {
                 ::printw("|");
             }
@@ -289,6 +301,67 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
     return ((ch == '|') | (ch == '-'));
 }
 
+void Sudoku::place_value (const uint8_t VALUE)
+{
+    //TODO: Add support for delete and backspace
+    //TODO: Disable adding numbers around initial values (may or may not need to be done in this function)
+    /*
+     * TODO if value is red (starting value)
+     * TODO     ignore, do nothing
+     * TODO if position is not mapped to position in 9x9 matrix
+     * TODO      place value in display matrix only
+     *           display value on screen
+     *           refresh
+     * TODO if position is mapped to position in 9x9 matrix
+     * TODO      place value in display matrix
+     * TODO      clear 8 surrounding cells
+     * TODO      refresh
+     * TODO      place into appropriate spot in appropriate row, column, and 3x3 submatrix
+     */
+    //clear();
+    // Get the 8 cells around the current cursor position
+    cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
+         T  = {cursor_pos.first - 1, cursor_pos.second},
+         TR = {cursor_pos.first - 1, cursor_pos.second + 1},
+         L  = {cursor_pos.first,     cursor_pos.second - 1},
+         R  = {cursor_pos.first,     cursor_pos.second + 1},
+         BL = {cursor_pos.first + 1, cursor_pos.second - 1},
+         B  = {cursor_pos.first + 1, cursor_pos.second},
+         BR = {cursor_pos.first + 1, cursor_pos.second + 1};
+    chtype ch = inch();
+    //::mvprintw(20, 100, "ch: %u\n", ch);
+    //::mvprintw(21, 100, "COLOR_RED: %d\n", COLOR_RED);
+    //::mvprintw(22, 100, "A_COLOR: %d\n", A_COLOR);
+    //::mvprintw(23, 100, "COLOR_PAIR(KNOWN): %d\n", COLOR_PAIR(KNOWN));
+    //::mvprintw(24, 100, "ch & A_COLOR: %d\n", ch & A_COLOR);
+    //::refresh();
+    if ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (ch & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
+        (mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN)    ) reset_cursor();
+    //else if ((ch & A_CHARTEXT) == '?') {}
+    else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}
+    else {
+        reset_cursor();
+        uint8_t y = display_matrix_offset[cursor_pos].first,
+                x = display_matrix_offset[cursor_pos].second;
+        display_matrix[y][x] = VALUE;
+        ::printw("%c", VALUE);
+        refresh();
+    }
+    reset_cursor(); //have cursor maintain position after printing
+}
+
+void Sudoku::reset_cursor ()
+{
+    ::move(cursor_pos.first, cursor_pos.second);
+}
+
 void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
@@ -303,20 +376,38 @@ void Sudoku::start_game()
     do {
         uint16_t input = getch();
         //TODO: Finish out all cases in this switch statement
-        switch(input) {
-            case KEY_DOWN: move(KEY_DOWN);
+        //switch(input) {
+        if (input == 'q') {     //NOTE: This check has to be here first for this to work.
+            quit_game = true;   //      Not sure why.
+        }
+        else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
+            move(input);
+        }
+        else if (input >= '1' and input <= '9') {
+            place_value(input);
+        }
+        else if (KEY_ENTER) {
+            uint8_t y = display_matrix_offset[cursor_pos].first,
+                    x = display_matrix_offset[cursor_pos].second;
+            ::mvprintw(20, 100, "    cursor_pos[%d][%d]: ", cursor_pos.first, cursor_pos.second);
+            ::mvprintw(21, 100, "display_matrix[%d][%d]: %d", y, x, display_matrix[y][x]);
+            refresh();
+            reset_cursor();
+        }
+
+            /*case KEY_DOWN: move(KEY_DOWN);
                            break;
             case KEY_UP: move(KEY_UP);
                          break;
             case KEY_LEFT: move(KEY_LEFT);
                            break;
             case KEY_RIGHT: move(KEY_RIGHT);
-                            break;
+                            break;*/
             //TODO: Check if current cell is a red number (can't be changed)
             //      NOTE: Use mvinch to get color attribute
             //TODO: Place number into display matrix and logical data structures
             //TODO: Clear 8 surrounding cells if current cell is mapped to 9x9 matrix
-            case '1': break;
+            /*case '1': break;
             case '2': break;
             case '3': break;
             case '4': break;
@@ -327,8 +418,8 @@ void Sudoku::start_game()
             case '9': break;
             case 'q': quit_game = true;
                       break;
-            case KEY_ENTER: break;  //TODO: Check if puzzle is finished and valid (error-free)
-            default:;   //Nothing happens, just continue onto the next loop
-        }
+            case KEY_ENTER: break;*/  //TODO: Check if puzzle is finished and valid (error-free)
+            //default:;   //Nothing happens, just continue onto the next loop
+        //}
     } while (!quit_game);
 }
