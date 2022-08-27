@@ -102,6 +102,14 @@ void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTIN
 
 void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
+    uint8_t y,
+            x;
+    getyx(stdscr, y, x);
+    mvprintw(y, x, COLUMN_PRINTING, SUBMATRIX_PRINTING);
+}
+
+void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
+{
     /*
             NUMBERED (ROW x COLUMN)
         00 01 02 | 10 11 12 | 20 21 22
@@ -116,11 +124,17 @@ void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTI
         63 64 65 | 73 74 75 | 83 84 85
         66 67 68 | 76 77 78 | 86 87 88
     */
+    uint8_t y = YCOORD,
+            x = XCOORD;
+    //move(YCOORD, XCOORD);
+    //getyx(stdscr, y, x);
+
     if (SUBMATRIX_PRINTING) {   //for printing from a submatrix
         for (uint8_t i = 0; i < 9; i += 3) {
             uint8_t count = 0,
                     offset = 0;
             while (count < 3) {
+                move(y, x);
                 for (uint8_t j = i; j < i + 3; j++) {
                     Matrix_3x3 submatrix = get_submatrix(j);
                     for (uint8_t k = 0; k < 3; k++) {
@@ -141,16 +155,21 @@ void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTI
                 
                 count++;
                 offset += 3;
-                ::printw("\n");
+                y++;
+                //x++;
+                //::printw("\n");
             }
 
             if (i < 6) {
-                ::printw("---|---|---\n");
+                //::printw("---|---|---\n");
+                ::mvprintw(y, x, "---|---|---");
+                y++;
             }
         }
     }
     else {  //for printing using either rows or columns
         for (uint8_t i = 0; i < 9; i++) {
+            move(y, x);
             for (uint8_t j = 0; j < 9; j++) {
                 if (COLUMN_PRINTING) {
                     if (get_column(j)[i] >= ONE and get_column(j)[i] <= NINE) {
@@ -178,10 +197,14 @@ void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTI
                 }
             }
 
-            ::printw("\n");
+            //::printw("\n");
+            //y++;
             if (i == 2 or i == 5) {
-                ::printw("---|---|---\n");
+                //::printw("---|---|---\n");
+                ::mvprintw(y + 1, x, "---|---|---");
+                y += 2;
             }
+            else y++;
         }
     }
 }
