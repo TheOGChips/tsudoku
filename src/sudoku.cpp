@@ -15,7 +15,7 @@ Sudoku::Sudoku ()
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
-    _map_ = this->create_map();
+    create_map();
 
     //Start ncurses
     initscr();
@@ -39,6 +39,12 @@ Sudoku::Sudoku ()
             ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
             (i+1) % 9 ? ::printw("\t") : ::printw("\n");
         }
+        ::printw("\n\n");
+        for (uint8_t i = 0; i < _rev_map_.size(); i++) {
+            ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
+            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+        }
+        //NOTE: The mapping appears to be correct according to the printout, so why is adding new values not working as expected?
         refresh();  //TODO: Consider putting these three functions into one if used like this more often
         getch();
         clear();
@@ -80,14 +86,17 @@ Sudoku::~Sudoku()
     endwin();   //terminate ncurses session
 }
 
-map<uint8_t, cell> Sudoku::create_map()
+//map<uint8_t, cell> Sudoku::create_map()
+void Sudoku::create_map()
 {
-    map<uint8_t, cell> m;
+    //map<uint8_t, cell> m;
     uint8_t row = 1,
             column = 1;
 
     for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-        m[i] = cell(row, column);
+        //m[i] = cell(row, column);
+        _map_[i] = cell(row, column);
+        _rev_map_[cell(row, column)] = i;
         column += 3;
         if (column / 27) {
             column %= 27;
@@ -95,7 +104,7 @@ map<uint8_t, cell> Sudoku::create_map()
         }
     }
 
-    return m;
+    //return m;
 }
 
 void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX)
@@ -118,12 +127,14 @@ void Sudoku::set_color_pairs()
         //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
-        init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+        init_pair(GUESS, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(TEMP, COLOR_GREEN, COLOR_BLACK);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+        init_pair(TEMP, COLOR_WHITE, COLOR_BLACK);
     }
 }
 
@@ -186,7 +197,6 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
         for (uint8_t j = 0; j < 27; j++) {
             map_display_matrix_offset(i, j);
             ::printw("%c", display_matrix[i][j]);
-            //TODO: Map display_matrix to offset coordinates
             if (j == 8 or j == 17) {
                 ::printw("|");
             }
@@ -304,19 +314,18 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
 void Sudoku::place_value (const uint8_t VALUE)
 {
     //TODO: Add support for delete and backspace
-    //TODO: Disable adding numbers around initial values (may or may not need to be done in this function)
     /*
-     * TODO if value is red (starting value)
-     * TODO     ignore, do nothing
-     * TODO if position is not mapped to position in 9x9 matrix
-     * TODO      place value in display matrix only
-     *           display value on screen
-     *           refresh
-     * TODO if position is mapped to position in 9x9 matrix
-     * TODO      place value in display matrix
-     * TODO      clear 8 surrounding cells
-     * TODO      refresh
-     * TODO      place into appropriate spot in appropriate row, column, and 3x3 submatrix
+     * if value is red (starting value)
+     *      ignore, do nothing
+     * if position is not mapped to position in 9x9 matrix
+     *      place value in display matrix only
+     *      display value on screen
+     *      refresh
+     * if position is mapped to position in 9x9 matrix
+     *      place value in display matrix
+     *      clear 8 surrounding cells
+     *      refresh
+     *      place into appropriate spot in appropriate row, column, and 3x3 submatrix
      */
     //clear();
     // Get the 8 cells around the current cursor position
@@ -345,16 +354,70 @@ void Sudoku::place_value (const uint8_t VALUE)
         (mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
         (mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN)    ) reset_cursor();
     //else if ((ch & A_CHARTEXT) == '?') {}
-    else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}
     else {
         reset_cursor();
+
+        if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(TEMP)) {
+            mvprintw(TL.first, TL.second, " ");
+            mvprintw( T.first,  T.second, " ");
+            mvprintw(TR.first, TR.second, " ");
+            mvprintw( L.first,  L.second, " ");
+            mvprintw( R.first,  R.second, " ");
+            mvprintw(BL.first, BL.second, " ");
+            mvprintw( B.first,  B.second, " ");
+            mvprintw(BR.first, BR.second, " ");
+            attron(COLOR_PAIR(TEMP));
+            mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
+            attroff(COLOR_PAIR(TEMP));
+
+            uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
+                    row_number = mat.map_row(index),
+                    column_number = mat.map_column(index);
+
+            Row &row = mat.get_row(row_number);
+            Column &column = mat.get_column(column_number);
+            Matrix_3x3 &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
+
+            row.set_value(mat.get_row_index(index), VALUE);
+            column.set_value(mat.get_column_index(index), VALUE);
+            submatrix.set_value(mat.get_submatrix_index(index), VALUE);
+
+            if (DEBUG) {
+                enum print_by {row, column, submatrix};
+                for (uint8_t i = row; i <= submatrix; i++) {
+                    //::mvprintw(9, 40 + 20 * i, "Printing by ");
+                    ::move(9, 40 + 20 * i);
+                    if (i == submatrix) {
+                        ::printw("submatrix");
+                    }
+                    else if (i == column) {
+                        ::printw("column");
+                    }
+                    else {
+                        ::printw("row");
+                    }
+                    mat.mvprintw(10, 40 + 20 * i, i & column, i & submatrix);
+                    refresh();  //flush output to screen
+                    //getch();    //wait for user input
+                    //clear();    //clear the screen
+                }
+
+                ::mvprintw(25, 40 + 20, "index: %d", index);
+                ::mvprintw(26, 40 + 20, "row #: %d", row_number);
+                ::mvprintw(27, 40 + 20, "col #: %d", column_number);
+                refresh();
+            }
+        }
+        else {
+            ::printw("%c", VALUE);  //TODO: Make this a yellow or brown color
+        }
+
         uint8_t y = display_matrix_offset[cursor_pos].first,
                 x = display_matrix_offset[cursor_pos].second;
         display_matrix[y][x] = VALUE;
-        ::printw("%c", VALUE);
         refresh();
     }
-    reset_cursor(); //have cursor maintain position after printing
+    reset_cursor(); //have cursor maintain position after printing (maybe unnecessary now)
 }
 
 void Sudoku::reset_cursor ()
@@ -375,8 +438,7 @@ void Sudoku::start_game()
                                     //      one doesn't seem to work as expected anyway.
     do {
         uint16_t input = getch();
-        //TODO: Finish out all cases in this switch statement
-        //switch(input) {
+        //TODO: Finish out all cases in this do-while block
         if (input == 'q') {     //NOTE: This check has to be here first for this to work.
             quit_game = true;   //      Not sure why.
         }
@@ -387,39 +449,15 @@ void Sudoku::start_game()
             place_value(input);
         }
         else if (KEY_ENTER) {
+            #if false
             uint8_t y = display_matrix_offset[cursor_pos].first,
                     x = display_matrix_offset[cursor_pos].second;
             ::mvprintw(20, 100, "    cursor_pos[%d][%d]: ", cursor_pos.first, cursor_pos.second);
             ::mvprintw(21, 100, "display_matrix[%d][%d]: %d", y, x, display_matrix[y][x]);
             refresh();
             reset_cursor();
+            #endif
+            //TODO: Check if puzzle is finished and valid (error-free)
         }
-
-            /*case KEY_DOWN: move(KEY_DOWN);
-                           break;
-            case KEY_UP: move(KEY_UP);
-                         break;
-            case KEY_LEFT: move(KEY_LEFT);
-                           break;
-            case KEY_RIGHT: move(KEY_RIGHT);
-                            break;*/
-            //TODO: Check if current cell is a red number (can't be changed)
-            //      NOTE: Use mvinch to get color attribute
-            //TODO: Place number into display matrix and logical data structures
-            //TODO: Clear 8 surrounding cells if current cell is mapped to 9x9 matrix
-            /*case '1': break;
-            case '2': break;
-            case '3': break;
-            case '4': break;
-            case '5': break;
-            case '6': break;
-            case '7': break;
-            case '8': break;
-            case '9': break;
-            case 'q': quit_game = true;
-                      break;
-            case KEY_ENTER: break;*/  //TODO: Check if puzzle is finished and valid (error-free)
-            //default:;   //Nothing happens, just continue onto the next loop
-        //}
     } while (!quit_game);
 }

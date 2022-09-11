@@ -1,5 +1,5 @@
 #include "sudoku.hpp"
-//#include <ncurses.h>
+#include <ncurses.h>
 
 int main ()
 {
@@ -7,7 +7,10 @@ int main ()
     //TODO: Get user input to work correctly
     //TODO: Start game
     puzzle.start_game();
-    //clear();
-    
+    clear();
+    printw("sizeof(puzzle): %d B\n", sizeof(puzzle));
+    printw("sizeof(puzzle): %.7f kB", sizeof(puzzle) / 1024.0);
+    refresh();
+    getch();
     return 0;
 }

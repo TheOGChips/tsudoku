@@ -11,6 +11,7 @@ class Sudoku {
         uint8_t display_matrix[27][27] = {};
         Matrix_9x9 mat;
         map<uint8_t, cell> _map_;   //maps 81 positions to positions in 27x27 display matrix
+        map<cell, uint8_t> _rev_map_;
         /*const uint8_t INIT_OFFSETX = 6,
                       INIT_OFFSETY = 3;
         const cell ORIGIN = {INIT_OFFSETY, INIT_OFFSETX};*/
@@ -18,7 +19,8 @@ class Sudoku {
         cell cursor_pos;
         map<cell, cell> display_matrix_offset;
 
-        map<uint8_t, cell> create_map();
+        //map<uint8_t, cell> create_map();
+        void create_map();
         void map_display_matrix_offset (const uint8_t, const uint8_t);
         void set_color_pairs();
         //TODO: Start menu, accessed from constructor before generating a new puzzle.
@@ -38,7 +40,6 @@ class Sudoku {
         Sudoku();
         ~Sudoku();
 
-        //TODO: Start the game
         void start_game();
 };
 
