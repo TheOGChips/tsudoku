@@ -311,20 +311,33 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
     return ((ch == '|') | (ch == '-'));
 }
 
+array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
+{
+    array<cell, NUM_BORDER_POSITIONS> border;
+    border[TL] = {cursor_pos.first - 1, cursor_pos.second - 1};
+    border[T]  = {cursor_pos.first - 1, cursor_pos.second};
+    border[TR] = {cursor_pos.first - 1, cursor_pos.second + 1};
+    border[L]  = {cursor_pos.first,     cursor_pos.second - 1};
+    border[R]  = {cursor_pos.first,     cursor_pos.second + 1};
+    border[BL] = {cursor_pos.first + 1, cursor_pos.second - 1};
+    border[B]  = {cursor_pos.first + 1, cursor_pos.second};
+    border[TL] = {cursor_pos.first + 1, cursor_pos.second + 1};
+
+    return border;
+}
+
 bool Sudoku::do_nothing()
 {
     // Get the 8 cells around the current cursor position
-    cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
-         T  = {cursor_pos.first - 1, cursor_pos.second},
-         TR = {cursor_pos.first - 1, cursor_pos.second + 1},
-         L  = {cursor_pos.first,     cursor_pos.second - 1},
-         R  = {cursor_pos.first,     cursor_pos.second + 1},
-         BL = {cursor_pos.first + 1, cursor_pos.second - 1},
-         B  = {cursor_pos.first + 1, cursor_pos.second},
-         BR = {cursor_pos.first + 1, cursor_pos.second + 1};
-    chtype ch = inch();
+    array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
+    //chtype ch = inch();
 
-    return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+    if ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
+    for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
+        if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
+    }
+    return false;
+    /*return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
@@ -332,7 +345,7 @@ bool Sudoku::do_nothing()
            ((mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN));
+           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN));*/
 }
 
 void Sudoku::place_value (const uint8_t VALUE)

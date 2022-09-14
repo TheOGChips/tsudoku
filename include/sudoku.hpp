@@ -3,6 +3,7 @@
 
 #include "Matrix_9x9.hpp"   //cell, std::map, std::utility
 #include <cstdint>          //uint8_t
+#include <array>            //std::array
 
 using namespace std;
 
@@ -18,6 +19,8 @@ class Sudoku {
         const cell ORIGIN = {3, 6}; //NOTE: terminal coordinates are in (y,x) format
         cell cursor_pos;
         map<cell, cell> display_matrix_offset;
+        enum border_positions {TL, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS};
+        //const uint8_t NUM_POSITIONS = 8;
 
         //map<uint8_t, cell> create_map();
         void create_map();
@@ -33,6 +36,7 @@ class Sudoku {
         uint16_t getch();
         void clear();
         bool is_border (const uint8_t, const uint8_t);
+        array<cell, NUM_BORDER_POSITIONS> get_surrounding_cells();
         bool do_nothing();
         void place_value (const uint8_t);
         void reset_cursor();
