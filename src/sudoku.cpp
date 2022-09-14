@@ -1,6 +1,7 @@
 #include "sudoku.hpp"
 #include <ncurses.h>
 #include "colors.hpp"
+#include <cctype>
 
 #undef getch        //redefined as Sudoku::getch()
 #undef KEY_ENTER    //redefined in Sudoku::start_game()
@@ -380,7 +381,7 @@ bool Sudoku::do_nothing()
 
 void Sudoku::clear_surrounding_cells()
 {
-    reset_cursor();
+    //reset_cursor();
     // Get the 8 cells around the current cursor position
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
     /*::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
@@ -515,8 +516,8 @@ void Sudoku::start_game()
     do {
         uint16_t input = getch();
         //TODO: Finish out all cases in this do-while block
-        if (input == 'q') {     //NOTE: This check has to be here first for this to work.
-            quit_game = true;   //      Not sure why.
+        if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
+            quit_game = true;           //      to work. Not sure why.
         }
         else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
             move(input);
