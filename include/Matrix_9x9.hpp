@@ -40,9 +40,7 @@ class Matrix_9x9 {
         uint8_t get_column_index (const uint8_t);
         uint8_t get_submatrix_index (const uint8_t);
         //void print(const bool, const bool);
-        //TODO: Convert this to mvprintw
         void mvprintw (const uint8_t, const uint8_t, const bool, const bool);    //the one to call while using ncurses
-        //TODO: Add printw that actually just calls getyx() followed by mvprintw
         void printw (const bool, const bool);
         const cell get_map (uint8_t);
         uint8_t get_map_size() const;

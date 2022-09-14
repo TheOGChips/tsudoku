@@ -7,7 +7,7 @@ using namespace std;
 
 const uint8_t UNKNOWN = 1,
               KNOWN = 2,
-              GUESS = 3,
-              TEMP = 4;
+              NOTES = 3,
+              GUESS = 4;
 
 #endif

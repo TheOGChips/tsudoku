@@ -127,14 +127,14 @@ void Sudoku::set_color_pairs()
         //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
-        init_pair(GUESS, COLOR_YELLOW, COLOR_BLACK);
-        init_pair(TEMP, COLOR_GREEN, COLOR_BLACK);
+        init_pair(NOTES, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(NOTES, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
-        init_pair(TEMP, COLOR_WHITE, COLOR_BLACK);
     }
 }
 
@@ -313,7 +313,6 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
 
 void Sudoku::place_value (const uint8_t VALUE)
 {
-    //TODO: Add support for delete and backspace
     /*
      * if value is red (starting value)
      *      ignore, do nothing
@@ -357,7 +356,7 @@ void Sudoku::place_value (const uint8_t VALUE)
     else {
         reset_cursor();
 
-        if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(TEMP)) {
+        if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
             mvprintw(TL.first, TL.second, " ");
             mvprintw( T.first,  T.second, " ");
             mvprintw(TR.first, TR.second, " ");
@@ -366,9 +365,9 @@ void Sudoku::place_value (const uint8_t VALUE)
             mvprintw(BL.first, BL.second, " ");
             mvprintw( B.first,  B.second, " ");
             mvprintw(BR.first, BR.second, " ");
-            attron(COLOR_PAIR(TEMP));
+            attron(COLOR_PAIR(GUESS));
             mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
-            attroff(COLOR_PAIR(TEMP));
+            attroff(COLOR_PAIR(GUESS));
 
             uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
                     row_number = mat.map_row(index),
@@ -409,7 +408,11 @@ void Sudoku::place_value (const uint8_t VALUE)
             }
         }
         else {
-            ::printw("%c", VALUE);  //TODO: Make this a yellow or brown color
+            attron(COLOR_PAIR(NOTES));
+            attron(A_BOLD);
+            ::printw("%c", VALUE);
+            attroff(A_BOLD);
+            attroff(COLOR_PAIR(NOTES));
         }
 
         uint8_t y = display_matrix_offset[cursor_pos].first,
@@ -448,6 +451,7 @@ void Sudoku::start_game()
         else if (input >= '1' and input <= '9') {
             place_value(input);
         }
+        //TODO: Add support for delete and backspace
         else if (KEY_ENTER) {
             #if false
             uint8_t y = display_matrix_offset[cursor_pos].first,
