@@ -39,7 +39,7 @@ class Sudoku {
         array<cell, NUM_BORDER_POSITIONS> get_surrounding_cells();
         bool do_nothing();
         void clear_surrounding_cells();
-        void place_value (const uint8_t);
+        void place_value (const uint16_t);
         void reset_cursor();
         
     public:

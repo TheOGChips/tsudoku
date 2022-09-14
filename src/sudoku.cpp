@@ -400,7 +400,7 @@ void Sudoku::clear_surrounding_cells()
     //reset_cursor();
 }
 
-void Sudoku::place_value (const uint8_t VALUE)
+void Sudoku::place_value (const uint16_t VALUE)
 {
     /*
      * if value is red (starting value)
@@ -438,22 +438,36 @@ void Sudoku::place_value (const uint8_t VALUE)
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-            clear_surrounding_cells();
-            attron(COLOR_PAIR(GUESS));
-            mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
-            attroff(COLOR_PAIR(GUESS));
+            if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
+                if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
+                    attron(COLOR_PAIR(UNKNOWN));
+                    mvprintw(cursor_pos.first, cursor_pos.second, "?");
+                    attroff(COLOR_PAIR(UNKNOWN));
+                }
+                //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
+            }
+            else {
+                clear_surrounding_cells();
+                attron(COLOR_PAIR(GUESS));
+                mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
+                attroff(COLOR_PAIR(GUESS));
 
-            uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
-                    row_number = mat.map_row(index),
-                    column_number = mat.map_column(index);
+                uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
+                        row_number = mat.map_row(index),
+                        column_number = mat.map_column(index);
 
-            Row &row = mat.get_row(row_number);
-            Column &column = mat.get_column(column_number);
-            Matrix_3x3 &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
+                Row &row = mat.get_row(row_number);
+                Column &column = mat.get_column(column_number);
+                Matrix_3x3 &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
 
-            row.set_value(mat.get_row_index(index), VALUE);
-            column.set_value(mat.get_column_index(index), VALUE);
-            submatrix.set_value(mat.get_submatrix_index(index), VALUE);
+                row.set_value(mat.get_row_index(index), VALUE);
+                column.set_value(mat.get_column_index(index), VALUE);
+                submatrix.set_value(mat.get_submatrix_index(index), VALUE);
+
+                ::mvprintw(25, 40 + 20, "index: %d", index);
+                ::mvprintw(26, 40 + 20, "row #: %d", row_number);
+                ::mvprintw(27, 40 + 20, "col #: %d", column_number);
+            }
 
             if (DEBUG) {
                 enum print_by {row, column, submatrix};
@@ -475,18 +489,20 @@ void Sudoku::place_value (const uint8_t VALUE)
                     //clear();    //clear the screen
                 }
 
-                ::mvprintw(25, 40 + 20, "index: %d", index);
-                ::mvprintw(26, 40 + 20, "row #: %d", row_number);
-                ::mvprintw(27, 40 + 20, "col #: %d", column_number);
                 refresh();
             }
         }
         else {
-            attron(COLOR_PAIR(NOTES));
-            attron(A_BOLD);
-            ::printw("%c", VALUE);
-            attroff(A_BOLD);
-            attroff(COLOR_PAIR(NOTES));
+            if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
+                ::printw(" ");
+            }
+            else {
+                attron(COLOR_PAIR(NOTES));
+                attron(A_BOLD);
+                ::printw("%c", VALUE);
+                attroff(A_BOLD);
+                attroff(COLOR_PAIR(NOTES));
+            }
         }
 
         uint8_t y = display_matrix_offset[cursor_pos].first,
@@ -496,6 +512,8 @@ void Sudoku::place_value (const uint8_t VALUE)
     }
     reset_cursor(); //have cursor maintain position after printing (maybe unnecessary now)
 }
+
+
 
 void Sudoku::reset_cursor ()
 {
@@ -525,9 +543,8 @@ void Sudoku::start_game()
         else if (input >= '1' and input <= '9') {
             place_value(input);
         }
-        //TODO: Add support for delete and backspace
         else if (input == KEY_DC or input == KEY_BACKSPACE) {
-
+            place_value(input);
         }
         else if (KEY_ENTER) {
             #if false
