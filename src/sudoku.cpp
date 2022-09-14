@@ -311,6 +311,30 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
     return ((ch == '|') | (ch == '-'));
 }
 
+bool Sudoku::do_nothing()
+{
+    // Get the 8 cells around the current cursor position
+    cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
+         T  = {cursor_pos.first - 1, cursor_pos.second},
+         TR = {cursor_pos.first - 1, cursor_pos.second + 1},
+         L  = {cursor_pos.first,     cursor_pos.second - 1},
+         R  = {cursor_pos.first,     cursor_pos.second + 1},
+         BL = {cursor_pos.first + 1, cursor_pos.second - 1},
+         B  = {cursor_pos.first + 1, cursor_pos.second},
+         BR = {cursor_pos.first + 1, cursor_pos.second + 1};
+    chtype ch = inch();
+
+    return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((ch & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
+           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN));
+}
+
 void Sudoku::place_value (const uint8_t VALUE)
 {
     /*
@@ -343,21 +367,13 @@ void Sudoku::place_value (const uint8_t VALUE)
     //::mvprintw(23, 100, "COLOR_PAIR(KNOWN): %d\n", COLOR_PAIR(KNOWN));
     //::mvprintw(24, 100, "ch & A_COLOR: %d\n", ch & A_COLOR);
     //::refresh();
-    if ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (ch & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN) or
-        (mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN)    ) reset_cursor();
+    if (do_nothing()) reset_cursor();
     //else if ((ch & A_CHARTEXT) == '?') {}
     else {
         reset_cursor();
 
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-            mvprintw(TL.first, TL.second, " ");
+            mvprintw(TL.first, TL.second, " "); //TODO: Think about making this a function (override delch()?)
             mvprintw( T.first,  T.second, " ");
             mvprintw(TR.first, TR.second, " ");
             mvprintw( L.first,  L.second, " ");
@@ -452,6 +468,9 @@ void Sudoku::start_game()
             place_value(input);
         }
         //TODO: Add support for delete and backspace
+        else if (input == KEY_DC or input == KEY_BACKSPACE) {
+
+        }
         else if (KEY_ENTER) {
             #if false
             uint8_t y = display_matrix_offset[cursor_pos].first,

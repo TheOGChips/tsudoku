@@ -33,6 +33,7 @@ class Sudoku {
         uint16_t getch();
         void clear();
         bool is_border (const uint8_t, const uint8_t);
+        bool do_nothing();
         void place_value (const uint8_t);
         void reset_cursor();
         
