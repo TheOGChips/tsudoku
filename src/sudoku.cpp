@@ -313,15 +313,31 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
 
 array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
 {
-    array<cell, NUM_BORDER_POSITIONS> border;
-    border[TL] = {cursor_pos.first - 1, cursor_pos.second - 1};
-    border[T]  = {cursor_pos.first - 1, cursor_pos.second};
-    border[TR] = {cursor_pos.first - 1, cursor_pos.second + 1};
-    border[L]  = {cursor_pos.first,     cursor_pos.second - 1};
-    border[R]  = {cursor_pos.first,     cursor_pos.second + 1};
-    border[BL] = {cursor_pos.first + 1, cursor_pos.second - 1};
-    border[B]  = {cursor_pos.first + 1, cursor_pos.second};
-    border[TL] = {cursor_pos.first + 1, cursor_pos.second + 1};
+    //reset_cursor();
+    //NOTE: This has to be done this way, or else the array initialization doesn't work for some weird
+    //      reason.
+    cell tl = {cursor_pos.first - 1, cursor_pos.second - 1};
+    cell t  = {cursor_pos.first - 1, cursor_pos.second};
+    cell tr = {cursor_pos.first - 1, cursor_pos.second + 1};
+    cell l  = {cursor_pos.first,     cursor_pos.second - 1};
+    cell r  = {cursor_pos.first,     cursor_pos.second + 1};
+    cell bl = {cursor_pos.first + 1, cursor_pos.second - 1};
+    cell b  = {cursor_pos.first + 1, cursor_pos.second};
+    cell br = {cursor_pos.first + 1, cursor_pos.second + 1};
+    array<cell, NUM_BORDER_POSITIONS> border = {tl, t, tr, l, r, bl, b, br};
+
+    /*::mvprintw(4, 40, "%d,%d", cursor_pos.first - 1, cursor_pos.second - 1);
+    ::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
+    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
+    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
+    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
+    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
+    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
+    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
+    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
+    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
+    refresh();
+    getch();*/
 
     return border;
 }
@@ -332,11 +348,25 @@ bool Sudoku::do_nothing()
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
     //chtype ch = inch();
 
-    if ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
+    /*::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
+    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
+    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
+    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
+    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
+    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
+    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
+    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
+    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
+    refresh();
+    getch();*/
+
+    //if ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
     }
-    return false;
+    reset_cursor();
+    //return ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) ? true : false;
+    return (inch() & A_COLOR) == COLOR_PAIR(KNOWN);
     /*return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
@@ -346,6 +376,27 @@ bool Sudoku::do_nothing()
            ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
            ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN));*/
+}
+
+void Sudoku::clear_surrounding_cells()
+{
+    reset_cursor();
+    // Get the 8 cells around the current cursor position
+    array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
+    /*::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
+    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
+    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
+    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
+    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
+    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
+    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
+    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
+    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
+    refresh();*/
+    for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
+        mvprintw(border[i].first, border[i].second, " ");
+    }
+    //reset_cursor();
 }
 
 void Sudoku::place_value (const uint8_t VALUE)
@@ -365,15 +416,15 @@ void Sudoku::place_value (const uint8_t VALUE)
      */
     //clear();
     // Get the 8 cells around the current cursor position
-    cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
+    /*cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
          T  = {cursor_pos.first - 1, cursor_pos.second},
          TR = {cursor_pos.first - 1, cursor_pos.second + 1},
          L  = {cursor_pos.first,     cursor_pos.second - 1},
          R  = {cursor_pos.first,     cursor_pos.second + 1},
          BL = {cursor_pos.first + 1, cursor_pos.second - 1},
          B  = {cursor_pos.first + 1, cursor_pos.second},
-         BR = {cursor_pos.first + 1, cursor_pos.second + 1};
-    chtype ch = inch();
+         BR = {cursor_pos.first + 1, cursor_pos.second + 1};*/
+
     //::mvprintw(20, 100, "ch: %u\n", ch);
     //::mvprintw(21, 100, "COLOR_RED: %d\n", COLOR_RED);
     //::mvprintw(22, 100, "A_COLOR: %d\n", A_COLOR);
@@ -384,16 +435,9 @@ void Sudoku::place_value (const uint8_t VALUE)
     //else if ((ch & A_CHARTEXT) == '?') {}
     else {
         reset_cursor();
-
+        chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-            mvprintw(TL.first, TL.second, " "); //TODO: Think about making this a function (override delch()?)
-            mvprintw( T.first,  T.second, " ");
-            mvprintw(TR.first, TR.second, " ");
-            mvprintw( L.first,  L.second, " ");
-            mvprintw( R.first,  R.second, " ");
-            mvprintw(BL.first, BL.second, " ");
-            mvprintw( B.first,  B.second, " ");
-            mvprintw(BR.first, BR.second, " ");
+            clear_surrounding_cells();
             attron(COLOR_PAIR(GUESS));
             mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
             attroff(COLOR_PAIR(GUESS));
