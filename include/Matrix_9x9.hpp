@@ -14,16 +14,16 @@ class Matrix_9x9 {
         Matrix_3x3 matrices[9];
         Row rows[9];
         Column cols[9];
-        bool positions[81];
+        bool known_positions[81];
         mt19937 position_generator,
                 generator;
-        uniform_int_distribution<uint8_t> position_dist,
+        uniform_int_distribution<uint8_t> //position_dist,
                                           dist;
         map<uint8_t, cell> _map_;   //maps 81 positions to positions on 9x9 matrix
 
         void init_positions();
         void set_starting_positions (uint8_t);
-        uint8_t next_position();
+        //uint8_t next_position();
         uint8_t next_value();
         map<uint8_t, cell> create_map();
 
@@ -47,6 +47,7 @@ class Matrix_9x9 {
         uint8_t at (uint8_t);
         uint8_t operator [] (uint8_t);
         bool is_known (uint8_t);
+        //bool evaluate();    //TODO: Add function for evaluating puzzle after the user hits ENTER
 };
 
 #endif

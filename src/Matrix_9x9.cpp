@@ -2,8 +2,14 @@
 #include <ctime>    //time_t, time()
 #include <ncurses.h>
 #include "colors.hpp"
+#include <thread>
+#include <chrono>
+#include <iterator>
+#include <algorithm>
 
 using namespace std;
+
+const bool DEBUG = false;
 
 Matrix_9x9::Matrix_9x9 ()
 {
@@ -11,10 +17,11 @@ Matrix_9x9::Matrix_9x9 ()
     init_positions();
     time_t seed = time(nullptr);
     position_generator = mt19937(seed);
-    position_dist = uniform_int_distribution<uint8_t>(0, 80);
+    //position_dist = uniform_int_distribution<uint8_t>(0, 80);
     generator = mt19937(seed);
     dist = uniform_int_distribution<uint8_t>(1, 9);
-    set_starting_positions(17);
+    //set_starting_positions(17);   //TODO: Implement the following difficulty modes
+    set_starting_positions(40);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
 }
 
 #if false
@@ -227,27 +234,34 @@ Column& Matrix_9x9::get_column (uint8_t index)
 void Matrix_9x9::init_positions()
 {
     for (uint8_t i = 0; i < 81; i++) {
-        positions[i] = false;
+        known_positions[i] = false;
     }
 }
 
 void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
 {
+    uint8_t positions[81];
+    for (uint8_t i = 0; i < 81; i++) positions[i] = i;
+    shuffle(begin(positions), end(positions), position_generator);
+
     for (uint8_t i = 0; i < NUM_POSITIONS; i++) {
-        uint8_t pos,
+        //::clear();
+        //::printw("iter: %d", i);
+        //::getch();
+        uint8_t pos = positions[i],
                 value,
                 index_row,
                 index_column,
                 index_submatrix;
-        bool valid_position = false,
+        bool //valid_position = false,
              valid_value = false;
-        while (!valid_position) {
+        /*while (!valid_position) {     //TODO: Implement a better algorithm for this that always ends
             pos = next_position();      //get next position (random)
             if (!positions[pos]) {      //check if position is already filled
                 valid_position = true;
                 positions[pos] = true;
             }
-        }
+        }*/
         
         const uint8_t ROW_NUMBER = map_row(pos),                                      //map position to row
                       COLUMN_NUMBER = map_column(pos),                                //map position to column
@@ -275,6 +289,14 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
         /*cout << "value: " << value << endl
              << "row[" << index_row+0 << "]: " << row[index_row] << endl;
         print(false, false);*/
+        known_positions[pos] = true;
+
+        if (DEBUG) {
+            clear();
+            printw(false, false);
+            this_thread::sleep_for(chrono::seconds(1));
+            refresh();
+        }
     }
     /*cout << endl;
     for (uint8_t i = 0; i < 81; i++) {
@@ -286,12 +308,12 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
         }
     }*/
 }
-
+#if false
 uint8_t Matrix_9x9::next_position()
 {
     return position_dist(position_generator);
 }
-
+#endif
 uint8_t Matrix_9x9::map_row (const uint8_t POS)
 {
     return POS / 9;
@@ -431,5 +453,5 @@ uint8_t Matrix_9x9::operator [] (uint8_t index)
 
 bool Matrix_9x9::is_known (uint8_t index)
 {
-    return positions[index];
+    return known_positions[index];
 }
