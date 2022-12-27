@@ -5,6 +5,7 @@
 #include <map>      //std::map
 #include <utility>  //std::pair
 #include <cstdint>  //uint8_t
+#include <array>
 
 using namespace std;
 
@@ -18,6 +19,7 @@ class Matrix_3x3 {
 
     public:
         Matrix_3x3 ();
+        Matrix_3x3 (uint8_t[9]);
         ~Matrix_3x3 () {}
         uint8_t at (uint8_t);
         uint8_t operator [] (uint8_t);

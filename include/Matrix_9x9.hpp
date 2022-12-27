@@ -6,6 +6,7 @@
 #include "Row.hpp"
 #include "Column.hpp"
 #include <random>   //mt19937(), uniform_int_distribution<>(),
+#include <array>
 
 using namespace std;
 
@@ -15,17 +16,19 @@ class Matrix_9x9 {
         Row rows[9];
         Column cols[9];
         bool known_positions[81];
-        mt19937 position_generator,
-                generator;
-        uniform_int_distribution<uint8_t> //position_dist,
-                                          dist;
+        //mt19937 //position_generator,
+                //generator;
+        //uniform_int_distribution<uint8_t> //position_dist,
+                                          //dist;
         map<uint8_t, cell> _map_;   //maps 81 positions to positions on 9x9 matrix
 
         void init_positions();
+        array<uint8_t, 81> generate_solved_puzzle (time_t);
         void set_starting_positions (uint8_t);
         //uint8_t next_position();
-        uint8_t next_value();
+        //uint8_t next_value();
         map<uint8_t, cell> create_map();
+        bool solve(uint8_t, uint8_t, Row[9], Column[9], Matrix_3x3[9]); //TODO: Make this book
 
     public:
         Matrix_9x9();

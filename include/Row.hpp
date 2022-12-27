@@ -10,6 +10,7 @@ class Row {
 
     public:
         Row();
+        Row (uint8_t[9]);
         ~Row() {}
         uint8_t at (uint8_t);
         uint8_t operator [] (uint8_t);

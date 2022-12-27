@@ -1,8 +1,8 @@
 COMPILER = clang++
 INCLUDE = -I include/ -std=c++11
 COMPILE = $(COMPILER) -c $(INCLUDE)
-LIBS = lib
-LINK = $(COMPILER) $(LIBS)/*.o -o
+LIB = lib
+LINK = $(COMPILER) $(LIB)/*.o -o
 SRC = src
 MAIN = main
 SUDOKU = sudoku
@@ -10,37 +10,37 @@ ROW = Row
 COLUMN = Column
 MATRIX_3X3 = Matrix_3x3
 MATRIX_9X9 = Matrix_9x9
-OBJ = $(LIBS)/$(MAIN).o $(LIBS)/$(SUDOKU).o $(LIBS)/$(ROW).o $(LIBS)/$(COLUMN).o $(LIBS)/$(MATRIX_3X3).o $(LIBS)/$(MATRIX_9X9).o
+OBJ = $(LIB)/$(MAIN).o $(LIB)/$(SUDOKU).o $(LIB)/$(ROW).o $(LIB)/$(COLUMN).o $(LIB)/$(MATRIX_3X3).o $(LIB)/$(MATRIX_9X9).o
 TGT = $(SUDOKU).exe
 
 .PHONY: all run clean
 
 all:	$(OBJ)
-	mkdir -p $(LIBS)
-	-mv $(?F) $(LIBS)/
+	mkdir -p $(LIB)
+	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT) -lncurses
 
-$(LIBS)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
+$(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 			$(COMPILE) $<
 
-$(LIBS)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
+$(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
 			$(COMPILE) $<
 
-$(LIBS)/$(ROW).o:	$(SRC)/$(ROW).cpp
+$(LIB)/$(ROW).o:	$(SRC)/$(ROW).cpp
 			$(COMPILE) $<
 
-$(LIBS)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
+$(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
 			$(COMPILE) $<
 
-$(LIBS)/$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
+$(LIB)/$(MATRIX_3X3).o:	$(SRC)/$(MATRIX_3X3).cpp
 				$(COMPILE) $<
 
-$(LIBS)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
+$(LIB)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
 				$(COMPILE) $<
 
 run:	$(TGT)
 	./$<
 
 clean:	$(TGT)
-	rm $< $(LIBS)/*.o
-	rmdir $(LIBS)
+	rm $< $(LIB)/*.o
+	rmdir $(LIB)

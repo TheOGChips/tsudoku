@@ -6,6 +6,8 @@
 #include <chrono>
 #include <iterator>
 #include <algorithm>
+#include <cstdlib>
+#include <queue>
 
 using namespace std;
 
@@ -15,15 +17,16 @@ Matrix_9x9::Matrix_9x9 ()
 {
     _map_ = this->create_map();
     init_positions();
-    time_t seed = time(nullptr);
-    position_generator = mt19937(seed);
-    //position_dist = uniform_int_distribution<uint8_t>(0, 80);
-    generator = mt19937(seed);
-    dist = uniform_int_distribution<uint8_t>(1, 9);
-    //set_starting_positions(17);   //TODO: Implement the following difficulty modes
-    set_starting_positions(40);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
-}
 
+    //position_generator = mt19937(seed);
+    //position_dist = uniform_int_distribution<uint8_t>(0, 80);
+    //generator = mt19937(seed);
+    //dist = uniform_int_distribution<uint8_t>(1, 9);
+    set_starting_positions(17);   //TODO: Implement the following difficulty modes
+    //set_starting_positions(80);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+}                                   //NOTE: This appears to be more complicated than I at
+                                    //      first thought. See note in
+                                    //      set_starting_positions for more details.
 #if false
 void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
@@ -238,11 +241,222 @@ void Matrix_9x9::init_positions()
     }
 }
 
-void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
-{
-    uint8_t positions[81];
+/*
+ * NOTE: ALGORITHM FOR SOLVING SUDOKU PUZZLE
+ * args <- submatrix # [1-3, 5-7], value # [1-9], row array, column array, submatrix array
+ * queue <- available positions on board [0-80]
+ * do next_pos <- queue.pop() while recursive call <- false
+ *    add value to next_pos in appropriate row, column, and submatrix if possible
+ *    return true if submatrix=7, value=9, queue not empty
+ *    return false otherwise (queue empty)
+ *    next_submatrix <- 5 if submatrix=3
+ *                   <- 1 if submatrix=7
+ *                   <- submatrix+1 otherwise
+ *    next_value <- value+1 if submatrix=7
+ *               <- same otherwise
+ *    remove value from row, column, and submatrix if recursive call <- false
+ * end do-while
+ */
+bool Matrix_9x9::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Matrix_3x3 submatrices[9]) {
+    queue<uint8_t> available_pos;
+    uint8_t positions[9];
+    //Figure out positions in submatrix based on submatrix number
+    //Start with upper right
+    /*
+     * 0   | 3   | 6
+     *     |     | 
+     *     |     | 
+     * ----|-----|----
+     * 27  | 30  | 33
+     *     |     | 
+     *     |     | 
+     * ----|-----|----
+     * 54  | 57  | 60
+     *     |     |
+     *     |     |
+     */
+    for (uint8_t i = submatrix; i >= 3; i -= 3) {
+        positions[0] += 27;
+    }
+    positions[0] += 3 * (submatrix % 3);
+    
+    //Figure out remaining 8 positions in submatrix
+    for (uint8_t i = 1; i < 9; i++) {
+        positions[i] = positions[0] + 9 * (i / 3) + i % 3;
+    }
+    
+    #if false
+        printf("\nPRINTING POSITIONS IN SUBMATRIX\n");
+        for (uint8_t i = 0; i < 9; i++) {
+            printf("pos: %hhu\n", positions[i]);
+        }
+        exit(EXIT_SUCCESS);
+    #endif
+    
+    //Figure out positions value can and can't be placed
+    //map row and column (submatrix shouldn't be needed)
+    for (uint8_t i = 0; i < 9; i++) {
+        uint8_t row_number = map_row(positions[i]),
+                column_number = map_column(positions[i]);
+        if (not rows[row_number].value_exists(value) and
+            not columns[column_number].value_exists(value) and not is_known(positions[i])) {
+            available_pos.push(positions[i]);
+        }
+    }
+    
+    #if false
+        printf("\nPRINTING AVAILABLE POSITIONS\n");
+        while (!available_pos.empty()) {
+            printf("pos: %hhu\n", available_pos.front());
+            available_pos.pop();
+        }
+        exit(EXIT_SUCCESS);
+    #endif
+    
+    //printf("submatrix: %d, value: %d\n", submatrix, value);
+    bool soln;
+    while (true) {  //NOTE: Doing it this way gets rid of a compiler warning
+        if (available_pos.empty()) return false;
+        
+        uint8_t row_number = map_row(available_pos.front()),
+                column_number = map_column(available_pos.front()),
+                submatrix_number = submatrix,
+                row_index = get_row_index(available_pos.front()),
+                column_index = get_column_index(available_pos.front()),
+                submatrix_index = get_submatrix_index(available_pos.front()),
+                next_submatrix,
+                next_value;
+        rows[row_number].set_value(row_index, value + 48);
+        columns[column_number].set_value(column_index, value + 48);
+        submatrices[submatrix_number].set_value(submatrix_index, value + 48);
+        known_positions[available_pos.front()] = true;
+        
+        if (submatrix == 7 and value == 9) return true;
+        
+        if (submatrix == 3) next_submatrix = 5;
+        else if (submatrix == 7) next_submatrix = 1;
+        else next_submatrix = submatrix + 1;
+        next_value = (submatrix == 7) ? value + 1 : value;
+        
+        if ((soln = solve(next_submatrix, next_value, rows, columns, submatrices))) return soln;
+        else {
+            rows[row_number].set_value(row_index, '?');
+            columns[column_number].set_value(column_index, '?');
+            submatrices[submatrix_number].set_value(submatrix_index, '?');
+            known_positions[available_pos.front()] = false;
+            available_pos.pop();
+        }
+    }
+}
+
+array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
+    array<uint8_t, 81> soln;
+    uint8_t soln_matrix[9][9];
+    mt19937 generator(0);   //TODO: Replace this with seed when the time comes
+    uniform_int_distribution<uint8_t> dist (1, 9);
+    uint8_t values[9];
+    for (uint8_t i = 0; i < 9; i++) {
+        values[i] = i + 1;
+    }
+
+    //Initialize matrix with '?' placeholders
+    for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t j = 0; j < 9; j++) {
+            soln_matrix[i][j] = '?';
+        }
+    }
+
+    //Fill in submatrices along the diagonal first
+    for (uint8_t i = 0; i < 9; i += 3) {
+    //for (uint8_t i = 0; i < 3; i += 3) {
+        shuffle(begin(values), end(values), generator);
+        uint8_t count = 0;
+        for (uint8_t j = i; j < i + 3; j++) {
+            for (uint8_t k = i; k < i + 3; k++) {
+                soln_matrix[j][k] = values[count] + 48;
+                count++;
+                //printf("j: %u, k: %u\n", j, k);
+            }
+        }
+    }
+
+    //Create row, column, and submatrix objects from partial solution matrix
+    Row soln_rows[9];
+    Column soln_columns[9];
+    Matrix_3x3 soln_matrices[9];
+
+    for (uint8_t i = 0; i < 9; i++) {
+        soln_rows[i] = Row(soln_matrix[i]);
+    }
+
+    uint8_t temp_col[9];
+    for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t j = 0; j < 9; j++) {
+            temp_col[j] = soln_matrix[j][i];
+        }
+        soln_columns[i] = Column(temp_col);
+    }
+
+    uint8_t temp_submat[9];
+    uint8_t count = 0;
+    for (uint8_t i = 1; i < 9; i += 3) {
+        for (uint8_t j = 1; j < 9; j += 3) {
+            temp_submat[0] = soln_matrix[i-1][j-1];
+            temp_submat[1] = soln_matrix[i-1][j];
+            temp_submat[2] = soln_matrix[i-1][j+1];
+            temp_submat[3] = soln_matrix[i][j-1];
+            temp_submat[4] = soln_matrix[i][j];
+            temp_submat[5] = soln_matrix[i][j+1];
+            temp_submat[6] = soln_matrix[i+1][j-1];
+            temp_submat[7] = soln_matrix[i+1][j];
+            temp_submat[8] = soln_matrix[i+1][j+1];
+            soln_matrices[count] = Matrix_3x3(temp_submat);
+            count++;
+        }
+    }
+    
+    bool soln_found = solve(1, 1, soln_rows, soln_columns, soln_matrices);
+    
+    for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t j = 0; j < 9; j++) {
+            if (soln_matrix[i][j] == '?') {
+                soln_matrix[i][j] = soln_rows[i][j];
+            //if (soln_matrix[j][i] == '?') {
+            //    soln_matrix[j][i] = soln_columns[i][j];
+            }
+        }
+    }
+    
+    for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t j = 0; j < 9; j++) {
+            soln[i * 9 + j] = soln_matrix[i][j];
+        }
+    }
+    return soln;
+}
+
+void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
+    //TODO: Will need to fill an entire puzzle first, then randomly pick elements to add to display matrix
+    time_t seed = time(nullptr);
+    array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
+    
+    #if true
+        printf("\n");
+        for (uint8_t i = 0; i < 81; i++) {
+            printf("%c", solved_puzzle[i]);
+            if (i % 9 == 2 or i % 9 == 5) printf("|");
+            if (i % 9 == 8) printf("\n");
+            if (i == 26 or i == 53) printf("---|---|---\n");
+        }
+        exit(EXIT_SUCCESS);
+    #endif
+        
+    //TODO: Figure out where to go from here
+    uint8_t positions[81],
+            values[9];
     for (uint8_t i = 0; i < 81; i++) positions[i] = i;
-    shuffle(begin(positions), end(positions), position_generator);
+    for (uint8_t i = 0; i < 9; i++) values[i] = i + 1;
+    shuffle(begin(positions), end(positions), mt19937(seed));
 
     for (uint8_t i = 0; i < NUM_POSITIONS; i++) {
         //::clear();
@@ -271,10 +485,46 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS)
         Row &row = get_row(ROW_NUMBER); //NOTE: why these require the ampersand, I'm not really sure
         Column &column = get_column(COLUMN_NUMBER);
         Matrix_3x3 &submatrix = get_submatrix(SUBMATRIX_NUMBER);
-        while (!valid_value) {
-            value = next_value();
+
+        shuffle(begin(values), end(values), mt19937(seed));
+        //while (!valid_value) {
+        for (uint8_t j = 0; j < 9; j++) {
+            //value = next_value();
+            value = values[j];
+            #if false
+                ::initscr();
+                ::printw("value: %d\n", value);
+                ::printw("pos: %d\n", pos + 1);
+                ::printw("ROW #: %d\n", ROW_NUMBER + 1);
+                ::printw("COL #: %d\n", COLUMN_NUMBER + 1);
+                ::printw("MAT #: %d\n", SUBMATRIX_NUMBER + 1);
+                ::printw("# pos: %d\n", i)
+                enum print_by {r, c, s};
+                for (uint8_t k = r; k <= s; k++) {
+                    //::mvprintw(9, 40 + 20 * i, "Printing by ");
+                    ::move(9, 40 + 20 * k);
+                    if (k == s) {
+                        ::printw("submatrix");
+                    }
+                    else if (k == c) {
+                        ::printw("column");
+                    }
+                    else {
+                        ::printw("row");
+                    }
+                    mvprintw(10, 40 + 20 * k, k & c, k & s);
+                    //refresh();  //flush output to screen
+                    //getch();    //wait for user input
+                    //clear();    //clear the screen
+                }
+                ::refresh();
+                ::getch();
+                ::clear();
+                ::endwin();
+            #endif
             if (!row.value_exists(value) and !column.value_exists(value) and !submatrix.value_exists(value)) {
-                valid_value = true;
+                //valid_value = true;
+                break;
             }
         }
 
@@ -375,12 +625,12 @@ uint8_t Matrix_9x9::map_submatrix (const uint8_t ROW, const uint8_t COLUMN)
         }
     }
 }
-
+#if false
 uint8_t Matrix_9x9::next_value()
 {
     return dist(generator);
 }
-
+#endif
 uint8_t Matrix_9x9::get_row_index (const uint8_t POS)
 {
     /*
@@ -451,7 +701,6 @@ uint8_t Matrix_9x9::operator [] (uint8_t index)
     return at(index);
 }
 
-bool Matrix_9x9::is_known (uint8_t index)
-{
+bool Matrix_9x9::is_known (uint8_t index) {
     return known_positions[index];
 }
