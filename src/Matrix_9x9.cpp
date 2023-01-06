@@ -436,11 +436,10 @@ array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
 }
 
 void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
-    //TODO: Will need to fill an entire puzzle first, then randomly pick elements to add to display matrix
     time_t seed = time(nullptr);
     array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
     
-    #if true
+    #if false
         printf("\n");
         for (uint8_t i = 0; i < 81; i++) {
             printf("%c", solved_puzzle[i]);
@@ -451,13 +450,12 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
         exit(EXIT_SUCCESS);
     #endif
         
-    //TODO: Figure out where to go from here
-    uint8_t positions[81],
-            values[9];
+    uint8_t positions[81]/*,
+            values[9]*/;
     for (uint8_t i = 0; i < 81; i++) positions[i] = i;
-    for (uint8_t i = 0; i < 9; i++) values[i] = i + 1;
+    //for (uint8_t i = 0; i < 9; i++) values[i] = i + 1;
     shuffle(begin(positions), end(positions), mt19937(seed));
-
+    
     for (uint8_t i = 0; i < NUM_POSITIONS; i++) {
         //::clear();
         //::printw("iter: %d", i);
@@ -467,9 +465,9 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
                 index_row,
                 index_column,
                 index_submatrix;
-        bool //valid_position = false,
-             valid_value = false;
-        /*while (!valid_position) {     //TODO: Implement a better algorithm for this that always ends
+        //bool //valid_position = false,
+             //valid_value = false;
+        /*while (!valid_position) {     
             pos = next_position();      //get next position (random)
             if (!positions[pos]) {      //check if position is already filled
                 valid_position = true;
@@ -486,9 +484,9 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
         Column &column = get_column(COLUMN_NUMBER);
         Matrix_3x3 &submatrix = get_submatrix(SUBMATRIX_NUMBER);
 
-        shuffle(begin(values), end(values), mt19937(seed));
+        //shuffle(begin(values), end(values), mt19937(seed));
         //while (!valid_value) {
-        for (uint8_t j = 0; j < 9; j++) {
+        /*for (uint8_t j = 0; j < 9; j++) {
             //value = next_value();
             value = values[j];
             #if false
@@ -526,13 +524,14 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
                 //valid_value = true;
                 break;
             }
-        }
+        }*/
 
         //Get indeces for particular row, column, and submatrix
         index_row = get_row_index(pos);
         index_column = get_column_index(pos);
         index_submatrix = get_submatrix_index(pos);
-        value += 48;    //convert in order to display proper character
+        //value += 48;    //convert in order to display proper character
+        value = solved_puzzle[pos];
         row.set_value(index_row, value);
         column.set_value(index_column, value);
         submatrix.set_value(index_submatrix, value);
@@ -548,6 +547,11 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
             refresh();
         }
     }
+    
+    for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
+        known_positions[positions[i]] = false;
+    }
+    
     /*cout << endl;
     for (uint8_t i = 0; i < 81; i++) {
         if (positions[i] == true) {
