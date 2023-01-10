@@ -4,8 +4,7 @@
 int main ()
 {
     Sudoku puzzle;  //initialize a sudoku puzzle
-    //TODO: Get user input to work correctly
-    //TODO: Start game
+    puzzle.main_menu(); //TODO: Start in main menu
     puzzle.start_game();
     clear();
     printw("sizeof(puzzle): %lu B\n", sizeof(puzzle));

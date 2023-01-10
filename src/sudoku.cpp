@@ -2,6 +2,7 @@
 #include <ncurses.h>
 #include "colors.hpp"
 #include <cctype>
+#include <sstream>
 
 #undef getch        //redefined as Sudoku::getch()
 #undef KEY_ENTER    //redefined in Sudoku::start_game()
@@ -527,6 +528,47 @@ bool Sudoku::evaluate() {
     return mat.evaluate();
 }
 
+void Sudoku::main_menu () {
+    uint8_t x,
+            y,
+            y_min = ORIGIN.first * 2 + 27,  //TODO: Change min size in order to fit the in-game menu
+            x_min = ORIGIN.second * 2 + 27;
+    getmaxyx(stdscr, y, x);
+    while (y < y_min or x < x_min) {
+        uint8_t x_curr,
+                y_curr;
+        clear();
+        string msg1 = "The current window is too small",
+               msg4 = "Resize the terminal window to continue";
+        stringstream msg2,
+                     msg3;
+        msg2 << "Required dimensions: " << x_min+0 << " x " << y_min+0;
+        msg3 << "Current dimensions: " << x+0 << " x " << y+0;
+        ::mvprintw(y/2, x/2 - msg1.size()/2, msg1.c_str());
+        ::mvprintw(y/2 + 2, x/2 - msg2.str().size()/2, msg2.str().c_str());
+        ::mvprintw(y/2 + 3, x/2 - msg3.str().size()/2, msg3.str().c_str());
+        ::mvprintw(y/2 + 5, x/2 - msg4.size()/2, msg4.c_str());
+        refresh();
+        getmaxyx(stdscr, y, x);
+        getch();
+    }
+    clear();
+    string msg1 = "The window is now an appropriate size",
+           msg2 = "Press Enter to continue";
+    ::mvprintw(y/2, x/2 - msg1.size()/2, msg1.c_str());
+    ::mvprintw(y/2 + 1, x/2 - msg2.size()/2, msg2.c_str());
+    refresh();
+    getch();
+    clear();
+    
+    //TODO:
+    //Options
+        //Start new game
+        //Resume unfinished game
+        //Print # finished games
+    //delwin(win2);
+}
+
 void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
@@ -540,7 +582,6 @@ void Sudoku::start_game()
                                     //      one doesn't seem to work as expected anyway.
     do {
         uint16_t input = getch();
-        //TODO: Finish out all cases in this do-while block
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work. Not sure why.
         }
@@ -562,7 +603,6 @@ void Sudoku::start_game()
             refresh();
             reset_cursor();
             #endif
-            //TODO: Check if puzzle is finished and valid (error-free)
             if (evaluate()) {
                 ::mvprintw(ORIGIN.second + 30, 10, "You win!");
                 clrtoeol();
