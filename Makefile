@@ -1,4 +1,4 @@
-COMPILER = clang++
+COMPILER = g++
 INCLUDE = -I include/ -std=c++11
 COMPILE = $(COMPILER) -c $(INCLUDE)
 LIB = lib

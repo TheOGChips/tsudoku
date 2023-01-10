@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 //Matrix_9x9 sudoku_init()
 Sudoku::Sudoku ()
@@ -456,6 +456,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                         row_number = mat.map_row(index),
                         column_number = mat.map_column(index);
 
+                //TODO: Maybe put the next 7 lines in Matrix_9x9.cpp
                 Row &row = mat.get_row(row_number);
                 Column &column = mat.get_column(column_number);
                 Matrix_3x3 &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
@@ -464,9 +465,11 @@ void Sudoku::place_value (const uint16_t VALUE)
                 column.set_value(mat.get_column_index(index), VALUE);
                 submatrix.set_value(mat.get_submatrix_index(index), VALUE);
 
-                ::mvprintw(25, 40 + 20, "index: %d", index);
-                ::mvprintw(26, 40 + 20, "row #: %d", row_number);
-                ::mvprintw(27, 40 + 20, "col #: %d", column_number);
+                if (DEBUG) {
+                    ::mvprintw(25, 40 + 20, "index: %d", index);
+                    ::mvprintw(26, 40 + 20, "row #: %d", row_number);
+                    ::mvprintw(27, 40 + 20, "col #: %d", column_number);
+                }
             }
 
             if (DEBUG) {
@@ -520,6 +523,10 @@ void Sudoku::reset_cursor ()
     ::move(cursor_pos.first, cursor_pos.second);
 }
 
+bool Sudoku::evaluate() {
+    return mat.evaluate();
+}
+
 void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
@@ -540,13 +547,13 @@ void Sudoku::start_game()
         else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
             move(input);
         }
-        else if (input >= '1' and input <= '9') {
+        else if (input >= ONE and input <= NINE) {
             place_value(input);
         }
         else if (input == KEY_DC or input == KEY_BACKSPACE) {
             place_value(input);
         }
-        else if (KEY_ENTER) {
+        else if (input == KEY_ENTER) {
             #if false
             uint8_t y = display_matrix_offset[cursor_pos].first,
                     x = display_matrix_offset[cursor_pos].second;
@@ -556,6 +563,14 @@ void Sudoku::start_game()
             reset_cursor();
             #endif
             //TODO: Check if puzzle is finished and valid (error-free)
+            if (evaluate()) {
+                ::mvprintw(ORIGIN.second + 30, 10, "You win!");
+                clrtoeol();
+            }
+            else {
+                ::mvprintw(ORIGIN.second + 30, 10, "Puzzle incomplete!");
+                reset_cursor();
+            }
         }
     } while (!quit_game);
 }

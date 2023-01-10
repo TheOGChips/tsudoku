@@ -22,8 +22,8 @@ Matrix_9x9::Matrix_9x9 ()
     //position_dist = uniform_int_distribution<uint8_t>(0, 80);
     //generator = mt19937(seed);
     //dist = uniform_int_distribution<uint8_t>(1, 9);
-    set_starting_positions(17);   //TODO: Implement the following difficulty modes
-    //set_starting_positions(80);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+    //set_starting_positions(17);   //TODO: Implement the following difficulty modes
+    set_starting_positions(72);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
 }                                   //NOTE: This appears to be more complicated than I at
                                     //      first thought. See note in
                                     //      set_starting_positions for more details.
@@ -707,4 +707,18 @@ uint8_t Matrix_9x9::operator [] (uint8_t index)
 
 bool Matrix_9x9::is_known (uint8_t index) {
     return known_positions[index];
+}
+
+bool Matrix_9x9::evaluate () {
+    for (uint8_t i = 0; i < 9; i++) {
+        //Row &row = mat.get_row(i);
+        //Column &column = mat.get_column(i);
+        //Matrix_3x3 &submatrix = mat.get_submatrix(i);
+        Row row = rows[i];
+        Column column = cols[i];
+        Matrix_3x3 submatrix = matrices[i];
+        
+        if (not row.evaluate() or not column.evaluate() or not submatrix.evaluate()) return false;
+    }
+    return true;
 }

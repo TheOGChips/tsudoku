@@ -27,7 +27,7 @@ uint8_t Column::operator [] (uint8_t index)
 
 bool Column::value_exists (const uint8_t VALUE)
 {
-    const uint8_t CONVERTED = VALUE + 48;
+    const uint8_t CONVERTED = (VALUE == '?') ? VALUE : VALUE + 48;
     for (uint8_t i = 0; i < 9; i++) {
         if (at(i) == CONVERTED) {
             return true;
@@ -39,4 +39,12 @@ bool Column::value_exists (const uint8_t VALUE)
 void Column::set_value (uint8_t index, uint8_t value)
 {
     col[index] = value;
+}
+
+bool Column::evaluate() {
+    if (value_exists('?')) return false;
+    for (uint8_t i = 1; i <= 9; i++) {
+        if (not value_exists(i)) return false;
+    }
+    return true;
 }

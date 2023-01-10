@@ -26,6 +26,7 @@ class Matrix_3x3 {
         void print_map();
         bool value_exists (uint8_t);
         void set_value (uint8_t, uint8_t);
+        bool evaluate();
 };
 
 #endif

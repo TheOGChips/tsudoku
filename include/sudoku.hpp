@@ -40,7 +40,9 @@ class Sudoku {
         bool do_nothing();
         void clear_surrounding_cells();
         void place_value (const uint16_t);
+        cell find_closest_guess_cell ();
         void reset_cursor();
+        bool evaluate();
         
     public:
         Sudoku();

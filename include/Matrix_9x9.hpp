@@ -28,7 +28,7 @@ class Matrix_9x9 {
         //uint8_t next_position();
         //uint8_t next_value();
         map<uint8_t, cell> create_map();
-        bool solve(uint8_t, uint8_t, Row[9], Column[9], Matrix_3x3[9]); //TODO: Make this book
+        bool solve(uint8_t, uint8_t, Row[9], Column[9], Matrix_3x3[9]);
 
     public:
         Matrix_9x9();
@@ -50,7 +50,7 @@ class Matrix_9x9 {
         uint8_t at (uint8_t);
         uint8_t operator [] (uint8_t);
         bool is_known (uint8_t);
-        //bool evaluate();    //TODO: Add function for evaluating puzzle after the user hits ENTER
+        bool evaluate();    //TODO: Add function for evaluating puzzle after the user hits ENTER
 };
 
 #endif
