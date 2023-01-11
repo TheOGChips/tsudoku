@@ -1,5 +1,5 @@
 COMPILER = g++
-INCLUDE = -I include/ -std=c++11
+INCLUDE = -I include/ -std=c++17
 COMPILE = $(COMPILER) -c $(INCLUDE)
 LIB = lib
 LINK = $(COMPILER) $(LIB)/*.o -o
@@ -44,6 +44,7 @@ $(LIB)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
 
 run:	$(TGT)
 	./$<
+	@#rmdir ~/.tsudoku
 
 clean:	$(TGT)
 	rm $< $(LIB)/*.o

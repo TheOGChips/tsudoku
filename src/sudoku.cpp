@@ -571,6 +571,7 @@ void Sudoku::start_game()
                 ::mvprintw(ORIGIN.second + 30, 10, "Puzzle incomplete!");
                 reset_cursor();
             }
+            //TODO: Add one to running score of completed puzzles
         }
     } while (!quit_game);
 }
