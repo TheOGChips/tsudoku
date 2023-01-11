@@ -51,11 +51,11 @@ void Menu::display_main_menu (options opt, uint8_t y, uint8_t x) {
     }
 }
 
-options operator ++ (options& opt, int) {
+options operator ++ (options& opt) {
     return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
 }
 
-options operator -- (options& opt, int) {
+options operator -- (options& opt) {
     return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
 }
 
@@ -105,10 +105,10 @@ options Menu::main_menu () {
         refresh();
         input = getch();
         switch (input) {
-            case KEY_DOWN:  display_main_menu(opt++, y_max, x_max);
+            case KEY_DOWN:  display_main_menu(++opt, y_max, x_max);
                             break;
                             
-            case KEY_UP:    display_main_menu(opt--, y_max, x_max);
+            case KEY_UP:    display_main_menu(--opt, y_max, x_max);
                             break;
                 
             default:;

@@ -2,6 +2,9 @@
 #include <ncurses.h>
 #include "colors.hpp"
 #include <cctype>
+#include <thread>
+#include <chrono>
+#include <fstream>
 
 #undef getch        //redefined as Sudoku::getch()
 #undef KEY_ENTER    //redefined in Sudoku::start_game()
@@ -528,6 +531,22 @@ bool Sudoku::evaluate() {
     return mat.evaluate();
 }
 
+void Sudoku::increment_completed_games () {
+    string HOME = getenv("HOME"),
+           filename = HOME + "/.tsudoku/completed_puzzles.txt";
+    uint64_t num_completed;
+    
+    ifstream infile;
+    infile.open(filename.c_str());
+    infile >> num_completed;
+    infile.close();
+    
+    ofstream outfile;
+    outfile.open(filename.c_str());
+    outfile << ++num_completed << endl;
+    outfile.close();
+}
+
 void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
@@ -566,12 +585,16 @@ void Sudoku::start_game()
             if (evaluate()) {
                 ::mvprintw(ORIGIN.second + 30, 10, "You win!");
                 clrtoeol();
+                refresh();
+                increment_completed_games();
+                quit_game = true;
+                this_thread::sleep_for(chrono::seconds(2));
             }
             else {
                 ::mvprintw(ORIGIN.second + 30, 10, "Puzzle incomplete!");
+                refresh();
                 reset_cursor();
             }
-            //TODO: Add one to running score of completed puzzles
         }
     } while (!quit_game);
 }

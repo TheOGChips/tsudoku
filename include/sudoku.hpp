@@ -42,6 +42,7 @@ class Sudoku {
         void place_value (const uint16_t);
         void reset_cursor();
         bool evaluate();
+        void increment_completed_games();
         
     public:
         Sudoku (bool);
