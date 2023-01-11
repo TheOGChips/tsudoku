@@ -2,7 +2,6 @@
 #include <ncurses.h>
 #include "colors.hpp"
 #include <cctype>
-#include <sstream>
 
 #undef getch        //redefined as Sudoku::getch()
 #undef KEY_ENTER    //redefined in Sudoku::start_game()
@@ -12,7 +11,7 @@ using namespace std;
 const bool DEBUG = false;
 
 //Matrix_9x9 sudoku_init()
-Sudoku::Sudoku ()
+Sudoku::Sudoku (bool is_initscr)
 {
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
@@ -20,7 +19,8 @@ Sudoku::Sudoku ()
     create_map();
 
     //Start ncurses
-    initscr();
+    
+    if (not is_initscr) initscr();
     //establish color support and color pairs
     set_color_pairs();
     cbreak();   //TODO: Will need to account for signal handling
@@ -528,47 +528,6 @@ bool Sudoku::evaluate() {
     return mat.evaluate();
 }
 
-void Sudoku::main_menu () {
-    uint8_t x,
-            y,
-            y_min = ORIGIN.first * 2 + 27,  //TODO: Change min size in order to fit the in-game menu
-            x_min = ORIGIN.second * 2 + 27;
-    getmaxyx(stdscr, y, x);
-    while (y < y_min or x < x_min) {
-        uint8_t x_curr,
-                y_curr;
-        clear();
-        string msg1 = "The current window is too small",
-               msg4 = "Resize the terminal window to continue";
-        stringstream msg2,
-                     msg3;
-        msg2 << "Required dimensions: " << x_min+0 << " x " << y_min+0;
-        msg3 << "Current dimensions: " << x+0 << " x " << y+0;
-        ::mvprintw(y/2, x/2 - msg1.size()/2, msg1.c_str());
-        ::mvprintw(y/2 + 2, x/2 - msg2.str().size()/2, msg2.str().c_str());
-        ::mvprintw(y/2 + 3, x/2 - msg3.str().size()/2, msg3.str().c_str());
-        ::mvprintw(y/2 + 5, x/2 - msg4.size()/2, msg4.c_str());
-        refresh();
-        getmaxyx(stdscr, y, x);
-        getch();
-    }
-    clear();
-    string msg1 = "The window is now an appropriate size",
-           msg2 = "Press Enter to continue";
-    ::mvprintw(y/2, x/2 - msg1.size()/2, msg1.c_str());
-    ::mvprintw(y/2 + 1, x/2 - msg2.size()/2, msg2.c_str());
-    refresh();
-    getch();
-    clear();
-    
-    //TODO:
-    //Options
-        //Start new game
-        //Resume unfinished game
-        //Print # finished games
-    //delwin(win2);
-}
-
 void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
@@ -578,8 +537,9 @@ void Sudoku::start_game()
     refresh();
 
     const uint8_t KEY_ENTER = 10;   //NOTE: This is the Enter key on the main keyboard. The original
-    bool quit_game = false;         //      KEY_ENTER refers to the one on the number pad, but that
+    bool quit_game = false;         //      KEY_ENTER refers to the one on the number pad, but that 
                                     //      one doesn't seem to work as expected anyway.
+    
     do {
         uint16_t input = getch();
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this

@@ -44,11 +44,10 @@ class Sudoku {
         bool evaluate();
         
     public:
-        Sudoku();
+        Sudoku (bool);
         ~Sudoku();
 
         void start_game();
-        void main_menu ();
 };
 
 #endif

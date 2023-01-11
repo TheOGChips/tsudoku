@@ -1,14 +1,22 @@
+#include "Menu.hpp"
 #include "sudoku.hpp"
 #include <ncurses.h>
 
 int main ()
 {
-    Sudoku puzzle;  //initialize a sudoku puzzle
-    puzzle.main_menu(); //TODO: Start in main menu
-    puzzle.start_game();
+    Menu main_menu;
+    options opt = main_menu.main_menu(); //TODO: Start in main menu
+    
+    if (opt == options::NEW_GAME) {
+        Sudoku puzzle (true);  //initialize a sudoku puzzle
+        puzzle.start_game();
+    }
+    else if (opt == options::RESUME_GAME);
+    else;
+    
     clear();
-    printw("sizeof(puzzle): %lu B\n", sizeof(puzzle));
-    printw("sizeof(puzzle): %.7f kB", sizeof(puzzle) / 1024.0);
+    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));
+    printw("sizeof(Sudoku): %.7f kB", sizeof(Sudoku) / 1024.0);
     refresh();
     getch();
     return 0;
