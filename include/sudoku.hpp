@@ -5,6 +5,11 @@
 #include <cstdint>          //uint8_t
 #include <array>            //std::array
 
+#undef getch    /*
+                    NOTE: Redefined as Sudoku::getch(). This doesn't appear to affect the getch()
+                          calls in main.cpp, even though it logically should after seeing how
+                          rearranging #include statements got the KEY_ENTER redefinition to work.
+                 */
 using namespace std;
 
 class Sudoku {

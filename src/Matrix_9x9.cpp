@@ -1,6 +1,6 @@
+#include <ncurses.h>
 #include "Matrix_9x9.hpp"
 #include <ctime>    //time_t, time()
-#include <ncurses.h>
 #include "colors.hpp"
 #include <thread>
 #include <chrono>

@@ -1,13 +1,10 @@
-#include "sudoku.hpp"
 #include <ncurses.h>
+#include "sudoku.hpp"
 #include "colors.hpp"
 #include <cctype>
 #include <thread>
 #include <chrono>
 #include <fstream>
-
-#undef getch        //redefined as Sudoku::getch()
-#undef KEY_ENTER    //redefined in Sudoku::start_game()
 
 using namespace std;
 
@@ -555,7 +552,7 @@ void Sudoku::start_game()
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
 
-    const uint8_t KEY_ENTER = 10;   //NOTE: This is the Enter key on the main keyboard. The original
+    //const uint8_t KEY_ENTER = 10;   //NOTE: This is the Enter key on the main keyboard. The original
     bool quit_game = false;         //      KEY_ENTER refers to the one on the number pad, but that 
                                     //      one doesn't seem to work as expected anyway.
     

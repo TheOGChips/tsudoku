@@ -1,9 +1,8 @@
-#include "Menu.hpp"
 #include <ncurses.h>
+#include "Menu.hpp"
 #include "colors.hpp"
 #include <sstream>
-
-#undef KEY_ENTER
+#include "values.hpp"
 
 Menu::Menu () {
     //TODO: This is only required if using the main menu, will need to account for this later (look at what I did for Sudoku)
@@ -87,12 +86,13 @@ options Menu::main_menu () {
     }
     clear();
     
+    //const uint8_t KEY_ENTER = 10;
     string msg1 = "The window is now an appropriate size",
            msg2 = "Press Enter to continue";
     mvprintw(y_max/2,     x_max/2 - msg1.size()/2, msg1.c_str());
     mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, msg2.c_str());
     refresh();
-    getch();
+    while (getch() != KEY_ENTER);
     clear();
     
     curs_set(0);
@@ -100,7 +100,6 @@ options Menu::main_menu () {
     display_main_menu(opt, y_max, x_max);
     
     uint16_t input;
-    const uint8_t KEY_ENTER = 10;
     do {
         refresh();
         input = getch();

@@ -1,22 +1,22 @@
-#include "Menu.hpp"
-#include "sudoku.hpp"
-#include <ncurses.h>
+#include <ncurses.h>    //NOTE: NCurses is included first in all the files here so that the KEY_ENTER
+#include "Menu.hpp"     //      redefinition in values.hpp persists across files the way I wanted.
+#include "sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
+                        //      this file; however, there don't appear to be any for some reason.
 #include <filesystem>   //filesystem::create_directory, filesystem::exists
 #include <fstream>      //std::ofstream, std::ifstream
-#include <sstream>
-
-#undef KEY_ENTER
-const uint8_t KEY_ENTER = 10;
+#include <sstream>      //std::stringstream
 
 string HOME = getenv("HOME"),
-           dir = HOME + "/.tsudoku",
-           completed = dir + "/completed_puzzles.txt";
+       dir = HOME + "/.tsudoku",
+       completed = dir + "/completed_puzzles.txt";
            
 void create_dir ();
 void display_completed_puzzles ();
 
 int main ()
 {
+    //printf("KEY_ENTER: %d\n", KEY_ENTER);
+    //return 0;
     create_dir();
     
     Menu main_menu;
@@ -52,10 +52,7 @@ void create_dir () {
 }
 
 void display_completed_puzzles () {
-    uint8_t y_max,
-            x_max;
     uint64_t num_completed;
-    
     ifstream infile;
     infile.open(completed.c_str());
     infile >> num_completed;
@@ -64,11 +61,14 @@ void display_completed_puzzles () {
     stringstream sstr;
     sstr << "Completed Sudoku puzzles: " << num_completed;
     string str = "Press Enter to continue";
+    
+    uint8_t y_max,
+            x_max;
     getmaxyx(stdscr, y_max, x_max);
+    
     clear();
     mvprintw(y_max/2, x_max/2 - sstr.str().size()/2, sstr.str().c_str());
     mvprintw(y_max/2 + 2, x_max/2 - str.size()/2, str.c_str());
     refresh();
-    //getch();
     while (getch() != KEY_ENTER);
 }
