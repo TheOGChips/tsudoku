@@ -6,14 +6,14 @@
 #include <fstream>      //std::ofstream, std::ifstream
 #include <sstream>      //std::stringstream
 
-string HOME = getenv("HOME"),
+string HOME = getenv("HOME"),   //TODO: Make these const
        dir = HOME + "/.tsudoku",
        completed = dir + "/completed_puzzles.txt";
            
 void create_dir ();
 void display_completed_puzzles ();
 
-int main ()
+int main () //TODO: The majority of this code will need to be in a loop
 {
     //printf("KEY_ENTER: %d\n", KEY_ENTER);
     //return 0;
@@ -27,12 +27,12 @@ int main ()
         puzzle.start_game();
     }
     else if (opt == options::RESUME_GAME);  //TODO
-    else {  //TODO
+    else {
         display_completed_puzzles();
     }
     
     clear();
-    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));
+    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));  //TODO: This can be deleted later
     printw("sizeof(Sudoku): %.7f kB", sizeof(Sudoku) / 1024.0);
     refresh();
     getch();

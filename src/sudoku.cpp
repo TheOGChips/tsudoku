@@ -548,6 +548,7 @@ void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
     printw();
+    //TODO: Print key instructions on bottom line
     ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
@@ -593,5 +594,6 @@ void Sudoku::start_game()
                 reset_cursor();
             }
         }
+        //TODO: Work on the in-game menu
     } while (!quit_game);
 }

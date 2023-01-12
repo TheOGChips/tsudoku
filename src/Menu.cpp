@@ -63,15 +63,15 @@ options Menu::main_menu () {
             y_max,
             ORIGINfirst = 3,
             ORIGINsecond = 6,
-            y_min = ORIGINfirst * 2 + 30,  //TODO: Change min size in order to fit the in-game menu
-            x_min = ORIGINsecond * 2 + 27; //TODO: How to share the origin between game and menu
+            y_min = ORIGINy * 2 + 30,  //TODO: Change min size in order to fit the in-game menu
+            x_min = ORIGINx * 2 + 27;
     getmaxyx(stdscr, y_max, x_max);
     while (y_max < y_min or x_max < x_min) {
         uint8_t x_curr,
                 y_curr;
         clear();
         string msg1 = "The current window is too small",
-               msg4 = "Resize the terminal window to continue";
+               msg4 = "Resize the terminal window and press Enter to continue";
         stringstream msg2,
                      msg3;
         msg2 << "Required dimensions: " << x_min+0 << " x " << y_min+0;
@@ -82,7 +82,7 @@ options Menu::main_menu () {
         mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       msg4.c_str());
         refresh();
         getmaxyx(stdscr, y_max, x_max);
-        getch();
+        while (getch() != KEY_ENTER);
     }
     clear();
     

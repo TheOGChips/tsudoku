@@ -21,8 +21,8 @@ class Sudoku {
         /*const uint8_t INIT_OFFSETX = 6,
                       INIT_OFFSETY = 3;
         const cell ORIGIN = {INIT_OFFSETY, INIT_OFFSETX};*/
-        const cell ORIGIN = {3, 6}; //NOTE: terminal coordinates are in (y,x) format
-        cell cursor_pos;
+        const cell ORIGIN = {ORIGINy, ORIGINx}; //NOTE: Terminal coordinates are in (y,x) format
+        cell cursor_pos;                        //      Origin coordinates found in values.hpp
         map<cell, cell> display_matrix_offset;
         enum border_positions {TL = 0, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS};
         //const uint8_t NUM_POSITIONS = 8;
