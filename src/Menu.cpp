@@ -5,7 +5,6 @@
 #include "values.hpp"
 
 Menu::Menu (const menu_type type) {
-    //TODO: This is only required if using the main menu, will need to account for this later (look at what I did for Sudoku)
     this->type = type;
     if (this->type == menu_type::MAIN) {
         initscr();
@@ -26,20 +25,20 @@ Menu::~Menu () {
     }
 }
 
-void Menu::display_main_menu (options opt, uint8_t y, uint8_t x) {
+void Menu::display_main_menu (main_options opt, uint8_t y, uint8_t x) {
     string opt1 = "New Game",
            opt2 = "Resume Game",
            opt3 = "Show # Finished Games";
            
     mvprintw(y/2 - 2, x/2 - 5, "MAIN MENU");
-    if (opt == options::NEW_GAME) {
+    if (opt == main_options::NEW_GAME) {
         attron(COLOR_PAIR(MENU_SELECTION));
         mvprintw(y/2,     x/2 - 5, opt1.c_str());
         attroff(COLOR_PAIR(MENU_SELECTION));
         mvprintw(y/2 + 1, x/2 - 5, opt2.c_str());
         mvprintw(y/2 + 2, x/2 - 5, opt3.c_str());
     }
-    else if (opt == options::RESUME_GAME) {
+    else if (opt == main_options::RESUME_GAME) {
         mvprintw(y/2,     x/2 - 5, opt1.c_str());
         attron(COLOR_PAIR(MENU_SELECTION));
         mvprintw(y/2 + 1, x/2 - 5, opt2.c_str());
@@ -55,19 +54,54 @@ void Menu::display_main_menu (options opt, uint8_t y, uint8_t x) {
     }
 }
 
-options operator ++ (options& opt) {
-    return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
+void Menu::display_in_game_menu (in_game_options opt, uint8_t y, uint8_t x) {
+    string opt1 = "View the rules of sudoku",
+           opt2 = "See game manual",
+           opt3 = "Save current game";
+    uint8_t spacing = 1;
+           
+    mvprintw(y, x, "IN-GAME MENU");
+    if (opt == in_game_options::RULES) {
+        attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(y + spacing + 1, x, opt1.c_str());
+        attroff(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(y + spacing + 2, x, opt2.c_str());
+        mvprintw(y + spacing + 3, x, opt3.c_str());
+    }
+    else if (opt == in_game_options::MANUAL) {
+        mvprintw(y + spacing + 1, x, opt1.c_str());
+        attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(y + spacing + 2, x, opt2.c_str());
+        attroff(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(y + spacing + 3, x, opt3.c_str());
+    }
+    else if (opt == in_game_options::SAVE_GAME) {
+        mvprintw(y + spacing + 1, x, opt1.c_str());
+        mvprintw(y + spacing + 2, x, opt2.c_str());
+        attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(y + spacing + 3, x, opt3.c_str());
+        attroff(COLOR_PAIR(MENU_SELECTION));
+    }
+    else {
+        mvprintw(y + spacing + 1, x, opt1.c_str());
+        mvprintw(y + spacing + 2, x, opt2.c_str());
+        mvprintw(y + spacing + 3, x, opt3.c_str());
+    }
+    //Options
+    //Sudoku rules
+    //Game instructions
+    //Save game
+    refresh();
 }
 
-options operator -- (options& opt) {
-    return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
-}
-
-options Menu::main_menu () {
+main_options Menu::main_menu () {
     uint8_t x_max,
             y_max,
-            y_min = ORIGINy * 2 + 32,  //TODO: Change min size in order to fit the in-game menu
-            x_min = ORIGINx * 2 + 27;
+            puzzle_space = 27,
+            result_msg_space = 5,
+            in_game_menu_space = 60,
+            y_min = ORIGINy * 2 + puzzle_space + result_msg_space,  //TODO: Change min size in order to fit the in-game menu
+            x_min = ORIGINx * 2 + puzzle_space + in_game_menu_space;
     getmaxyx(stdscr, y_max, x_max);
     while (y_max < y_min or x_max < x_min) {
         uint8_t x_curr,
@@ -99,7 +133,7 @@ options Menu::main_menu () {
     clear();
     
     curs_set(0);
-    options opt = options::NEW_GAME;
+    main_options opt = main_options::NEW_GAME;
     display_main_menu(opt, y_max, x_max);
     
     uint16_t input;
@@ -119,4 +153,46 @@ options Menu::main_menu () {
     clear();
     curs_set(1);
     return opt;
-} 
+}
+
+void Menu::in_game_menu () {
+    uint8_t y_first = ORIGINy,
+            in_game_menu_edge = 5,
+            x_edge = ORIGINx * 2 + 27 + in_game_menu_edge;
+    in_game_options opt = in_game_options::RULES;
+    
+    curs_set(0);
+    uint16_t input;
+    do {
+        refresh();
+        display_in_game_menu(opt, y_first, x_edge);
+        input = getch();
+        switch (input) {
+            case KEY_DOWN:  ++opt;
+                            break;
+                           
+            case KEY_UP:    --opt;
+                            break;
+                            
+            default:;
+        }
+    } while (tolower(input) != 'm');
+    display_in_game_menu(in_game_options::NONE, y_first, x_edge);
+    curs_set(1);
+}
+
+main_options operator ++ (main_options& opt) {
+    return opt = (opt == main_options::NEW_GAME) ? main_options::RESUME_GAME : main_options::SHOW_STATS;
+}
+
+main_options operator -- (main_options& opt) {
+    return opt = (opt == main_options::SHOW_STATS) ? main_options::RESUME_GAME : main_options::NEW_GAME;
+}
+
+in_game_options operator ++ (in_game_options& opt) {
+    return opt = (opt == in_game_options::RULES) ? in_game_options::MANUAL : in_game_options::SAVE_GAME;
+}
+
+in_game_options operator -- (in_game_options& opt) {
+    return opt = (opt == in_game_options::SAVE_GAME) ? in_game_options::MANUAL : in_game_options::RULES;
+}

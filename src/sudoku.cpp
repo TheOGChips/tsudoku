@@ -553,7 +553,6 @@ void Sudoku::start_game()
     //Load and display the new or saved puzzle
     printw();
     Menu in_game_menu (menu_type::IN_GAME);
-    //TODO: Print key instructions on bottom line
     attron(COLOR_PAIR(MENU_SELECTION));
     ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
     attroff(COLOR_PAIR(MENU_SELECTION));
@@ -569,6 +568,21 @@ void Sudoku::start_game()
         uint16_t input = getch();
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work. Not sure why.
+        }
+        else if (tolower(input) == 'm') {
+            attron(COLOR_PAIR(MENU_SELECTION));
+            mvprintw(getmaxy(stdscr) - 1, 0, "m -> return to game");
+            attroff(COLOR_PAIR(MENU_SELECTION));
+            clrtoeol();
+            
+            in_game_menu.in_game_menu();
+            
+            attron(COLOR_PAIR(MENU_SELECTION));
+            mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
+            attroff(COLOR_PAIR(MENU_SELECTION));
+            clrtoeol();
+            
+            reset_cursor();
         }
         else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
             move(input);
@@ -604,9 +618,6 @@ void Sudoku::start_game()
                 reset_cursor();
             }
         }
-        //TODO: Work on the in-game menu
-        else if (tolower(input) == 'm') {
-            
-        }
+        
     } while (!quit_game);
 }

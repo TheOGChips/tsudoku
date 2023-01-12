@@ -20,13 +20,13 @@ int main () //TODO: The majority of this code will need to be in a loop
     create_dir();
     
     Menu main_menu (menu_type::MAIN);
-    options opt = main_menu.main_menu();
+    main_options opt = main_menu.main_menu();
     
-    if (opt == options::NEW_GAME) {
+    if (opt == main_options::NEW_GAME) {
         Sudoku puzzle (true);  //initialize a sudoku puzzle
         puzzle.start_game();
     }
-    else if (opt == options::RESUME_GAME);  //TODO
+    else if (opt == main_options::RESUME_GAME);  //TODO
     else {
         display_completed_puzzles();
     }
