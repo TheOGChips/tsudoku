@@ -4,21 +4,26 @@
 #include <sstream>
 #include "values.hpp"
 
-Menu::Menu () {
+Menu::Menu (const menu_type type) {
     //TODO: This is only required if using the main menu, will need to account for this later (look at what I did for Sudoku)
-    initscr();
-    cbreak();   //TODO: Will need to account for signal handling
-    noecho();
-    keypad(stdscr, true);
-    
-    start_color();
-    init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
+    this->type = type;
+    if (this->type == menu_type::MAIN) {
+        initscr();
+        cbreak();   //TODO: Will need to account for signal handling
+        noecho();
+        keypad(stdscr, true);
+        
+        start_color();
+        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
+    }
 }
 
 Menu::~Menu () {
-    echo();
-    nocbreak();
-    endwin();
+    if (type == menu_type::MAIN) {
+        echo();
+        nocbreak();
+        endwin();
+    }
 }
 
 void Menu::display_main_menu (options opt, uint8_t y, uint8_t x) {
@@ -61,9 +66,7 @@ options operator -- (options& opt) {
 options Menu::main_menu () {
     uint8_t x_max,
             y_max,
-            ORIGINfirst = 3,
-            ORIGINsecond = 6,
-            y_min = ORIGINy * 2 + 30,  //TODO: Change min size in order to fit the in-game menu
+            y_min = ORIGINy * 2 + 32,  //TODO: Change min size in order to fit the in-game menu
             x_min = ORIGINx * 2 + 27;
     getmaxyx(stdscr, y_max, x_max);
     while (y_max < y_min or x_max < x_min) {
@@ -71,7 +74,7 @@ options Menu::main_menu () {
                 y_curr;
         clear();
         string msg1 = "The current window is too small",
-               msg4 = "Resize the terminal window and press Enter to continue";
+               msg4 = "Resize the terminal window and press Enter twice to continue";
         stringstream msg2,
                      msg3;
         msg2 << "Required dimensions: " << x_min+0 << " x " << y_min+0;

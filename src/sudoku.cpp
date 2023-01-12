@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include "Menu.hpp"
 
 using namespace std;
 
@@ -84,6 +85,7 @@ Sudoku::Sudoku (bool is_initscr)
 
 Sudoku::~Sudoku()
 {
+    echo();
     nocbreak();
     endwin();   //terminate ncurses session
 }
@@ -131,12 +133,14 @@ void Sudoku::set_color_pairs()
         init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
         init_pair(NOTES, COLOR_YELLOW, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(NOTES, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
 }
 
@@ -548,7 +552,11 @@ void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
     printw();
+    Menu in_game_menu (menu_type::IN_GAME);
     //TODO: Print key instructions on bottom line
+    attron(COLOR_PAIR(MENU_SELECTION));
+    ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
+    attroff(COLOR_PAIR(MENU_SELECTION));
     ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
@@ -581,7 +589,8 @@ void Sudoku::start_game()
             reset_cursor();
             #endif
             if (evaluate()) {
-                ::mvprintw(ORIGIN.second + 30, 10, "You win!");
+                string msg = "You win!";
+                ::mvprintw(ORIGIN.first + 31, 14, msg.c_str());
                 clrtoeol();
                 refresh();
                 increment_completed_games();
@@ -589,11 +598,15 @@ void Sudoku::start_game()
                 this_thread::sleep_for(chrono::seconds(2));
             }
             else {
-                ::mvprintw(ORIGIN.second + 30, 10, "Puzzle incomplete!");
+                string msg = "Puzzle incomplete!";
+                ::mvprintw(ORIGIN.first + 31, 14, msg.c_str());
                 refresh();
                 reset_cursor();
             }
         }
         //TODO: Work on the in-game menu
+        else if (tolower(input) == 'm') {
+            
+        }
     } while (!quit_game);
 }

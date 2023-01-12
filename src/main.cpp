@@ -19,7 +19,7 @@ int main () //TODO: The majority of this code will need to be in a loop
     //return 0;
     create_dir();
     
-    Menu main_menu;
+    Menu main_menu (menu_type::MAIN);
     options opt = main_menu.main_menu();
     
     if (opt == options::NEW_GAME) {
