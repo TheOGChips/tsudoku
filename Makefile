@@ -1,7 +1,8 @@
 COMPILER = g++
-INCLUDE = -I include/ -std=c++17
-COMPILE = $(COMPILER) -c $(INCLUDE)
+INCLUDE_FLAGS = -I $(INCLUDE)/ -std=c++17
+COMPILE = $(COMPILER) -c $(INCLUDE_FLAGS)
 LIB = lib
+INCLUDE = include
 LINK = $(COMPILER) $(LIB)/*.o -o
 SRC = src
 MAIN = main
@@ -24,7 +25,7 @@ all:	$(OBJ)
 $(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 			$(COMPILE) $<
 
-$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp
+$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE)/$(MENU).hpp
 			$(COMPILE) $<
 
 $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp

@@ -13,10 +13,12 @@ class Menu {
     private:
         menu_type type;
         const uint8_t IN_GAME_MENU_TITLE_SPACING = 1,   //y-axis, blank lines below menu title
-                      IN_GAME_MENU_DISPLAY_SPACING = 60;    //x-axis, columns for display area
+                      IN_GAME_MENU_DISPLAY_SPACING = 90;    //x-axis, columns for display area
         void display_main_menu (main_options, uint8_t, uint8_t);
         void display_in_game_menu (in_game_options, uint8_t, uint8_t);
+        void clear (uint8_t, uint8_t);
         void display_rules (uint8_t, uint8_t);
+        void display_manual (uint8_t, uint8_t);
         void screen_reader (std::string, uint8_t&, uint8_t, uint8_t);
         
     public:
