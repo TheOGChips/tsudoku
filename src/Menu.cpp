@@ -58,34 +58,33 @@ void Menu::display_in_game_menu (in_game_options opt, uint8_t y, uint8_t x) {
     string opt1 = "View the rules of sudoku",
            opt2 = "See game manual",
            opt3 = "Save current game";
-    uint8_t spacing = 1;
            
     mvprintw(y, x, "IN-GAME MENU");
     if (opt == in_game_options::RULES) {
         attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(y + spacing + 1, x, opt1.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 1, x, opt1.c_str());
         attroff(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(y + spacing + 2, x, opt2.c_str());
-        mvprintw(y + spacing + 3, x, opt3.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 2, x, opt2.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 3, x, opt3.c_str());
     }
     else if (opt == in_game_options::MANUAL) {
-        mvprintw(y + spacing + 1, x, opt1.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 1, x, opt1.c_str());
         attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(y + spacing + 2, x, opt2.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 2, x, opt2.c_str());
         attroff(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(y + spacing + 3, x, opt3.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 3, x, opt3.c_str());
     }
     else if (opt == in_game_options::SAVE_GAME) {
-        mvprintw(y + spacing + 1, x, opt1.c_str());
-        mvprintw(y + spacing + 2, x, opt2.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 1, x, opt1.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 2, x, opt2.c_str());
         attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(y + spacing + 3, x, opt3.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 3, x, opt3.c_str());
         attroff(COLOR_PAIR(MENU_SELECTION));
     }
     else {
-        mvprintw(y + spacing + 1, x, opt1.c_str());
-        mvprintw(y + spacing + 2, x, opt2.c_str());
-        mvprintw(y + spacing + 3, x, opt3.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 1, x, opt1.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 2, x, opt2.c_str());
+        mvprintw(y + IN_GAME_MENU_TITLE_SPACING + 3, x, opt3.c_str());
     }
     //Options
     //Sudoku rules
@@ -94,14 +93,58 @@ void Menu::display_in_game_menu (in_game_options opt, uint8_t y, uint8_t x) {
     refresh();
 }
 
+void Menu::display_rules (uint8_t y_edge, uint8_t x_edge) {
+    const string TITLE = "RULES FOR PLAYING SUDOKU",
+                 RULES_INTRO = string("Sudoku is a puzzle game using the numbers 1-9. The ") +
+                               "puzzle board is a 9x9 grid that can be broken up evenly in 3 " +
+                               "different ways: rows, columns, and 3x3 sub-grids. A completed " +
+                               "sudoku puzzle is one where each cell contains a number, but with " +
+                               "the following restrictions:",
+                 RULES_ROWS = "1. Each row can only contain one each of the numbers 1-9",
+                 RULES_COLUMNS = "2. Each column can only contain one each of the numbers 1-9",
+                 RULES_SUBMATRIX = "3. Each sub-grid can only contain one each of the numbers 1-9";
+                 
+    string rules[4] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
+    uint8_t display_line = 5;
+    
+    mvprintw(y_edge + IN_GAME_MENU_TITLE_SPACING + display_line++, x_edge, TITLE.c_str());
+    for (uint8_t i = 0; i < 4; i++) {
+        display_line++;
+        screen_reader(rules[i], display_line, y_edge, x_edge);
+    }
+}
+
+void Menu::screen_reader (string str, uint8_t& display_line, uint8_t y_edge, uint8_t x_edge) {
+    string display_str;
+    while (not str.empty()) {
+        size_t space_pos = str.find_first_of(' ');
+        
+        if (space_pos == string::npos) {
+            display_str += str;
+            str.clear();
+            mvprintw(y_edge + IN_GAME_MENU_TITLE_SPACING + display_line++, x_edge,
+                     display_str.c_str());
+        }
+        else if (display_str.size() + space_pos + 1 < IN_GAME_MENU_DISPLAY_SPACING - 3) {
+            display_str += str.substr(0, space_pos + 1);
+            str = str.substr(space_pos + 1);
+        }
+        else {
+            mvprintw(y_edge + IN_GAME_MENU_TITLE_SPACING + display_line++, x_edge,
+                     display_str.c_str());
+            display_str.clear();
+        }
+    }
+    display_str.clear();
+}
+
 main_options Menu::main_menu () {
     uint8_t x_max,
             y_max,
             puzzle_space = 27,
             result_msg_space = 5,
-            in_game_menu_space = 60,
             y_min = ORIGINy * 2 + puzzle_space + result_msg_space,  //TODO: Change min size in order to fit the in-game menu
-            x_min = ORIGINx * 2 + puzzle_space + in_game_menu_space;
+            x_min = ORIGINx * 2 + puzzle_space + IN_GAME_MENU_DISPLAY_SPACING;
     getmaxyx(stdscr, y_max, x_max);
     while (y_max < y_min or x_max < x_min) {
         uint8_t x_curr,
@@ -156,7 +199,7 @@ main_options Menu::main_menu () {
 }
 
 void Menu::in_game_menu () {
-    uint8_t y_first = ORIGINy,
+    uint8_t y_edge = ORIGINy,
             in_game_menu_edge = 5,
             x_edge = ORIGINx * 2 + 27 + in_game_menu_edge;
     in_game_options opt = in_game_options::RULES;
@@ -165,7 +208,7 @@ void Menu::in_game_menu () {
     uint16_t input;
     do {
         refresh();
-        display_in_game_menu(opt, y_first, x_edge);
+        display_in_game_menu(opt, y_edge, x_edge);
         input = getch();
         switch (input) {
             case KEY_DOWN:  ++opt;
@@ -174,10 +217,20 @@ void Menu::in_game_menu () {
             case KEY_UP:    --opt;
                             break;
                             
+            //TODO: Case for Enter key
+            case KEY_ENTER: if (opt == in_game_options::RULES) {
+                                display_rules(y_edge, x_edge);
+                            }
+                            else if (opt == in_game_options::MANUAL) {
+                                //TODO
+                            }
+                            else {  //NOTE: opt will never be NONE based on this logic
+                                //TODO
+                            }
             default:;
         }
     } while (tolower(input) != 'm');
-    display_in_game_menu(in_game_options::NONE, y_first, x_edge);
+    display_in_game_menu(in_game_options::NONE, y_edge, x_edge);
     curs_set(1);
 }
 

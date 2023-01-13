@@ -505,6 +505,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                 ::printw(" ");
             }
             else {
+                //TODO: Try to figure out how to alternate colors
                 attron(COLOR_PAIR(NOTES));
                 attron(A_BOLD);
                 ::printw("%c", VALUE);
