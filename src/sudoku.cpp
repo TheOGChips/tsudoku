@@ -464,7 +464,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                 //TODO: Maybe put the next 7 lines in Matrix_9x9.cpp
                 Row &row = mat.get_row(row_number);
                 Column &column = mat.get_column(column_number);
-                Matrix_3x3 &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
+                Box &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
 
                 row.set_value(mat.get_row_index(index), VALUE);
                 column.set_value(mat.get_column_index(index), VALUE);

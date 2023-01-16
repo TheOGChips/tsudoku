@@ -50,7 +50,7 @@ void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTIN
                     offset = 0;
             while (count < 3) {
                 for (uint8_t j = i; j < i + 3; j++) {
-                    Matrix_3x3 submatrix = get_submatrix(j);
+                    Box submatrix = get_submatrix(j);
                     for (uint8_t k = 0; k < 3; k++) {
                         if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
                             cout << RED << submatrix[k + offset] << WHITE;
@@ -146,7 +146,7 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
             while (count < 3) {
                 move(y, x);
                 for (uint8_t j = i; j < i + 3; j++) {
-                    Matrix_3x3 submatrix = get_submatrix(j);
+                    Box submatrix = get_submatrix(j);
                     for (uint8_t k = 0; k < 3; k++) {
                         if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
                             attron(COLOR_PAIR(KNOWN));
@@ -219,7 +219,7 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
     }
 }
 
-Matrix_3x3& Matrix_9x9::get_submatrix (uint8_t index)
+Box& Matrix_9x9::get_submatrix (uint8_t index)
 {
     return matrices[index];
 }
@@ -242,7 +242,7 @@ void Matrix_9x9::init_positions()
 }
 
 /*
- * NOTE: ALGORITHM FOR SOLVING SUDOKU PUZZLE
+ * NOTE: ALGORITHM FOR SOLVING SUDOKU PUZZLE (essentially Bowman's Bingo technique)
  * args <- submatrix # [1-3, 5-7], value # [1-9], row array, column array, submatrix array
  * queue <- available positions on board [0-80]
  * do next_pos <- queue.pop() while recursive call <- false
@@ -257,7 +257,7 @@ void Matrix_9x9::init_positions()
  *    remove value from row, column, and submatrix if recursive call <- false
  * end do-while
  */
-bool Matrix_9x9::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Matrix_3x3 submatrices[9]) {
+bool Matrix_9x9::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Box submatrices[9]) {
     queue<uint8_t> available_pos;
     uint8_t positions[9];
     //Figure out positions in submatrix based on submatrix number
@@ -383,7 +383,7 @@ array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
     //Create row, column, and submatrix objects from partial solution matrix
     Row soln_rows[9];
     Column soln_columns[9];
-    Matrix_3x3 soln_matrices[9];
+    Box soln_matrices[9];
 
     for (uint8_t i = 0; i < 9; i++) {
         soln_rows[i] = Row(soln_matrix[i]);
@@ -410,7 +410,7 @@ array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
             temp_submat[6] = soln_matrix[i+1][j-1];
             temp_submat[7] = soln_matrix[i+1][j];
             temp_submat[8] = soln_matrix[i+1][j+1];
-            soln_matrices[count] = Matrix_3x3(temp_submat);
+            soln_matrices[count] = Box(temp_submat);
             count++;
         }
     }
@@ -482,7 +482,7 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
         //check the row, column, and submatrix for the value
         Row &row = get_row(ROW_NUMBER); //NOTE: why these require the ampersand, I'm not really sure
         Column &column = get_column(COLUMN_NUMBER);
-        Matrix_3x3 &submatrix = get_submatrix(SUBMATRIX_NUMBER);
+        Box &submatrix = get_submatrix(SUBMATRIX_NUMBER);
 
         //shuffle(begin(values), end(values), mt19937(seed));
         //while (!valid_value) {
@@ -713,10 +713,10 @@ bool Matrix_9x9::evaluate () {
     for (uint8_t i = 0; i < 9; i++) {
         //Row &row = mat.get_row(i);
         //Column &column = mat.get_column(i);
-        //Matrix_3x3 &submatrix = mat.get_submatrix(i);
+        //Box &submatrix = mat.get_submatrix(i);
         Row row = rows[i];
         Column column = cols[i];
-        Matrix_3x3 submatrix = matrices[i];
+        Box submatrix = matrices[i];
         
         if (not row.evaluate() or not column.evaluate() or not submatrix.evaluate()) return false;
     }

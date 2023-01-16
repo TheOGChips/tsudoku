@@ -2,7 +2,7 @@
 #define MATRIX_9X9_HPP
 
 //#include "values.hpp"
-#include "Matrix_3x3.hpp"
+#include "Box.hpp"
 #include "Row.hpp"
 #include "Column.hpp"
 #include <random>   //mt19937(), uniform_int_distribution<>(),
@@ -12,7 +12,7 @@ using namespace std;
 
 class Matrix_9x9 {
     private:
-        Matrix_3x3 matrices[9];
+        Box matrices[9];
         Row rows[9];
         Column cols[9];
         bool known_positions[81];
@@ -28,7 +28,7 @@ class Matrix_9x9 {
         //uint8_t next_position();
         //uint8_t next_value();
         map<uint8_t, cell> create_map();
-        bool solve(uint8_t, uint8_t, Row[9], Column[9], Matrix_3x3[9]);
+        bool solve(uint8_t, uint8_t, Row[9], Column[9], Box[9]);
 
     public:
         Matrix_9x9();
@@ -36,7 +36,7 @@ class Matrix_9x9 {
         uint8_t map_row (const uint8_t);
         uint8_t map_column (const uint8_t);
         uint8_t map_submatrix (const uint8_t, const uint8_t);
-        Matrix_3x3& get_submatrix (uint8_t);
+        Box& get_submatrix (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);
         uint8_t get_row_index (const uint8_t);
@@ -47,10 +47,11 @@ class Matrix_9x9 {
         void printw (const bool, const bool);
         const cell get_map (uint8_t);
         uint8_t get_map_size() const;
-        uint8_t at (uint8_t);
-        uint8_t operator [] (uint8_t);
+        uint8_t at (uint8_t);           //TODO: Virtual function candidate
+        uint8_t operator [] (uint8_t);  //TODO: Virtual function candidate
         bool is_known (uint8_t);
-        bool evaluate();    //TODO: Add function for evaluating puzzle after the user hits ENTER
+        bool evaluate();                //TODO: Virtual function candidate
+                                        //TODO: value_exists and set_value virtual candidates missing
 };
 
 #endif
