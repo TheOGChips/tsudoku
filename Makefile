@@ -10,6 +10,7 @@ MENU = Menu
 MAIN_MENU = MainMenu
 INGAME_MENU = InGameMenu
 SUDOKU = sudoku
+CONTAINER = Container
 ROW = Row
 COLUMN = Column
 BOX = Box
@@ -46,7 +47,7 @@ $(LIB)/$(ROW).o:	$(SRC)/$(ROW).cpp
 $(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
 			$(COMPILE) $<
 
-$(LIB)/$(BOX).o:	$(SRC)/$(BOX).cpp $(INCLUDE)/$(BOX).hpp
+$(LIB)/$(BOX).o:	$(SRC)/$(BOX).cpp $(INCLUDE)/$(BOX).hpp $(INCLUDE)/$(CONTAINER).hpp
 			$(COMPILE) $<
 
 $(LIB)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
