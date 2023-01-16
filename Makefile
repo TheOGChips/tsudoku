@@ -44,7 +44,7 @@ $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
 $(LIB)/$(ROW).o:	$(SRC)/$(ROW).cpp
 			$(COMPILE) $<
 
-$(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp
+$(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp $(INCLUDE)/$(COLUMN).hpp $(INCLUDE)/$(CONTAINER).hpp
 			$(COMPILE) $<
 
 $(LIB)/$(BOX).o:	$(SRC)/$(BOX).cpp $(INCLUDE)/$(BOX).hpp $(INCLUDE)/$(CONTAINER).hpp

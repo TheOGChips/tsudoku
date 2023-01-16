@@ -1,10 +1,10 @@
 #ifndef COLUMN_HPP
 #define COLUMN_HPP
 
-#include "values.hpp"
+#include "Container.hpp"
 #include <cstdint>  //uint8_t
 
-class Column {
+class Column : public Container {
     private:
         char col[9];
 
@@ -12,11 +12,11 @@ class Column {
         Column();
         Column (uint8_t[9]);
         ~Column() {}
-        uint8_t at (uint8_t);
-        uint8_t operator [] (uint8_t);
-        bool value_exists (uint8_t);
-        void set_value (uint8_t, uint8_t);
-        bool evaluate();
+        uint8_t at (uint8_t) override;
+        uint8_t operator [] (uint8_t) override;
+        bool value_exists (uint8_t) override;
+        void set_value (uint8_t, uint8_t) override;
+        bool evaluate() override;
 };
 
 #endif
