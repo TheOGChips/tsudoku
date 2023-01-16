@@ -30,14 +30,19 @@ int main () //TODO: The majority of this code will need to be in a loop
      *       commits if it works and depending on what I decide.
      */
     
-    //TODO: Convert this to a switch statement
-    if (opt == mm_options::NEW_GAME) {
-        Sudoku puzzle (true);  //initialize a sudoku puzzle
-        puzzle.start_game();
-    }
-    else if (opt == mm_options::RESUME_GAME);  //TODO
-    else {
-        display_completed_puzzles();
+    switch (opt) {
+        case mm_options::NEW_GAME:  {
+                                        Sudoku puzzle(true);    //TODO: Consider making this a static
+                                        puzzle.start_game();    //      function, depending on how
+                                        break;                  //      resuming games works
+                                    }
+                       
+        case mm_options::RESUME_GAME: break;  //TODO
+        
+        case mm_options::SHOW_STATS: display_completed_puzzles();
+                                     break;
+                         
+        default:;
     }
     
     clear();

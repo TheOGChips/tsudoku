@@ -126,24 +126,27 @@ uint8_t InGameMenu::menu () {
         display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, static_cast<uint8_t>(opt));
         input = getch();
         switch (input) {
-            case KEY_DOWN:  ++opt;
-                            break;
+            case KEY_DOWN:  ++opt;  //TODO: These could actually be changed to be post-increment/
+                            break;  //      decrement judging by how they're used here.
                            
             case KEY_UP:    --opt;
                             break;
                             
             //TODO: Case for Enter key
-            case KEY_ENTER: if (opt == igm_options::RULES) {
-                                clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                            }
-                            else if (opt == igm_options::MANUAL) {
-                                clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                            }
-                            else {  //NOTE: opt will never be NONE based on this logic
-                                //TODO: Saving games
-                            }
+            case KEY_ENTER: 
+                switch (opt) {
+                    case igm_options::RULES: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                             display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                             break;
+                                             
+                    case igm_options::MANUAL: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                              display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                              break;
+                                              
+                    case igm_options::SAVE_GAME: break; //TODO
+                    
+                    default:;   //NOTE: opt will never be NONE based on this logic
+                }
             default:;
         }
     } while (tolower(input) != 'm');
