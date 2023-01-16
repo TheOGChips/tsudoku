@@ -1,10 +1,10 @@
 #ifndef ROW_HPP
 #define ROW_HPP
 
-#include "values.hpp"
+#include "Container.hpp"
 #include <cstdint>  //uint8_t
 
-class Row {
+class Row : public Container {
     private:
         char row[9];
 
@@ -12,11 +12,11 @@ class Row {
         Row();
         Row (uint8_t[9]);
         ~Row() {}
-        uint8_t at (uint8_t);
-        uint8_t operator [] (uint8_t);
-        bool value_exists (uint8_t);
-        void set_value (uint8_t, uint8_t);
-        bool evaluate();
+        uint8_t at (uint8_t) override;
+        uint8_t operator [] (uint8_t) override;
+        bool value_exists (uint8_t) override;
+        void set_value (uint8_t, uint8_t) override;
+        bool evaluate() override;
 };
 
 #endif

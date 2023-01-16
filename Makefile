@@ -41,7 +41,7 @@ $(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp
 $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
 			$(COMPILE) $<
 
-$(LIB)/$(ROW).o:	$(SRC)/$(ROW).cpp
+$(LIB)/$(ROW).o:	$(SRC)/$(ROW).cpp $(INCLUDE)/$(ROW).hpp $(INCLUDE)/$(CONTAINER).hpp
 			$(COMPILE) $<
 
 $(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp $(INCLUDE)/$(COLUMN).hpp $(INCLUDE)/$(CONTAINER).hpp
