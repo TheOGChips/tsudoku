@@ -10,7 +10,7 @@
  *       into this next.
  */
 
-//enum class options;
+enum class options;
 
 class Menu {
     public:
@@ -30,8 +30,8 @@ class Menu {
         
         Menu () {}
         ~Menu () {}
-        virtual uint8_t menu () = PURE_VIRTUAL;
-        virtual void display_menu (const uint8_t, const uint8_t, const uint8_t) = PURE_VIRTUAL;
+        virtual options menu () = PURE_VIRTUAL;
+        virtual void display_menu (const uint8_t, const uint8_t, const options) = PURE_VIRTUAL;
         //virtual options operator ++ ();
         //virtual options operator -- ();
 };

@@ -3,22 +3,22 @@
 #include "colors.hpp"
 #include <map>
 
-void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const uint8_t opt) {
+void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const options OPT) {
     const uint8_t NUM_OPTS = 3;
     const string TITLE = "IN-GAME MENU",
-                 OPT[NUM_OPTS] = { "View the rules of sudoku",
+                 OPTS[NUM_OPTS] = { "View the rules of sudoku",
                                    "See game manual", 
                                    "Save current game"};
-    map<uint8_t, igm_options> opt_map;
-    opt_map[0] = igm_options::RULES;
-    opt_map[1] = igm_options::MANUAL;
-    opt_map[2] = igm_options::SAVE_GAME;
+    map<uint8_t, options> opt_map;
+    opt_map[0] = options::RULES;
+    opt_map[1] = options::MANUAL;
+    opt_map[2] = options::SAVE_GAME;
            
     mvprintw(Y_EDGE, X_EDGE, TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
-        if (igm_options(opt) == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + i + 1, X_EDGE, OPT[i].c_str());
-        if (igm_options(opt) == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
+        if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + i + 1, X_EDGE, OPTS[i].c_str());
+        if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
 }
@@ -117,50 +117,50 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
     display_str.clear();
 }
 
-uint8_t InGameMenu::menu () {    
+options InGameMenu::menu () {    
     curs_set(0);
-    igm_options opt = igm_options::RULES;
+    options opt = options::RULES;
     uint16_t input;
     do {
         refresh();
-        display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, static_cast<uint8_t>(opt));
+        display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, opt);
         input = getch();
         switch (input) {
-            case KEY_DOWN:  ++opt;  //TODO: These could actually be changed to be post-increment/
-                            break;  //      decrement judging by how they're used here.
+            case KEY_DOWN: opt++;  //TODO: These could actually be changed to be post-increment/
+                           break;  //      decrement judging by how they're used here.
                            
-            case KEY_UP:    --opt;
-                            break;
+            case KEY_UP: opt--;
+                         break;
                             
             //TODO: Case for Enter key
             case KEY_ENTER: 
                 switch (opt) {
-                    case igm_options::RULES: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             break;
+                    case options::RULES: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                         display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                         break;
                                              
-                    case igm_options::MANUAL: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                              display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                              break;
+                    case options::MANUAL: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                          display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                          break;
                                               
-                    case igm_options::SAVE_GAME: break; //TODO
+                    case options::SAVE_GAME: break; //TODO
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
                 }
             default:;
         }
     } while (tolower(input) != 'm');
-    opt = igm_options::NONE;
-    display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, static_cast<uint8_t>(opt));
+    opt = options::NONE;
+    display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, opt);
     curs_set(1);
     
-    return static_cast<uint8_t>(opt);
+    return opt;
 }
 
-igm_options operator ++ (igm_options& opt) {
-    return opt = (opt == igm_options::RULES) ? igm_options::MANUAL : igm_options::SAVE_GAME;
+options operator ++ (options& opt, int) {
+    return opt = (opt == options::RULES) ? options::MANUAL : options::SAVE_GAME;
 }
 
-igm_options operator -- (igm_options& opt) {
-    return opt = (opt == igm_options::SAVE_GAME) ? igm_options::MANUAL : igm_options::RULES;
+options operator -- (options& opt, int) {
+    return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;
 }

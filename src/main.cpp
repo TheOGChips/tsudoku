@@ -20,26 +20,18 @@ int main () //TODO: The majority of this code will need to be in a loop
     create_dir();
     
     MainMenu main_menu;
-    mm_options opt = mm_options(main_menu.menu());
-    /*
-     * NOTE: The distinction between main menu and in-game menu options has to be maintained because
-     *       the linker gets upset due to a "multiple definition" error for the operator overloads.
-     *       Using actual functions instead of operator overloads might still work since the
-     *       operators are prefix increment/decrement. This would help clean up the code some more,
-     *       but loses the nice brevity of the operators. This might be done within the next 1 or 2
-     *       commits if it works and depending on what I decide.
-     */
+    options opt = main_menu.menu();
     
     switch (opt) {
-        case mm_options::NEW_GAME:  {
+        case options::NEW_GAME:  {
                                         Sudoku puzzle(true);    //TODO: Consider making this a static
                                         puzzle.start_game();    //      function, depending on how
                                         break;                  //      resuming games works
                                     }
                        
-        case mm_options::RESUME_GAME: break;  //TODO
+        case options::RESUME_GAME: break;  //TODO
         
-        case mm_options::SHOW_STATS: display_completed_puzzles();
+        case options::SHOW_STATS: display_completed_puzzles();
                                      break;
                          
         default:;

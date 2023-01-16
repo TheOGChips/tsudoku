@@ -3,11 +3,11 @@
 
 #include "Menu.hpp"
 
-enum class igm_options { RULES, MANUAL, SAVE_GAME, NONE };
+enum class options { RULES, MANUAL, SAVE_GAME, NONE };
 
 class InGameMenu : public Menu {
     private:
-        void display_menu (const uint8_t, const uint8_t, const uint8_t) override;
+        void display_menu (const uint8_t, const uint8_t, const options) override;
         void clear (const uint8_t, const uint8_t);
         void display_rules (const uint8_t, const uint8_t);
         void display_manual (const uint8_t, const uint8_t);
@@ -16,10 +16,10 @@ class InGameMenu : public Menu {
     public:
         InGameMenu () {}
         ~InGameMenu () {}
-        uint8_t menu () override;
+        options menu () override;
 };
 
-igm_options operator ++ (igm_options&);
-igm_options operator -- (igm_options&);
+options operator ++ (options&, int);
+options operator -- (options&, int);
 
 #endif

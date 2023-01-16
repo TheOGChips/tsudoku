@@ -20,27 +20,27 @@ MainMenu::~MainMenu () {
     endwin();
 }
 
-void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const uint8_t opt) {
+void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT) {
     const string TITLE = "MAIN MENU";
     const uint8_t Y_CENTER = Y / 2,
                   X_CENTER = X/2 - TITLE.size()/2,
                   NUM_OPTS = 3;
-    const string OPT[NUM_OPTS] = { "New Game", "Resume Game", "Show # Finished Games" };
-    map<uint8_t, mm_options> opt_map;
-    opt_map[0] = mm_options::NEW_GAME;
-    opt_map[1] = mm_options::RESUME_GAME;
-    opt_map[2] = mm_options::SHOW_STATS;
+    const string OPTS[NUM_OPTS] = { "New Game", "Resume Game", "Show # Finished Games" };
+    map<uint8_t, options> opt_map;
+    opt_map[0] = options::NEW_GAME;
+    opt_map[1] = options::RESUME_GAME;
+    opt_map[2] = options::SHOW_STATS;
            
     mvprintw(Y_CENTER - 2, X_CENTER, TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
-        if (mm_options(opt) == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_CENTER + i, X_CENTER, OPT[i].c_str());
-        if (mm_options(opt) == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
+        if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(Y_CENTER + i, X_CENTER, OPTS[i].c_str());
+        if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
 }
 
-uint8_t MainMenu::menu () {
+options MainMenu::menu () {
     uint8_t x_max,
             y_max;
     getmaxyx(stdscr, y_max, x_max);
@@ -73,19 +73,19 @@ uint8_t MainMenu::menu () {
     ::clear();
     
     curs_set(0);
-    mm_options opt = mm_options::NEW_GAME;
-    display_menu(y_max, x_max, static_cast<uint8_t>(opt));
+    options opt = options::NEW_GAME;
+    display_menu(y_max, x_max, opt);
     
     uint16_t input;
     do {
         input = getch();
         switch (input) {
             case KEY_DOWN:  ++opt;
-                            display_menu(y_max, x_max, static_cast<uint8_t>(opt));
+                            display_menu(y_max, x_max, opt);
                             break;
                             
             case KEY_UP:    --opt;
-                            display_menu(y_max, x_max, static_cast<uint8_t>(opt));
+                            display_menu(y_max, x_max, opt);
                             break;
                 
             default:;
@@ -93,13 +93,13 @@ uint8_t MainMenu::menu () {
     } while (input != KEY_ENTER);
     ::clear();
     curs_set(1);
-    return static_cast<uint8_t>(opt);
+    return opt;
 }
 
-mm_options operator ++ (mm_options& opt) {
-    return opt = (opt == mm_options::NEW_GAME) ? mm_options::RESUME_GAME : mm_options::SHOW_STATS;
+options operator ++ (options& opt) {
+    return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
 }
 
-mm_options operator -- (mm_options& opt) {
-    return opt = (opt == mm_options::SHOW_STATS) ? mm_options::RESUME_GAME : mm_options::NEW_GAME;
+options operator -- (options& opt) {
+    return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
 }
