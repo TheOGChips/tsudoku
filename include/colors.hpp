@@ -6,8 +6,8 @@
 using namespace std;
 
 const uint8_t UNKNOWN = 1,
-              KNOWN = 2,
-              NOTES = 3,
+              GIVEN = 2,
+              CANDIDATES = 3,
               GUESS = 4,
               MENU_SELECTION = 5;
 

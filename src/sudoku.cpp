@@ -130,15 +130,15 @@ void Sudoku::set_color_pairs()
     if (has_colors()) { //color mode
         //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(KNOWN, COLOR_RED, COLOR_BLACK);
-        init_pair(NOTES, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(GIVEN, COLOR_RED, COLOR_BLACK);
+        init_pair(CANDIDATES, COLOR_YELLOW, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
         init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(KNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(NOTES, COLOR_WHITE, COLOR_BLACK);
+        init_pair(GIVEN, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CANDIDATES, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
         init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
@@ -225,9 +225,9 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
         cell coords = _map_[i];
         move(coords.first, coords.second);  //Move cursor to position
         if (mat.is_known(i)) {
-            attron(COLOR_PAIR(KNOWN));  //Turn color scheme on
+            attron(COLOR_PAIR(GIVEN));  //Turn color scheme on
             ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
-            attroff(COLOR_PAIR(KNOWN));//Turn color scheme off
+            attroff(COLOR_PAIR(GIVEN));//Turn color scheme off
         }
         else {
             attron(COLOR_PAIR(UNKNOWN));
@@ -366,22 +366,22 @@ bool Sudoku::do_nothing()
     refresh();
     getch();*/
 
-    //if ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
+    //if ((inch() & A_COLOR) == COLOR_PAIR(GIVEN)) return true;
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
-        if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(KNOWN)) return true;
+        if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(GIVEN)) return true;
     }
     reset_cursor();
-    //return ((inch() & A_COLOR) == COLOR_PAIR(KNOWN)) ? true : false;
-    return (inch() & A_COLOR) == COLOR_PAIR(KNOWN);
-    /*return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((ch & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(KNOWN)) |
-           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(KNOWN));*/
+    //return ((inch() & A_COLOR) == COLOR_PAIR(GIVEN)) ? true : false;
+    return (inch() & A_COLOR) == COLOR_PAIR(GIVEN);
+    /*return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((ch & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
+           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(GIVEN));*/
 }
 
 void Sudoku::clear_surrounding_cells()
@@ -434,7 +434,7 @@ void Sudoku::place_value (const uint16_t VALUE)
     //::mvprintw(20, 100, "ch: %u\n", ch);
     //::mvprintw(21, 100, "COLOR_RED: %d\n", COLOR_RED);
     //::mvprintw(22, 100, "A_COLOR: %d\n", A_COLOR);
-    //::mvprintw(23, 100, "COLOR_PAIR(KNOWN): %d\n", COLOR_PAIR(KNOWN));
+    //::mvprintw(23, 100, "COLOR_PAIR(GIVEN): %d\n", COLOR_PAIR(GIVEN));
     //::mvprintw(24, 100, "ch & A_COLOR: %d\n", ch & A_COLOR);
     //::refresh();
     if (do_nothing()) reset_cursor();
@@ -506,11 +506,11 @@ void Sudoku::place_value (const uint16_t VALUE)
             }
             else {
                 //TODO: Try to figure out how to alternate colors
-                attron(COLOR_PAIR(NOTES));
+                attron(COLOR_PAIR(CANDIDATES));
                 attron(A_BOLD);
                 ::printw("%c", VALUE);
                 attroff(A_BOLD);
-                attroff(COLOR_PAIR(NOTES));
+                attroff(COLOR_PAIR(CANDIDATES));
             }
         }
 

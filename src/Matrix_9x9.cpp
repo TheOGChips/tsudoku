@@ -149,9 +149,9 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
                     Box submatrix = get_submatrix(j);
                     for (uint8_t k = 0; k < 3; k++) {
                         if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
-                            attron(COLOR_PAIR(KNOWN));
+                            attron(COLOR_PAIR(GIVEN));
                             ::printw("%c", submatrix[k + offset]);
-                            attroff(COLOR_PAIR(KNOWN));
+                            attroff(COLOR_PAIR(GIVEN));
                         }
                         else {
                             ::printw("%c", submatrix[k + offset]);
@@ -183,9 +183,9 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
             for (uint8_t j = 0; j < 9; j++) {
                 if (COLUMN_PRINTING) {
                     if (get_column(j)[i] >= ONE and get_column(j)[i] <= NINE) {
-                        attron(COLOR_PAIR(KNOWN));
+                        attron(COLOR_PAIR(GIVEN));
                         ::printw("%c", get_column(j)[i]);
-                        attroff(COLOR_PAIR(KNOWN));
+                        attroff(COLOR_PAIR(GIVEN));
                     }
                     else {
                         ::printw("%c", get_column(j)[i]);
@@ -193,9 +193,9 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
                 }
                 else {  //if (ROW_PRINTING)
                     if (get_row(i)[j] >= ONE and get_row(i)[j] <= NINE) {
-                        attron(COLOR_PAIR(KNOWN));
+                        attron(COLOR_PAIR(GIVEN));
                         ::printw("%c", get_row(i)[j]);
-                        attroff(COLOR_PAIR(KNOWN));
+                        attroff(COLOR_PAIR(GIVEN));
                     }
                     else {
                         ::printw("%c", get_row(i)[j]);
