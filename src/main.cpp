@@ -1,5 +1,5 @@
 #include <ncurses.h>    //NOTE: NCurses is included first in all the files here so that the KEY_ENTER
-#include "Menu.hpp"     //      redefinition in values.hpp persists across files the way I wanted.
+#include "MainMenu.hpp" //      redefinition in values.hpp persists across files the way I wanted.
 #include "sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
                         //      this file; however, there don't appear to be any for some reason.
 #include <filesystem>   //filesystem::create_directory, filesystem::exists
@@ -19,14 +19,23 @@ int main () //TODO: The majority of this code will need to be in a loop
     //return 0;
     create_dir();
     
-    Menu main_menu (menu_type::MAIN);
-    main_options opt = main_menu.main_menu();
+    MainMenu main_menu;
+    mm_options opt = mm_options(main_menu.menu());
+    /*
+     * NOTE: The distinction between main menu and in-game menu options has to be maintained because
+     *       the linker gets upset due to a "multiple definition" error for the operator overloads.
+     *       Using actual functions instead of operator overloads might still work since the
+     *       operators are prefix increment/decrement. This would help clean up the code some more,
+     *       but loses the nice brevity of the operators. This might be done within the next 1 or 2
+     *       commits if it works and depending on what I decide.
+     */
     
-    if (opt == main_options::NEW_GAME) {
+    //TODO: Convert this to a switch statement
+    if (opt == mm_options::NEW_GAME) {
         Sudoku puzzle (true);  //initialize a sudoku puzzle
         puzzle.start_game();
     }
-    else if (opt == main_options::RESUME_GAME);  //TODO
+    else if (opt == mm_options::RESUME_GAME);  //TODO
     else {
         display_completed_puzzles();
     }

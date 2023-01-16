@@ -7,12 +7,14 @@ LINK = $(COMPILER) $(LIB)/*.o -o
 SRC = src
 MAIN = main
 MENU = Menu
+MAIN_MENU = MainMenu
+INGAME_MENU = InGameMenu
 SUDOKU = sudoku
 ROW = Row
 COLUMN = Column
 MATRIX_3X3 = Matrix_3x3
 MATRIX_9X9 = Matrix_9x9
-OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(ROW).o $(LIB)/$(COLUMN).o $(LIB)/$(MATRIX_3X3).o $(LIB)/$(MATRIX_9X9).o
+OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(ROW).o $(LIB)/$(COLUMN).o $(LIB)/$(MATRIX_3X3).o $(LIB)/$(MATRIX_9X9).o
 TGT = $(SUDOKU).exe
 
 .PHONY: all run clean
@@ -25,9 +27,16 @@ all:	$(OBJ)
 $(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
 			$(COMPILE) $<
 
-$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE)/$(MENU).hpp
+#$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE)/$(MENU).hpp
+#			$(COMPILE) $<
+
+$(LIB)/$(MAIN_MENU).o:	$(SRC)/$(MAIN_MENU).cpp $(INCLUDE)/$(MAIN_MENU).hpp $(INCLUDE)/$(MENU).hpp
 			$(COMPILE) $<
 
+$(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp $(INCLUDE)/$(MENU).hpp
+				$(COMPILE) $<
+#TODO: MainMenu.cpp
+#TODO: InGameMenu.cpp
 $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
 			$(COMPILE) $<
 

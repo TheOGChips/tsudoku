@@ -5,7 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
-#include "Menu.hpp"
+#include "InGameMenu.hpp"
 
 using namespace std;
 
@@ -553,7 +553,7 @@ void Sudoku::start_game()
 {
     //Load and display the new or saved puzzle
     printw();
-    Menu in_game_menu (menu_type::IN_GAME);
+    InGameMenu in_game_menu;
     attron(COLOR_PAIR(MENU_SELECTION));
     ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
     attroff(COLOR_PAIR(MENU_SELECTION));
@@ -576,7 +576,7 @@ void Sudoku::start_game()
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
-            in_game_menu.in_game_menu();
+            in_game_menu.menu();
             
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
@@ -613,7 +613,7 @@ void Sudoku::start_game()
                 this_thread::sleep_for(chrono::seconds(2));
             }
             else {
-                string msg = "Puzzle incomplete!";
+                string msg = "Puzzle incomplete!";  //TODO: Remove this result display after a delay
                 ::mvprintw(ORIGIN.first + 31, 14, msg.c_str());
                 refresh();
                 reset_cursor();
