@@ -34,12 +34,12 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     const string TITLE = "RULES FOR PLAYING SUDOKU",
                  RULES_INTRO = string("Sudoku is a puzzle game using the numbers 1-9. The ") +
                                "puzzle board is a 9x9 grid that can be broken up evenly in 3 " +
-                               "different ways: rows, columns, and 3x3 sub-grids. A completed " +
-                               "sudoku puzzle is one where each cell contains a number, but with " +
-                               "the following restrictions:",
+                               "different ways: rows, columns, and 3x3 boxes. A completed sudoku " +
+                               "puzzle is one where each cell contains a number, but with the " +
+                               "following restrictions:",
                  RULES_ROWS = "1. Each row can only contain one each of the numbers 1-9",
                  RULES_COLUMNS = "2. Each column can only contain one each of the numbers 1-9",
-                 RULES_SUBMATRIX = "3. Each sub-grid can only contain one each of the numbers 1-9";
+                 RULES_SUBMATRIX = "3. Each 3x3 box can only contain one each of the numbers 1-9";
                  
     const uint8_t NUM_RULES = 4;
     string rules_text[NUM_RULES] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
@@ -54,8 +54,8 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
 
 void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     const string TITLE = "TSUDOKU GAME MANUAL",
-                 MANUAL_INTRO = string("Red numbers are hints provided for you when the puzzle ") +
-                                "has been generated. The number of hints present corresponds to " +
+                 MANUAL_INTRO = string("Red numbers are givens provided for you when the puzzle ") +
+                                "has been generated. The number of givens present corresponds to " +
                                 "the difficulty level you have chosen. Cells with white '?' " +
                                 "symbols are empty cells which you must solve for to complete " +
                                 "the puzzle. To enter a number 1-9 into an empty cell, simply " +
@@ -66,14 +66,15 @@ void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                                 "Backspace or Delete keys; the green number will be replaced " +
                                 "with a '?' symbol again. The eight blank cells surrounding each " +
                                 "sudoku puzzle cell are available as a note-taking area when " +
-                                "analyzing what numbers should go in that particular cell; " +
-                                "numbers entered in these cells will appear yellow in color. " +
-                                "Numbers in these cells can also be removed by pressing either " +
-                                "the Backspace or Delete keys while the cursor is over the cell. " +
-                                "You cannot enter anything in the note-taking cells surrounding " +
-                                "puzzle cells with red numbers. BEWARE: Entering a number in a " +
-                                "'?' occupied cell will also erase your notes in the eight " +
-                                "surrounding cells. This action cannot be undone.",
+                                "analyzing what numbers (candidates) should go in that " +
+                                "particular cell; numbers entered in these cells will appear " +
+                                "yellow in color. Numbers in these cells can also be removed by " +
+                                "pressing either the Backspace or Delete keys while the cursor " +
+                                "is over the cell. You cannot enter anything in the note-taking " +
+                                "cells surrounding puzzle cells with red numbers. BEWARE: " +
+                                "Entering a number in a '?' occupied cell will also erase your " +
+                                "notes in the eight surrounding cells. This action cannot be " +
+                                "undone.",
                  MANUAL_M = "m/M -> Enter/Exit the in-game manual",
                  MANUAL_Q = "q/Q -> Quit the game without saving",
                  MANUAL_DIR_KEYS = "Up, Down, Left, Right -> Navigate the sudoku board",
