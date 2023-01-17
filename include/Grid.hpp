@@ -1,5 +1,5 @@
-#ifndef MATRIX_9X9_HPP
-#define MATRIX_9X9_HPP
+#ifndef GRID_HPP
+#define GRID_HPP
 
 //#include "values.hpp"
 #include "Box.hpp"
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class Matrix_9x9 {
+class Grid {
     private:
         Box matrices[9];
         Row rows[9];
@@ -31,8 +31,8 @@ class Matrix_9x9 {
         bool solve(uint8_t, uint8_t, Row[9], Column[9], Box[9]);
 
     public:
-        Matrix_9x9();
-        ~Matrix_9x9() {}
+        Grid();
+        ~Grid() {}
         uint8_t map_row (const uint8_t);
         uint8_t map_column (const uint8_t);
         uint8_t map_submatrix (const uint8_t, const uint8_t);

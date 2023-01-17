@@ -1,7 +1,7 @@
 #ifndef SUDOKU_HPP
 #define SUDOKU_HPP
 
-#include "Matrix_9x9.hpp"   //cell, std::map, std::utility
+#include "Grid.hpp"   //cell, std::map, std::utility
 #include <cstdint>          //uint8_t
 #include <array>            //std::array
 
@@ -15,7 +15,7 @@ using namespace std;
 class Sudoku {
     private:
         uint8_t display_matrix[27][27] = {};
-        Matrix_9x9 mat;
+        Grid mat;
         map<uint8_t, cell> _map_;   //maps 81 positions to positions in 27x27 display matrix
         map<cell, uint8_t> _rev_map_;
         /*const uint8_t INIT_OFFSETX = 6,

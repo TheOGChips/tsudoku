@@ -1,5 +1,5 @@
 #include <ncurses.h>
-#include "Matrix_9x9.hpp"
+#include "Grid.hpp"
 #include <ctime>    //time_t, time()
 #include "colors.hpp"
 #include <thread>
@@ -13,7 +13,7 @@ using namespace std;
 
 const bool DEBUG = false;
 
-Matrix_9x9::Matrix_9x9 ()
+Grid::Grid ()
 {
     _map_ = this->create_map();
     init_positions();
@@ -28,7 +28,7 @@ Matrix_9x9::Matrix_9x9 ()
                                     //      first thought. See note in
                                     //      set_starting_positions for more details.
 #if false
-void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
+void Grid::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*
             NUMBERED (ROW x COLUMN)
@@ -110,7 +110,7 @@ void Matrix_9x9::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTIN
 }
 #endif
 
-void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
+void Grid::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     uint8_t y,
             x;
@@ -118,7 +118,7 @@ void Matrix_9x9::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTI
     mvprintw(y, x, COLUMN_PRINTING, SUBMATRIX_PRINTING);
 }
 
-void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
+void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
     /*
             NUMBERED (ROW x COLUMN)
@@ -219,22 +219,22 @@ void Matrix_9x9::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const boo
     }
 }
 
-Box& Matrix_9x9::get_submatrix (uint8_t index)
+Box& Grid::get_submatrix (uint8_t index)
 {
     return matrices[index];
 }
 
-Row& Matrix_9x9::get_row (uint8_t index)
+Row& Grid::get_row (uint8_t index)
 {
     return rows[index];
 }
 
-Column& Matrix_9x9::get_column (uint8_t index)
+Column& Grid::get_column (uint8_t index)
 {
     return cols[index];
 }
 
-void Matrix_9x9::init_positions()
+void Grid::init_positions()
 {
     for (uint8_t i = 0; i < 81; i++) {
         known_positions[i] = false;
@@ -257,7 +257,7 @@ void Matrix_9x9::init_positions()
  *    remove value from row, column, and submatrix if recursive call <- false
  * end do-while
  */
-bool Matrix_9x9::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Box submatrices[9]) {
+bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Box submatrices[9]) {
     queue<uint8_t> available_pos;
     uint8_t positions[9];
     //Figure out positions in submatrix based on submatrix number
@@ -349,7 +349,7 @@ bool Matrix_9x9::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column col
     }
 }
 
-array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
+array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
     array<uint8_t, 81> soln;
     uint8_t soln_matrix[9][9];
     mt19937 generator(0);   //TODO: Replace this with seed when the time comes
@@ -435,7 +435,7 @@ array<uint8_t, 81> Matrix_9x9::generate_solved_puzzle (time_t seed) {
     return soln;
 }
 
-void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
+void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
     time_t seed = time(nullptr);
     array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
     
@@ -563,22 +563,22 @@ void Matrix_9x9::set_starting_positions (const uint8_t NUM_POSITIONS) {
     }*/
 }
 #if false
-uint8_t Matrix_9x9::next_position()
+uint8_t Grid::next_position()
 {
     return position_dist(position_generator);
 }
 #endif
-uint8_t Matrix_9x9::map_row (const uint8_t POS)
+uint8_t Grid::map_row (const uint8_t POS)
 {
     return POS / 9;
 }
 
-uint8_t Matrix_9x9::map_column (const uint8_t POS)
+uint8_t Grid::map_column (const uint8_t POS)
 {
     return POS % 9;
 }
 
-uint8_t Matrix_9x9::map_submatrix (const uint8_t ROW, const uint8_t COLUMN)
+uint8_t Grid::map_submatrix (const uint8_t ROW, const uint8_t COLUMN)
 {
     /*
                 NUMBERED (0-80)                NUMBERED (ROW x COLUMN)
@@ -630,12 +630,12 @@ uint8_t Matrix_9x9::map_submatrix (const uint8_t ROW, const uint8_t COLUMN)
     }
 }
 #if false
-uint8_t Matrix_9x9::next_value()
+uint8_t Grid::next_value()
 {
     return dist(generator);
 }
 #endif
-uint8_t Matrix_9x9::get_row_index (const uint8_t POS)
+uint8_t Grid::get_row_index (const uint8_t POS)
 {
     /*
                 NUMBERED (0-80)                NUMBERED (ROW x COLUMN)
@@ -655,13 +655,13 @@ uint8_t Matrix_9x9::get_row_index (const uint8_t POS)
     return POS % 9;
 }
 
-uint8_t Matrix_9x9::get_column_index (const uint8_t POS)
+uint8_t Grid::get_column_index (const uint8_t POS)
 {
     //map column index
     return POS / 9;
 }
 
-uint8_t Matrix_9x9::get_submatrix_index (const uint8_t POS)
+uint8_t Grid::get_submatrix_index (const uint8_t POS)
 {
     uint8_t row = get_row_index(POS),
             column = get_column_index (POS);
@@ -669,7 +669,7 @@ uint8_t Matrix_9x9::get_submatrix_index (const uint8_t POS)
     return 3 * (column % 3) + row % 3;
 }
 
-map<uint8_t, cell> Matrix_9x9::create_map()
+map<uint8_t, cell> Grid::create_map()
 {
     map<uint8_t, cell> m;
 
@@ -683,33 +683,33 @@ map<uint8_t, cell> Matrix_9x9::create_map()
     return m;
 }
 
-const cell Matrix_9x9::get_map (uint8_t index)
+const cell Grid::get_map (uint8_t index)
 {
     return _map_[index];
 }
 
-uint8_t Matrix_9x9::get_map_size() const
+uint8_t Grid::get_map_size() const
 {
     return _map_.size();
 }
 
-uint8_t Matrix_9x9::at(uint8_t index)
+uint8_t Grid::at(uint8_t index)
 {
     return get_row(map_row(index))[get_row_index(index)];
     //return get_column(map_column(index))[get_column_index(index)];
     //return get_submatrix(map_submatrix_index(index))[get_submatrix_index(index)];
 }
 //TODO: Make parameter const in all classes with this operator
-uint8_t Matrix_9x9::operator [] (uint8_t index)
+uint8_t Grid::operator [] (uint8_t index)
 {
     return at(index);
 }
 
-bool Matrix_9x9::is_known (uint8_t index) {
+bool Grid::is_known (uint8_t index) {
     return known_positions[index];
 }
 
-bool Matrix_9x9::evaluate () {
+bool Grid::evaluate () {
     for (uint8_t i = 0; i < 9; i++) {
         //Row &row = mat.get_row(i);
         //Column &column = mat.get_column(i);

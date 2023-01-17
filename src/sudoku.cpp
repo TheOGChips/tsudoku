@@ -11,7 +11,7 @@ using namespace std;
 
 const bool DEBUG = false;
 
-//Matrix_9x9 sudoku_init()
+//Grid sudoku_init()
 Sudoku::Sudoku (bool is_initscr)
 {
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
@@ -461,7 +461,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                         row_number = mat.map_row(index),
                         column_number = mat.map_column(index);
 
-                //TODO: Maybe put the next 7 lines in Matrix_9x9.cpp
+                //TODO: Maybe put the next 7 lines in Grid.cpp
                 Row &row = mat.get_row(row_number);
                 Column &column = mat.get_column(column_number);
                 Box &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));

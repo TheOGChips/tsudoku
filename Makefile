@@ -14,8 +14,8 @@ CONTAINER = Container
 ROW = Row
 COLUMN = Column
 BOX = Box
-MATRIX_9X9 = Matrix_9x9
-OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(ROW).o $(LIB)/$(COLUMN).o $(LIB)/$(BOX).o $(LIB)/$(MATRIX_9X9).o
+GRID = Grid
+OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(ROW).o $(LIB)/$(COLUMN).o $(LIB)/$(BOX).o $(LIB)/$(GRID).o
 TGT = $(SUDOKU).exe
 
 .PHONY: all run clean
@@ -50,8 +50,8 @@ $(LIB)/$(COLUMN).o:	$(SRC)/$(COLUMN).cpp $(INCLUDE)/$(COLUMN).hpp $(INCLUDE)/$(C
 $(LIB)/$(BOX).o:	$(SRC)/$(BOX).cpp $(INCLUDE)/$(BOX).hpp $(INCLUDE)/$(CONTAINER).hpp
 			$(COMPILE) $<
 
-$(LIB)/$(MATRIX_9X9).o:	$(SRC)/$(MATRIX_9X9).cpp
-				$(COMPILE) $<
+$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp
+			$(COMPILE) $<
 
 run:	$(TGT)
 	./$<
