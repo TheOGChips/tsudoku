@@ -8,7 +8,8 @@ class Container {
         char arr[9];
         
     public:
-        Container () {}
+        Container ();
+        Container (uint8_t[9]);
         ~Container () {}
         
         uint8_t at (uint8_t);
@@ -19,6 +20,8 @@ class Container {
 };
 
 typedef Container House;
-//TODO: Could potentially just typedef Box, Column, and Row as well instead of having separate classes for them.
+typedef Container Box;
+typedef Container Column;
+typedef Container Row;
 
 #endif

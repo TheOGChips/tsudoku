@@ -1,7 +1,8 @@
 #ifndef VALUES_HPP
 #define VALUES_HPP
 
-#include <cstdint>
+#include <cstdint>  //uint8_t
+#include <utility>  //std::pair
 
 #define PURE_VIRTUAL 0
 
@@ -12,4 +13,7 @@ const uint8_t KEY_ENTER = 10,
 
 enum Values { ONE = '1', TWO, THREE, FOUR, FIVE,
                          SIX, SEVEN, EIGHT, NINE};
+                         
+typedef std::pair<uint8_t, uint8_t> cell;
+
 #endif

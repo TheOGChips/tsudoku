@@ -2,11 +2,13 @@
 #define GRID_HPP
 
 //#include "values.hpp"
-#include "Box.hpp"
-#include "Row.hpp"
-#include "Column.hpp"
+//#include "Box.hpp"
+//#include "Row.hpp"
+//#include "Column.hpp"
+#include "Container.hpp"
 #include <random>   //mt19937(), uniform_int_distribution<>(),
 #include <array>
+#include <map>
 
 using namespace std;
 
