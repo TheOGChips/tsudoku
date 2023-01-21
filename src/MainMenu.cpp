@@ -40,6 +40,11 @@ void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT
     refresh();
 }
 
+options MainMenu::menu (bool use_in_game_menu) {
+    //TODO: Change some of the constants to zero depending on the value of the parameter
+    return menu();
+}
+
 options MainMenu::menu () {
     uint8_t x_max,
             y_max;
