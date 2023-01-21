@@ -549,12 +549,12 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
-void Sudoku::start_game (bool use_in_game_menu)
+void Sudoku::start_game (const bool USE_IN_GAME_MENU)
 {
     //Load and display the new or saved puzzle
     printw();
     InGameMenu* in_game_menu;
-    if (not use_in_game_menu) in_game_menu = nullptr;
+    if (not USE_IN_GAME_MENU) in_game_menu = nullptr;
     else {
         in_game_menu = new InGameMenu();
         attron(COLOR_PAIR(MENU_SELECTION));
@@ -574,7 +574,7 @@ void Sudoku::start_game (bool use_in_game_menu)
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work. Not sure why.
         }
-        else if (tolower(input) == 'm' and in_game_menu) {
+        else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - 1, 0, "m -> return to game");
             attroff(COLOR_PAIR(MENU_SELECTION));

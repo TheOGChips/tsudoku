@@ -53,7 +53,7 @@ class Sudoku {
         Sudoku (bool);
         ~Sudoku();
 
-        void start_game (bool);
+        void start_game (const bool);
 };
 
 #endif

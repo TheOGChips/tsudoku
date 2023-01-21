@@ -40,8 +40,26 @@ void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT
     refresh();
 }
 
-options MainMenu::menu (bool use_in_game_menu) {
-    //TODO: Change some of the constants to zero depending on the value of the parameter
+void MainMenu::set_VERTICAL_DIVIDER (const uint8_t VAL) {
+    VERTICAL_DIVIDER = VAL;
+}
+
+void MainMenu::set_IN_GAME_MENU_DISPLAY_SPACING (const uint8_t VAL) {
+    IN_GAME_MENU_DISPLAY_SPACING = VAL;
+}
+
+void MainMenu::set_WINDOW_XMIN () {
+    WINDOW_XMIN = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER + IN_GAME_MENU_DISPLAY_SPACING +
+                  RIGHT_PADDING;
+}
+
+options MainMenu::menu (const bool USE_IN_GAME_MENU) {
+    if (not USE_IN_GAME_MENU) {
+        set_VERTICAL_DIVIDER(0);
+        set_IN_GAME_MENU_DISPLAY_SPACING(0);
+    }
+    set_WINDOW_XMIN();
+    
     return menu();
 }
 

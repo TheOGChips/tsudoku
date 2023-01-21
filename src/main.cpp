@@ -42,7 +42,7 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
     create_dir();
     
     MainMenu main_menu;
-    options opt = main_menu.menu();
+    options opt = main_menu.menu(use_in_game_menu);
     
     switch (opt) {
         case options::NEW_GAME:  {
