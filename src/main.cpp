@@ -5,17 +5,39 @@
 #include <filesystem>   //filesystem::create_directory, filesystem::exists
 #include <fstream>      //std::ofstream, std::ifstream
 #include <sstream>      //std::stringstream
+#include <cstring>      //strcmp
 
 string HOME = getenv("HOME"),   //TODO: Make these const
        dir = HOME + "/.tsudoku",
        completed = dir + "/completed_puzzles.txt";
-           
+enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
+
 void create_dir ();
 void display_completed_puzzles ();
+void print_err_msg (err_msg);
 
-int main () //TODO: The majority of this code will need to be in a loop
+int main (int argc, char** argv) //TODO: The majority of this code will need to be in a loop
 {
-    //printf("KEY_ENTER: %d\n", KEY_ENTER);
+    bool use_in_game_menu;
+    switch (argc) {
+        case 1: use_in_game_menu = true;
+                break;
+                
+        case 2: if (not strcmp(argv[1], "--no-in-game-menu") or
+                    not strcmp(argv[1], "-n")) use_in_game_menu = false;
+                //TODO: Add a --help/-? option
+                //TODO: Add a --info option
+                else {
+                    print_err_msg(err_msg::INVALID_ARG);
+                    return 1;
+                }
+                break;
+                
+        default: print_err_msg(err_msg::TOO_MANY_ARGS);
+                 return 1;
+    }
+    
+    //printf("argv[1]: %s\n", argv[1]);
     //return 0;
     create_dir();
     
@@ -24,9 +46,11 @@ int main () //TODO: The majority of this code will need to be in a loop
     
     switch (opt) {
         case options::NEW_GAME:  {
-                                        Sudoku puzzle(true);    //TODO: Consider making this a static
-                                        puzzle.start_game();    //      function, depending on how
-                                        break;                  //      resuming games works
+                                        Sudoku puzzle(true);    //TODO: Consider making this a
+                                                                //      static function, depending
+                                                                //      on how resuming games works
+                                        puzzle.start_game(use_in_game_menu);
+                                        break;
                                     }
                        
         case options::RESUME_GAME: break;  //TODO
@@ -43,6 +67,22 @@ int main () //TODO: The majority of this code will need to be in a loop
     refresh();
     getch();
     return 0;
+}
+
+void print_err_msg (err_msg err) {
+    string str;
+    switch (err) {
+        case err_msg::INVALID_ARG: str = string("Invalid argument. Use the '--help' option to ") +
+                                         "see a list of valid options.";
+                                   break;
+                          
+        case err_msg::TOO_MANY_ARGS: str = string("Too many arguments. Use the '--help' option ") +
+                                           "for a short how-to.";
+                                     break;
+                            
+        default:;
+    }
+    printf("Error: %s\n", str.c_str());
 }
 
 void create_dir () {

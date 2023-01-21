@@ -549,14 +549,18 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
-void Sudoku::start_game()
+void Sudoku::start_game (bool use_in_game_menu)
 {
     //Load and display the new or saved puzzle
     printw();
-    InGameMenu in_game_menu;
-    attron(COLOR_PAIR(MENU_SELECTION));
-    ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
-    attroff(COLOR_PAIR(MENU_SELECTION));
+    InGameMenu* in_game_menu;
+    if (not use_in_game_menu) in_game_menu = nullptr;
+    else {
+        in_game_menu = new InGameMenu();
+        attron(COLOR_PAIR(MENU_SELECTION));
+        ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
+        attroff(COLOR_PAIR(MENU_SELECTION));
+    }
     ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
@@ -570,13 +574,13 @@ void Sudoku::start_game()
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work. Not sure why.
         }
-        else if (tolower(input) == 'm') {
+        else if (tolower(input) == 'm' and in_game_menu) {
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - 1, 0, "m -> return to game");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
-            in_game_menu.menu();
+            in_game_menu->menu();
             
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
@@ -621,4 +625,6 @@ void Sudoku::start_game()
         }
         
     } while (!quit_game);
+    
+    delete in_game_menu;
 }
