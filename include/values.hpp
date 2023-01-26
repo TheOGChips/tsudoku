@@ -3,6 +3,7 @@
 
 #include <cstdint>  //uint8_t
 #include <utility>  //std::pair
+#include <string>
 
 #define PURE_VIRTUAL 0
 
@@ -15,5 +16,7 @@ enum Values { ONE = '1', TWO, THREE, FOUR, FIVE,
                          SIX, SEVEN, EIGHT, NINE};
                          
 typedef std::pair<uint8_t, uint8_t> cell;
+
+const std::string DIR = std::string(getenv("HOME")) + "/.tsudoku";
 
 #endif

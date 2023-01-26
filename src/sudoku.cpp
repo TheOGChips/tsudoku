@@ -556,7 +556,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
     InGameMenu* in_game_menu;
     if (not USE_IN_GAME_MENU) in_game_menu = nullptr;
     else {
-        in_game_menu = new InGameMenu();
+        in_game_menu = new InGameMenu(display_matrix);
         attron(COLOR_PAIR(MENU_SELECTION));
         ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
         attroff(COLOR_PAIR(MENU_SELECTION));

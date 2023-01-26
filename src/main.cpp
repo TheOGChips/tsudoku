@@ -7,9 +7,7 @@
 #include <sstream>      //std::stringstream
 #include <cstring>      //strcmp
 
-string HOME = getenv("HOME"),   //TODO: Make these const
-       dir = HOME + "/.tsudoku",
-       completed = dir + "/completed_puzzles.txt";
+const std::string COMPLETED = DIR + "/completed_puzzles.txt";
 enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
 
 void create_dir ();
@@ -87,11 +85,11 @@ void print_err_msg (err_msg err) {
 
 void create_dir () {
     using namespace std::filesystem;
-    create_directory(dir.c_str());
+    create_directory(DIR.c_str());
     
-    if (not exists(completed.c_str())) {
+    if (not exists(COMPLETED.c_str())) {
         ofstream outfile;
-        outfile.open(completed.c_str());
+        outfile.open(COMPLETED.c_str());
         outfile << 0 << endl;
         outfile.close();
     }
@@ -100,7 +98,7 @@ void create_dir () {
 void display_completed_puzzles () {
     uint64_t num_completed;
     ifstream infile;
-    infile.open(completed.c_str());
+    infile.open(COMPLETED.c_str());
     infile >> num_completed;
     infile.close();
     

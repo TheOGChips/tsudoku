@@ -2,6 +2,14 @@
 #include "InGameMenu.hpp"
 #include "colors.hpp"
 #include <map>
+#include <fstream>      //std::ofstream, std::ifstream
+
+//TODO: This might need to be dynamically allocated instead
+InGameMenu::InGameMenu (uint8_t display_matrix[27][27]) {
+    for (uint8_t i = 0; i < 27; i++) {
+        this->display_matrix[i] = display_matrix[i];
+    }
+}
 
 void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const options OPT) {
     const uint8_t NUM_OPTS = 3;
@@ -118,6 +126,15 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
     display_str.clear();
 }
 
+void InGameMenu::save_game () {
+    //TODO: Ask filename from user
+    const string FILENAME = DIR + "/saved.txt";
+    ofstream outfile;
+    outfile.open(FILENAME.c_str());
+    //TODO: How to determine color
+    outfile.close();
+}
+
 options InGameMenu::menu () {    
     curs_set(0);
     options opt = options::RULES;
@@ -144,7 +161,9 @@ options InGameMenu::menu () {
                                           display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
                                           break;
                                               
-                    case options::SAVE_GAME: break; //TODO
+                    case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                             save_game();
+                                             break; //TODO
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
                 }

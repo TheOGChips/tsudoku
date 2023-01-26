@@ -13,6 +13,7 @@ SUDOKU = sudoku
 CONTAINER = Container
 GRID = Grid
 OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
+COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/values.hpp
 TGT = $(SUDOKU).exe
 
 .PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean
@@ -22,23 +23,23 @@ all:	$(OBJ)
 	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT) -lncurses
 
-$(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp
+$(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
 #TODO: Clean this up some
-$(LIB)/$(MAIN_MENU).o:	$(SRC)/$(MAIN_MENU).cpp $(INCLUDE)/$(MAIN_MENU).hpp $(INCLUDE)/$(MENU).hpp
+$(LIB)/$(MAIN_MENU).o:	$(SRC)/$(MAIN_MENU).cpp $(INCLUDE)/$(MAIN_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
-$(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp $(INCLUDE)/$(MENU).hpp
+$(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
 				$(COMPILE) $<
 
-$(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp
+$(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
-$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp
+$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
-$(LIB)/$(CONTAINER).o:	$(SRC)/$(CONTAINER).cpp $(INCLUDE)/$(CONTAINER).hpp
+$(LIB)/$(CONTAINER).o:	$(SRC)/$(CONTAINER).cpp $(INCLUDE)/$(CONTAINER).hpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
 run_all: run run_no_menu run_help run_invalid run_too_many
