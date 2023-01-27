@@ -126,9 +126,17 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
     display_str.clear();
 }
 
-void InGameMenu::save_game () {
-    //TODO: Ask filename from user
-    const string FILENAME = DIR + "/saved.txt";
+void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
+    uint8_t display_offset = 5;
+    char name[16];  //TODO: Check to make sure the name isn't too long
+    
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter name for save: ");
+    echo();
+    getstr(name);
+    noecho();
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
+    
+    const string FILENAME = DIR + "/" + name + ".txt";
     ofstream outfile;
     outfile.open(FILENAME.c_str());
     //TODO: How to determine color
@@ -162,7 +170,7 @@ options InGameMenu::menu () {
                                           break;
                                               
                     case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             save_game();
+                                             save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
                                              break; //TODO
                     
                     default:;   //NOTE: opt will never be NONE based on this logic

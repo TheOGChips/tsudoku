@@ -16,7 +16,7 @@ class InGameMenu : public Menu {
         void display_rules (const uint8_t, const uint8_t);
         void display_manual (const uint8_t, const uint8_t);
         void screen_reader (const uint8_t, const uint8_t, std::string, uint8_t&);
-        void save_game ();
+        void save_game (const uint8_t, const uint8_t);
         
     public:
         InGameMenu (uint8_t[27][27]);
