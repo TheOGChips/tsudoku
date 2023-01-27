@@ -4,6 +4,8 @@
 #include <sstream>
 #include <map>
 
+using namespace std;
+
 MainMenu::MainMenu () {
     initscr();  //TODO: Account for already having been called somehow
     cbreak();   //TODO: Will need to account for signal handling

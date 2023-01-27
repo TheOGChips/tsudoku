@@ -4,9 +4,11 @@
 #include <map>
 #include <fstream>      //std::ofstream, std::ifstream
 
+using namespace std;
+
 //TODO: This might need to be dynamically allocated instead
-InGameMenu::InGameMenu (uint8_t display_matrix[27][27]) {
-    for (uint8_t i = 0; i < 27; i++) {
+InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         this->display_matrix[i] = display_matrix[i];
     }
 }
@@ -137,10 +139,33 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     noecho();
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
     
-    const string FILENAME = DIR + "/" + name + ".txt";
+    const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;
     outfile.open(FILENAME.c_str());
     //TODO: How to determine color
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            outfile << static_cast<uint16_t>(display_matrix[i][j]);
+            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
+            switch (ch & A_COLOR) {
+                case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
+                                          break;
+                                          
+                case COLOR_PAIR(GIVEN): outfile << color_code[GIVEN];
+                                        break;
+                                        
+                case COLOR_PAIR(CANDIDATES): outfile << color_code[CANDIDATES];
+                                             break;
+                                             
+                case COLOR_PAIR(GUESS): outfile << color_code[GUESS];
+                                        break;
+                                        
+                default: outfile << color_code[0];
+            }
+            if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
+        }
+        outfile << endl;
+    }
     outfile.close();
 }
 
@@ -172,7 +197,9 @@ options InGameMenu::menu () {
                                               
                     case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
                                              save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             break; //TODO
+                                             //TODO: Erase the background highlighting while typing in file name
+                                             //TODO: Re-enable background highlighting once done.
+                                             break;
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
                 }
