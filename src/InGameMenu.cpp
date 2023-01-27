@@ -128,11 +128,12 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
 
 void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     uint8_t display_offset = 5;
-    char name[16];  //TODO: Check to make sure the name isn't too long
+    const uint8_t NAME_SIZE = 16;
+    char name[NAME_SIZE];
     
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter name for save: ");
     echo();
-    getstr(name);
+    getnstr(name, NAME_SIZE - 1);
     noecho();
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
     
