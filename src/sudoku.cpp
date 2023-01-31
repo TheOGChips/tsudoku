@@ -554,7 +554,12 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
     //Load and display the new or saved puzzle
     printw();
     InGameMenu* in_game_menu;
-    if (not USE_IN_GAME_MENU) in_game_menu = nullptr;
+    if (not USE_IN_GAME_MENU) {
+        in_game_menu = nullptr;
+        attron(COLOR_PAIR(MENU_SELECTION));
+        ::mvprintw(getmaxy(stdscr) - 1, 0, "s -> save game");
+        attroff(COLOR_PAIR(MENU_SELECTION));
+    }
     else {
         in_game_menu = new InGameMenu(display_matrix);
         attron(COLOR_PAIR(MENU_SELECTION));
@@ -589,6 +594,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
             
             reset_cursor();
         }
+        //TODO: Add option for 's' when no in-game menu
         else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
             move(input);
         }
