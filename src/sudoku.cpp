@@ -555,9 +555,9 @@ void Sudoku::save_game () {
                   DISPLAY_LINE = ORIGIN.first + 31;
     char name[NAME_SIZE];
     
-    ::move(DISPLAY_LINE, 0);
+    ::move(DISPLAY_LINE, 1);
     clrtoeol();
-    ::mvprintw(DISPLAY_LINE, 1, msg.c_str());
+    ::printw(msg.c_str());
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
