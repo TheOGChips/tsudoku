@@ -134,9 +134,11 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     char name[NAME_SIZE];
     
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter name for save: ");
+    curs_set(true);
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
+    curs_set(false);
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
     
     const string FILENAME = DIR + "/" + name + ".csv";
@@ -146,7 +148,8 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             outfile << static_cast<uint16_t>(display_matrix[i][j]);
-            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
+            //NOTE: Might not need to print out the color information
+            /*chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
             switch (ch & A_COLOR) {
                 case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
                                           break;
@@ -161,7 +164,7 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                                         break;
                                         
                 default: outfile << color_code[0];
-            }
+            }*/
             if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
         }
         outfile << endl;
@@ -170,7 +173,7 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
 }
 
 options InGameMenu::menu () {    
-    curs_set(0);
+    curs_set(false);
     options opt = options::RULES;
     uint16_t input;
     do {
@@ -184,7 +187,6 @@ options InGameMenu::menu () {
             case KEY_UP: opt--;
                          break;
                             
-            //TODO: Case for Enter key
             case KEY_ENTER: 
                 switch (opt) {
                     case options::RULES: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
@@ -196,9 +198,11 @@ options InGameMenu::menu () {
                                           break;
                                               
                     case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                             //NOTE: Turn off highlighted option while entering in
+                                             //      save name
+                                             display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE,
+                                                          options::NONE);
                                              save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             //TODO: Erase the background highlighting while typing in file name
-                                             //TODO: Re-enable background highlighting once done.
                                              break;
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
