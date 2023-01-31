@@ -626,5 +626,5 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
         
     } while (!quit_game);
     
-    delete in_game_menu;
+    if (USE_IN_GAME_MENU) delete in_game_menu;
 }
