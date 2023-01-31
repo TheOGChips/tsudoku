@@ -115,7 +115,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
             mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE,
                      display_str.c_str());
         }
-        else if (display_str.size() + space_pos + 1 < IN_GAME_MENU_DISPLAY_SPACING - 3) {
+        else if (display_str.size() + space_pos + 1 < IN_GAME_MENU_DISPLAY_SPACING) {
             display_str += str.substr(0, space_pos + 1);
             str = str.substr(space_pos + 1);
         }
