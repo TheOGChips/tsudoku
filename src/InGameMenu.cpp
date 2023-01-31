@@ -139,8 +139,6 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     getnstr(name, NAME_SIZE - 1);
     noecho();
     curs_set(false);
-    //TODO: Move this line to occur after file actually saves
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
     
     const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;
@@ -171,6 +169,8 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
         outfile << endl;
     }
     outfile.close();
+    
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
 }
 
 options InGameMenu::menu () {    
