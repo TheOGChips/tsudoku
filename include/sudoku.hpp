@@ -48,6 +48,7 @@ class Sudoku {
         void reset_cursor();
         bool evaluate();
         void increment_completed_games();
+        void save_game ();
         
     public:
         Sudoku (bool);

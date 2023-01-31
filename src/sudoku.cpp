@@ -549,6 +549,36 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
+void Sudoku::save_game () {
+    string msg = "Enter save file name: ";
+    const uint8_t NAME_SIZE = 16,
+                  DISPLAY_LINE = ORIGIN.first + 31;
+    char name[NAME_SIZE];
+    
+    ::move(DISPLAY_LINE, 0);
+    clrtoeol();
+    ::mvprintw(DISPLAY_LINE, 1, msg.c_str());
+    echo();
+    getnstr(name, NAME_SIZE - 1);
+    noecho();
+    
+    const string FILENAME = DIR + "/" + name + ".csv";
+    ofstream outfile;
+    outfile.open(FILENAME.c_str());
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            outfile << static_cast<uint16_t>(display_matrix[i][j]);
+            if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
+        }
+        outfile << endl;
+    }
+    outfile.close();
+    
+    ::move(DISPLAY_LINE, 0);
+    clrtoeol();
+    mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", name);
+}
+
 void Sudoku::start_game (const bool USE_IN_GAME_MENU)
 {
     //Load and display the new or saved puzzle
@@ -595,6 +625,10 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
             reset_cursor();
         }
         //TODO: Add option for 's' when no in-game menu
+        else if (tolower(input) == 's' and not USE_IN_GAME_MENU) {
+            save_game();
+            reset_cursor();
+        }
         else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
             move(input);
         }
