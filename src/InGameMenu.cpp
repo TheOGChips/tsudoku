@@ -133,12 +133,13 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     const uint8_t NAME_SIZE = 16;
     char name[NAME_SIZE];
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter name for save: ");
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter save file name: ");
     curs_set(true);
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
     curs_set(false);
+    //TODO: Move this line to occur after file actually saves
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
     
     const string FILENAME = DIR + "/" + name + ".csv";
