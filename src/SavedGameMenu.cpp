@@ -8,7 +8,8 @@ void SavedGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, co
     clear();
     mvprintw(display_line++, X_EDGE, "Saved Games:");
     
-    for (list<string>::iterator iter = saved_games.begin(); iter != saved_games.end(); iter++) {
+    typedef list<string>::iterator list_iter;
+    for (list_iter iter = saved_games.begin(); iter != saved_games.end(); iter++) {
         mvprintw(++display_line, X_EDGE, "%s", iter->c_str());
     }
     
