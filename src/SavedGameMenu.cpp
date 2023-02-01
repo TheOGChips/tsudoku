@@ -25,7 +25,7 @@ void SavedGameMenu::generate_saved_games_list () {
             saved_games.push_back(iter->path().stem().string());
         }
     }
-    //TODO: Sort the list
+    saved_games.sort();
 }
 
 void SavedGameMenu::select_saved_game () {
@@ -54,5 +54,6 @@ void SavedGameMenu::select_saved_game () {
 options SavedGameMenu::menu () {
     generate_saved_games_list();
     select_saved_game();
+    //TODO: Read in saved game based on selection
     return options::NONE;
 }
