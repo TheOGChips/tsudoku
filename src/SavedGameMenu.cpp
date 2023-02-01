@@ -19,9 +19,10 @@ void SavedGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, co
 
 void SavedGameMenu::generate_saved_games_list () {
     using namespace filesystem;
-    directory_iterator dir_iter(DIR);
-    for (; dir_iter != end(directory_iterator()); dir_iter++) {
-        saved_games.push_back(dir_iter->path().stem().string());
+    typedef directory_iterator dir_iter;
+    
+    for (dir_iter iter(DIR); iter != end(directory_iterator()); iter++) {
+        saved_games.push_back(iter->path().stem().string());
     }
     //TODO: Remove "completed_puzzles.txt" from the list
 }
