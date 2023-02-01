@@ -3,7 +3,7 @@
 
 #include "Menu.hpp"
 
-enum class options { NEW_GAME, RESUME_GAME, SHOW_STATS };   //TODO: Add EXIT option
+//enum class options { NEW_GAME, RESUME_GAME, SHOW_STATS };   //TODO: Add EXIT option
 
 class MainMenu : public Menu {
     private:

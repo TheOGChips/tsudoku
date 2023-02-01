@@ -1,5 +1,6 @@
 #include <ncurses.h>    //NOTE: NCurses is included first in all the files here so that the KEY_ENTER
 #include "MainMenu.hpp" //      redefinition in values.hpp persists across files the way I wanted.
+#include "SavedGameMenu.hpp"
 #include "sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
                         //      this file; however, there don't appear to be any for some reason.
 #include <filesystem>   //filesystem::create_directory, filesystem::exists
@@ -9,6 +10,11 @@
 
 const std::string COMPLETED = DIR + "/completed_puzzles.txt";
 enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
+
+//NOTE: The address of a SavedPuzzle object and it's mat member matrix will be the same.
+/*struct SavedPuzzle {
+    uint8_t mat[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
+};*/
 
 void create_dir ();
 void display_completed_puzzles ();
@@ -51,7 +57,14 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
                                         break;
                                     }
                        
-        case options::RESUME_GAME: break;  //TODO
+        case options::RESUME_GAME:  {   SavedGameMenu saved_game_menu;
+                                        saved_game_menu.menu();
+                                        break;  //TODO
+                                    }//iterate through saved games in ~/.tsudoku
+                                   //allow user to pick from list of choices
+                                   //read from file based on user's choice
+                                   //instantiate Sudoku object
+                                   //puzzle.start_game(use_in_game_menu);
         
         case options::SHOW_STATS: display_completed_puzzles();
                                      break;
@@ -116,3 +129,12 @@ void display_completed_puzzles () {
     refresh();
     while (getch() != KEY_ENTER);
 }
+
+//TODO: Make a struct that will be returned with the saved puzzle contents inside it. This will be
+//      easier than trying to return the array itself.
+/*SavedPuzzle import_puzzle () {
+    SavedPuzzle saved_puzzle;
+    //ifstream infile("game1.csv");
+    
+    return saved_puzzle;
+}*/

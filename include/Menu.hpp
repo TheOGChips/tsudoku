@@ -5,7 +5,7 @@
 #include <string>
 #include "values.hpp"
 
-enum class options;
+enum class options { NEW_GAME, RESUME_GAME, SHOW_STATS, RULES, MANUAL, SAVE_GAME, NONE };
 
 class Menu {
     protected:

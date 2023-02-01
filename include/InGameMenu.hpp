@@ -3,7 +3,7 @@
 
 #include "Menu.hpp"
 
-enum class options { RULES, MANUAL, SAVE_GAME, NONE };
+//enum class options { RULES, MANUAL, SAVE_GAME, NONE };
 
 class InGameMenu : public Menu {
     private:
