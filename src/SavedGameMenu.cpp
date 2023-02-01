@@ -12,6 +12,7 @@ void SavedGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, co
     for (list_iter iter = saved_games.begin(); iter != saved_games.end(); iter++) {
         mvprintw(++display_line, X_EDGE, "%s", iter->c_str());
     }
+    //TODO: Implement interactive menu somewhere in here
     
     mvprintw(++display_line, X_EDGE, "Press ENTER to continue...");
     refresh();
@@ -22,10 +23,11 @@ void SavedGameMenu::generate_saved_games_list () {
     using namespace filesystem;
     typedef directory_iterator dir_iter;
     
-    for (dir_iter iter(DIR); iter != end(directory_iterator()); iter++) {
-        saved_games.push_back(iter->path().stem().string());
+    for (dir_iter iter(DIR); iter != end(dir_iter()); iter++) {
+        if (iter->path().extension() != ".txt") {
+            saved_games.push_back(iter->path().stem().string());
+        }
     }
-    //TODO: Remove "completed_puzzles.txt" from the list
 }
 
 options SavedGameMenu::menu () {
