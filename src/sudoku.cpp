@@ -513,7 +513,16 @@ void Sudoku::place_value (const uint16_t VALUE)
                 attroff(COLOR_PAIR(CANDIDATES));
             }
         }
-
+        /*
+         * TODO: There is a bug in here somewhere. The display matrix isn't alawys updated as
+         *       expected. The following have been observed:
+         *          - After deleting and replacing a guess with a '?', the surrounding cells remain 
+         *            in the display matrix structure, although they do not appear on screen
+         *          - Entering a correct guess and removing it will still allow a win when the Enter
+         *            key is pressed
+         *          - Using Backspace and Delete to remove numbers stores something else instead of
+         *            a space (the number 32)
+         */
         uint8_t y = display_matrix_offset[cursor_pos].first,
                 x = display_matrix_offset[cursor_pos].second;
         display_matrix[y][x] = VALUE;

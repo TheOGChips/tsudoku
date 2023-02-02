@@ -1,6 +1,7 @@
 #include <ncurses.h>
 #include "SavedGameMenu.hpp"
 #include "colors.hpp"
+#include <fstream>
 
 using namespace std;
 
@@ -43,6 +44,7 @@ void SavedGameMenu::select_saved_game () {
             if (input == KEY_DOWN and *selection != saved_games.back()) selection++;
             else if (input == KEY_UP and *selection != saved_games.front()) selection--;
         } while (input != KEY_ENTER);
+        *selection += ".csv";
         mvprintw(TOP_PADDING + saved_games.size() + 2, LEFT_PADDING, "You selected %s", selection->c_str());
     }
     mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
@@ -51,9 +53,39 @@ void SavedGameMenu::select_saved_game () {
     curs_set(true);
 }
 
+void SavedGameMenu::read_saved_game () {
+    ifstream infile (DIR + "/" + *selection);
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+        string row;
+        std::getline(infile, row);
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            size_t index;
+            saved_game[i][j] = stoi(row, &index);
+            
+            //NOTE: index will cause a thrown out_of_range exception on the last number in the string
+            try { row = row.substr(index + 1); }
+            catch (const out_of_range) { row = row.substr(index); }
+        }
+    }
+    infile.close();
+}
+
+void SavedGameMenu::print_saved_game () {
+    clear();
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+        move(TOP_PADDING + i, LEFT_PADDING);
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            printw("%c", saved_game[i][j]);
+        }
+    }
+    refresh();
+    getch();
+}
+
 options SavedGameMenu::menu () {
     generate_saved_games_list();
     select_saved_game();
-    //TODO: Read in saved game based on selection
+    read_saved_game();  //TODO: Read in saved game based on selection
+    print_saved_game();
     return options::NONE;
 }
