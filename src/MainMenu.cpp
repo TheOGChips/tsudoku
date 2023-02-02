@@ -33,10 +33,10 @@ void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT
     opt_map[1] = options::RESUME_GAME;
     opt_map[2] = options::SHOW_STATS;
            
-    mvprintw(Y_CENTER - 2, X_CENTER, TITLE.c_str());
+    mvprintw(Y_CENTER - 2, X_CENTER, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
         if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_CENTER + i, X_CENTER, OPTS[i].c_str());
+        mvprintw(Y_CENTER + i, X_CENTER, "%s", OPTS[i].c_str());
         if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -79,10 +79,10 @@ options MainMenu::menu () {
                      msg3;
         msg2 << "Required dimensions: " << WINDOW_XMIN+0 << " x " << WINDOW_YMIN+0;
         msg3 << "Current dimensions: " << x_max+0 << " x " << y_max+0;
-        mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       msg1.c_str());
-        mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, msg2.str().c_str());
-        mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, msg3.str().c_str());
-        mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       msg4.c_str());
+        mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       "%s", msg1.c_str());
+        mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, "%s", msg2.str().c_str());
+        mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, "%s", msg3.str().c_str());
+        mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       "%s", msg4.c_str());
         refresh();
         getmaxyx(stdscr, y_max, x_max);
         while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be pressed
@@ -91,8 +91,8 @@ options MainMenu::menu () {
     
     string msg1 = "The window is now an appropriate size",
            msg2 = "Press Enter to continue";
-    mvprintw(y_max/2,     x_max/2 - msg1.size()/2, msg1.c_str());
-    mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, msg2.c_str());
+    mvprintw(y_max/2,     x_max/2 - msg1.size()/2, "%s", msg1.c_str());
+    mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
     refresh();
     while (getch() != KEY_ENTER);
     ::clear();

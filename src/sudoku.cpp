@@ -557,7 +557,7 @@ void Sudoku::save_game () {
     
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
-    ::printw(msg.c_str());
+    ::printw("%s", msg.c_str());
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
@@ -649,7 +649,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
             #endif
             if (evaluate()) {
                 string msg = "You win!";
-                ::mvprintw(ORIGIN.first + 31, 14, msg.c_str());
+                ::mvprintw(ORIGIN.first + 31, 14, "%s", msg.c_str());
                 clrtoeol();
                 refresh();
                 increment_completed_games();
@@ -658,7 +658,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU)
             }
             else {
                 string msg = "Puzzle incomplete!";  //TODO: Remove this result display after a delay
-                ::mvprintw(ORIGIN.first + 31, 14, msg.c_str());
+                ::mvprintw(ORIGIN.first + 31, 14, "%s", msg.c_str());
                 refresh();
                 reset_cursor();
             }

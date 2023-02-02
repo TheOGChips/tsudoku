@@ -24,10 +24,10 @@ void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const
     opt_map[1] = options::MANUAL;
     opt_map[2] = options::SAVE_GAME;
            
-    mvprintw(Y_EDGE, X_EDGE, TITLE.c_str());
+    mvprintw(Y_EDGE, X_EDGE, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
         if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + i + 1, X_EDGE, OPTS[i].c_str());
+        mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + i + 1, X_EDGE, "%s", OPTS[i].c_str());
         if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -55,7 +55,7 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     string rules_text[NUM_RULES] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
     uint8_t display_offset = 5;
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, TITLE.c_str());
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_RULES; i++) {
         display_offset++;
         screen_reader(Y_EDGE, X_EDGE, rules_text[i], display_offset);
@@ -96,7 +96,7 @@ void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                                        MANUAL_NUM, MANUAL_ENTER };
     uint8_t display_offset = 5;
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, TITLE.c_str());
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_MANUAL; i++) {
         display_offset++;
         screen_reader(Y_EDGE, X_EDGE, manual_text[i], display_offset);
@@ -112,7 +112,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
         if (space_pos == string::npos) {
             display_str += str;
             str.clear();
-            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE,
+            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s",
                      display_str.c_str());
         }
         else if (display_str.size() + space_pos + 1 < IN_GAME_MENU_DISPLAY_SPACING) {
@@ -120,7 +120,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
             str = str.substr(space_pos + 1);
         }
         else {
-            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE,
+            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s",
                      display_str.c_str());
             display_str.clear();
         }

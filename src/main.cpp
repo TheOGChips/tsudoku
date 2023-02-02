@@ -124,8 +124,8 @@ void display_completed_puzzles () {
     getmaxyx(stdscr, y_max, x_max);
     
     clear();
-    mvprintw(y_max/2, x_max/2 - sstr.str().size()/2, sstr.str().c_str());
-    mvprintw(y_max/2 + 2, x_max/2 - str.size()/2, str.c_str());
+    mvprintw(y_max/2, x_max/2 - sstr.str().size()/2, "%s", sstr.str().c_str());
+    mvprintw(y_max/2 + 2, x_max/2 - str.size()/2, "%s", str.c_str());
     refresh();
     while (getch() != KEY_ENTER);
 }

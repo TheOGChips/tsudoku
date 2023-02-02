@@ -1,4 +1,4 @@
-COMPILER = g++
+COMPILER = clang++
 INCLUDE_FLAGS = -I $(INCLUDE)/ -std=c++17
 COMPILE = $(COMPILER) -c $(INCLUDE_FLAGS)
 LIB = lib
