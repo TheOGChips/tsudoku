@@ -82,10 +82,20 @@ void SavedGameMenu::print_saved_game () {
     getch();
 }
 
+SavedPuzzle SavedGameMenu::get_saved_game() {
+    SavedPuzzle saved_puzzle;
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            saved_puzzle.puzzle[i][j] = saved_game[i][j];
+        }
+    }
+    return saved_puzzle;
+}
+
 options SavedGameMenu::menu () {
     generate_saved_games_list();
     select_saved_game();
     read_saved_game();  //TODO: Read in saved game based on selection
-    print_saved_game();
+    //print_saved_game();
     return options::NONE;
 }

@@ -12,7 +12,7 @@ using namespace std;
 const bool DEBUG = false;
 
 //Grid sudoku_init()
-Sudoku::Sudoku (bool is_initscr)
+Sudoku::Sudoku (bool is_initscr, const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE])
 {
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
@@ -79,8 +79,7 @@ Sudoku::Sudoku (bool is_initscr)
             cout << mat.next()+0 << endl;
         }
     }*/
-
-    init_display_matrix();
+    init_display_matrix(DISPLAY_MATRIX);
 }
 
 Sudoku::~Sudoku()
@@ -144,7 +143,7 @@ void Sudoku::set_color_pairs()
     }
 }
 
-void Sudoku::init_display_matrix()
+void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE])
 {
     /*
          0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
@@ -179,15 +178,44 @@ void Sudoku::init_display_matrix()
     */
 
     //initialize display matrix with blank spaces
-    for (uint8_t i = 0; i < 27; i++) {
-        for (uint8_t j = 0; j < 27; j++) {
-            display_matrix[i][j] = ' ';
+    if (not DISPLAY_MATRIX) {
+        clear();
+        ::mvprintw(ORIGINy, ORIGINx, "DISPLAY_MATRIX is null");
+        refresh();
+        getch();
+    
+        for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+            for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+                display_matrix[i][j] = ' ';
+            }
+        }
+        //TODO: Will need to pass the display_matrix into Grid before this for loop runs
+        mat = Grid(nullptr);
+        for (uint8_t i = 0; i < _map_.size(); i++) {
+            cell coords = _map_[i];
+            display_matrix[coords.first][coords.second] = mat[i];
         }
     }
-
-    for (uint8_t i = 0; i < _map_.size(); i++) {
-        cell coords = _map_[i];
-        display_matrix[coords.first][coords.second] = mat[i];
+    else {
+        clear();
+        ::mvprintw(ORIGINy, ORIGINx, "DISPLAY_MATRIX is not null");
+        refresh();
+        getch();
+        
+        for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+            for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+                display_matrix[i][j] = DISPLAY_MATRIX[i][j];
+            }
+        }
+        
+        uint8_t grid[9][9] = {};
+        for (uint8_t i = 0; i < 9; i++) {
+            for (uint8_t j = 0; j < 9; j++) {
+                cell coords = _map_[i*9 + j];
+                grid[i][j] = DISPLAY_MATRIX[coords.first][coords.second];
+            }
+        }
+        mat = Grid(grid);
     }
 }
 

@@ -13,7 +13,7 @@ using namespace std;
 
 const bool DEBUG = false;
 
-Grid::Grid ()
+Grid::Grid (const uint8_t GRID[9][9])
 {
     _map_ = this->create_map();
     init_positions();
@@ -23,7 +23,8 @@ Grid::Grid ()
     //generator = mt19937(seed);
     //dist = uniform_int_distribution<uint8_t>(1, 9);
     //set_starting_positions(17);   //TODO: Implement the following difficulty modes
-    set_starting_positions(80);     //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+    if (not GRID) set_starting_positions(80);   //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+    else set_starting_positions(GRID);
 }                                   //NOTE: This appears to be more complicated than I at
                                     //      first thought. See note in
                                     //      set_starting_positions for more details.
@@ -435,9 +436,28 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
     return soln;
 }
 
+void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
+    clear();
+    ::mvprintw(ORIGINy, ORIGINx, "Placeholder text to ensure this is working");
+    refresh();
+    getch();
+    //TODO
+}
+
 void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
+    clear();
+    ::mvprintw(ORIGINy, ORIGINx, "Inside set_starting_positions");
+    refresh();
+    getch();
+    
     time_t seed = time(nullptr);
     array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
+    clear();
+    for (uint8_t i = 0; i < 81; i++) {
+        ::mvprintw(ORIGINy, ORIGINx + i, "%c", solved_puzzle[i]);
+    }
+    refresh();
+    getch();
     
     #if false
         printf("\n");
@@ -540,17 +560,19 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         print(false, false);*/
         known_positions[pos] = true;
 
-        if (DEBUG) {
+        if (not DEBUG) {
             clear();
             printw(false, false);
-            this_thread::sleep_for(chrono::seconds(1));
+            //this_thread::sleep_for(chrono::seconds(1));
             refresh();
         }
     }
+    getch();
     
-    for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
+    //TODO: Remove this as it's redundant since init_positions() is run before this function
+    /*for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
         known_positions[positions[i]] = false;
-    }
+    }*/
     
     /*cout << endl;
     for (uint8_t i = 0; i < 81; i++) {

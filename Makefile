@@ -40,7 +40,7 @@ $(LIB)/$(SAVED_GAME_MENU).o:	$(SRC)/$(SAVED_GAME_MENU).cpp $(INCLUDE)/$(SAVED_GA
 $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
-$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp $(COMMON_HDRS)
+$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp $(INCLUDE)/$(GRID).hpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
 $(LIB)/$(CONTAINER).o:	$(SRC)/$(CONTAINER).cpp $(INCLUDE)/$(CONTAINER).hpp $(COMMON_HDRS)

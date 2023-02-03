@@ -27,13 +27,16 @@ class Grid {
         void init_positions();
         array<uint8_t, 81> generate_solved_puzzle (time_t);
         void set_starting_positions (uint8_t);
+        void set_starting_positions (const uint8_t[9][9]);
         //uint8_t next_position();
         //uint8_t next_value();
         map<uint8_t, cell> create_map();
         bool solve(uint8_t, uint8_t, Row[9], Column[9], Box[9]);
 
     public:
-        Grid();
+        //TODO: A lot of these can probably be moved to private now
+        Grid () {}
+        Grid (const uint8_t[9][9]);
         ~Grid() {}
         uint8_t map_row (const uint8_t);
         uint8_t map_column (const uint8_t);

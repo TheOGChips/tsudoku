@@ -11,11 +11,6 @@
 const std::string COMPLETED = DIR + "/completed_puzzles.txt";
 enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
 
-//NOTE: The address of a SavedPuzzle object and it's mat member matrix will be the same.
-/*struct SavedPuzzle {
-    uint8_t mat[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
-};*/
-
 void create_dir ();
 void display_completed_puzzles ();
 void print_err_msg (err_msg);
@@ -50,7 +45,7 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
     
     switch (opt) {
         case options::NEW_GAME:  {
-                                        Sudoku puzzle(true);    //TODO: Consider making this a
+                                        Sudoku puzzle(true, nullptr);    //TODO: Consider making this a
                                                                 //      static function, depending
                                                                 //      on how resuming games works
                                         puzzle.start_game(use_in_game_menu);
@@ -59,10 +54,9 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
                        
         case options::RESUME_GAME:  {   SavedGameMenu saved_game_menu;
                                         saved_game_menu.menu();
+                                        Sudoku puzzle(true, saved_game_menu.get_saved_game().puzzle);
                                         break;  //TODO
-                                    }//iterate through saved games in ~/.tsudoku
-                                   //allow user to pick from list of choices
-                                   //read from file based on user's choice
+                                    }
                                    //instantiate Sudoku object
                                    //puzzle.start_game(use_in_game_menu);
         

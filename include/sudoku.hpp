@@ -15,7 +15,7 @@ using namespace std;
 class Sudoku {
     private:
         uint8_t display_matrix[27][27] = {};
-        Grid mat;
+        Grid mat;   //TODO: Change this name to grid
         map<uint8_t, cell> _map_;   //maps 81 positions to positions in 27x27 display matrix
         map<cell, uint8_t> _rev_map_;
         /*const uint8_t INIT_OFFSETX = 6,
@@ -33,7 +33,7 @@ class Sudoku {
         void set_color_pairs();
         //TODO: Start menu, accessed from constructor before generating a new puzzle.
         //      Can resume saved puzzle instead.
-        void init_display_matrix();
+        void init_display_matrix(const uint8_t[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]);
         void printw(/*const bool, const bool*/);
         void move (const uint8_t, const uint8_t);
         void move (const uint16_t);
@@ -51,7 +51,7 @@ class Sudoku {
         void save_game ();
         
     public:
-        Sudoku (bool);
+        Sudoku (bool, const uint8_t[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]);
         ~Sudoku();
 
         void start_game (const bool);
