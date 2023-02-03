@@ -401,9 +401,9 @@ void Sudoku::clear_surrounding_cells()
     refresh();*/
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         mvprintw(border[i].first, border[i].second, " ");
-        /*uint8_t y = border[i].first,
-                x = border[i].second;
-        display_matrix[y][x] = ' ';*/
+        uint8_t y = display_matrix_offset[border[i]].first,
+                x = display_matrix_offset[border[i]].second;
+        display_matrix[y][x] = ' ';
     }
     //reset_cursor();
 }
