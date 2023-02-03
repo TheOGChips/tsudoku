@@ -9,7 +9,8 @@ class InGameMenu : public Menu {
     private:
         const uint8_t IN_GAME_MENU_TITLE_SPACING = 1,   //y-axis, blank lines below menu title
                       IN_GAME_MENU_LEFT_EDGE = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER;
-        uint8_t* display_matrix[27];
+        //uint8_t* display_matrix[27];
+        uint8_t display_matrix[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE] = {};
         
         void display_menu (const uint8_t, const uint8_t, const options) override;
         void clear (const uint8_t, const uint8_t);

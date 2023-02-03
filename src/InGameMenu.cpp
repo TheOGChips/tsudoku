@@ -9,7 +9,9 @@ using namespace std;
 //TODO: This might need to be dynamically allocated instead
 InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        this->display_matrix[i] = display_matrix[i];
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+            this->display_matrix[i][j] = display_matrix[i][j];
+        }
     }
 }
 
