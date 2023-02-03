@@ -401,6 +401,9 @@ void Sudoku::clear_surrounding_cells()
     refresh();*/
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         mvprintw(border[i].first, border[i].second, " ");
+        /*uint8_t y = border[i].first,
+                x = border[i].second;
+        display_matrix[y][x] = ' ';*/
     }
     //reset_cursor();
 }
@@ -440,6 +443,9 @@ void Sudoku::place_value (const uint16_t VALUE)
     if (do_nothing()) reset_cursor();
     //else if ((ch & A_CHARTEXT) == '?') {}
     else {
+        uint8_t y = display_matrix_offset[cursor_pos].first,
+                x = display_matrix_offset[cursor_pos].second;
+                
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
@@ -448,6 +454,8 @@ void Sudoku::place_value (const uint16_t VALUE)
                     attron(COLOR_PAIR(UNKNOWN));
                     mvprintw(cursor_pos.first, cursor_pos.second, "?");
                     attroff(COLOR_PAIR(UNKNOWN));
+                    display_matrix[y][x] = '?';
+                    //TODO: This doesn't get updated for evaluation (user can still win if the last number was correct)
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
             }
@@ -469,7 +477,9 @@ void Sudoku::place_value (const uint16_t VALUE)
                 row.set_value(mat.get_row_index(index), VALUE);
                 column.set_value(mat.get_column_index(index), VALUE);
                 submatrix.set_value(mat.get_submatrix_index(index), VALUE);
-
+                
+                display_matrix[y][x] = VALUE;
+                
                 if (DEBUG) {
                     ::mvprintw(25, 40 + 20, "index: %d", index);
                     ::mvprintw(26, 40 + 20, "row #: %d", row_number);
@@ -503,6 +513,7 @@ void Sudoku::place_value (const uint16_t VALUE)
         else {
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 ::printw(" ");
+                display_matrix[y][x] = ' ';
             }
             else {
                 //TODO: Try to figure out how to alternate colors
@@ -511,6 +522,8 @@ void Sudoku::place_value (const uint16_t VALUE)
                 ::printw("%c", VALUE);
                 attroff(A_BOLD);
                 attroff(COLOR_PAIR(CANDIDATES));
+                
+                display_matrix[y][x] = VALUE;
             }
         }
         /*
@@ -523,9 +536,7 @@ void Sudoku::place_value (const uint16_t VALUE)
          *          - Using Backspace and Delete to remove numbers stores something else instead of
          *            a space (the number 32)
          */
-        uint8_t y = display_matrix_offset[cursor_pos].first,
-                x = display_matrix_offset[cursor_pos].second;
-        display_matrix[y][x] = VALUE;
+        
         refresh();
     }
     reset_cursor(); //have cursor maintain position after printing (maybe unnecessary now)
