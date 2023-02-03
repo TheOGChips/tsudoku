@@ -401,6 +401,7 @@ void Sudoku::clear_surrounding_cells()
     refresh();*/
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         mvprintw(border[i].first, border[i].second, " ");
+        //TODO: Make these const later
         uint8_t y = display_matrix_offset[border[i]].first,
                 x = display_matrix_offset[border[i]].second;
         display_matrix[y][x] = ' ';
@@ -443,19 +444,31 @@ void Sudoku::place_value (const uint16_t VALUE)
     if (do_nothing()) reset_cursor();
     //else if ((ch & A_CHARTEXT) == '?') {}
     else {
+        //TODO: Make these const later
         uint8_t y = display_matrix_offset[cursor_pos].first,
                 x = display_matrix_offset[cursor_pos].second;
                 
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
+            uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
+                    row_number = mat.map_row(index),
+                    column_number = mat.map_column(index);
+                    
+            Row &row = mat.get_row(row_number);
+            Column &column = mat.get_column(column_number);
+            Box &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
+            
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
                     attron(COLOR_PAIR(UNKNOWN));
                     mvprintw(cursor_pos.first, cursor_pos.second, "?");
                     attroff(COLOR_PAIR(UNKNOWN));
+                    
+                    row.set_value(mat.get_row_index(index), '?');
+                    column.set_value(mat.get_column_index(index), '?');
+                    submatrix.set_value(mat.get_submatrix_index(index), '?');
                     display_matrix[y][x] = '?';
-                    //TODO: This doesn't get updated for evaluation (user can still win if the last number was correct)
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
             }
@@ -464,20 +477,11 @@ void Sudoku::place_value (const uint16_t VALUE)
                 attron(COLOR_PAIR(GUESS));
                 mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
                 attroff(COLOR_PAIR(GUESS));
-
-                uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
-                        row_number = mat.map_row(index),
-                        column_number = mat.map_column(index);
-
-                //TODO: Maybe put the next 7 lines in Grid.cpp
-                Row &row = mat.get_row(row_number);
-                Column &column = mat.get_column(column_number);
-                Box &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
-
+                
+                //TODO: Maybe put the next 3 lines in Grid.cpp
                 row.set_value(mat.get_row_index(index), VALUE);
                 column.set_value(mat.get_column_index(index), VALUE);
                 submatrix.set_value(mat.get_submatrix_index(index), VALUE);
-                
                 display_matrix[y][x] = VALUE;
                 
                 if (DEBUG) {
