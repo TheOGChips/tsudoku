@@ -445,19 +445,8 @@ void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
 }
 
 void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
-    clear();
-    ::mvprintw(ORIGINy, ORIGINx, "Inside set_starting_positions");
-    refresh();
-    getch();
-    
     time_t seed = time(nullptr);
     array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
-    clear();
-    for (uint8_t i = 0; i < 81; i++) {
-        ::mvprintw(ORIGINy, ORIGINx + i, "%c", solved_puzzle[i]);
-    }
-    refresh();
-    getch();
     
     #if false
         printf("\n");
@@ -560,19 +549,18 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         print(false, false);*/
         known_positions[pos] = true;
 
-        if (not DEBUG) {
+        if (DEBUG) {
             clear();
             printw(false, false);
-            //this_thread::sleep_for(chrono::seconds(1));
+            this_thread::sleep_for(chrono::seconds(1));
             refresh();
         }
     }
-    getch();
     
-    //TODO: Remove this as it's redundant since init_positions() is run before this function
-    /*for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
+    //NOTE: For some reason, this is actually required, even though it seems redundant.
+    for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
         known_positions[positions[i]] = false;
-    }*/
+    }
     
     /*cout << endl;
     for (uint8_t i = 0; i < 81; i++) {

@@ -9,9 +9,7 @@ using namespace std;
 //TODO: This might need to be dynamically allocated instead
 InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
-            this->display_matrix[i][j] = display_matrix[i][j];
-        }
+        this->display_matrix[i] = display_matrix[i];
     }
 }
 
@@ -215,7 +213,7 @@ options InGameMenu::menu () {
     } while (tolower(input) != 'm');
     opt = options::NONE;
     display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, opt);
-    curs_set(1);
+    curs_set(true);
     
     return opt;
 }

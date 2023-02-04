@@ -17,7 +17,7 @@ Sudoku::Sudoku (bool is_initscr, const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
-    create_map();
+    //create_map(); //TODO: Move this to somewhere later on
 
     //Start ncurses
     
@@ -179,11 +179,6 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
 
     //initialize display matrix with blank spaces
     if (not DISPLAY_MATRIX) {
-        clear();
-        ::mvprintw(ORIGINy, ORIGINx, "DISPLAY_MATRIX is null");
-        refresh();
-        getch();
-    
         for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
             for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
                 display_matrix[i][j] = ' ';
@@ -191,17 +186,13 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
         }
         //TODO: Will need to pass the display_matrix into Grid before this for loop runs
         mat = Grid(nullptr);
+        create_map();
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
             display_matrix[coords.first][coords.second] = mat[i];
         }
     }
     else {
-        clear();
-        ::mvprintw(ORIGINy, ORIGINx, "DISPLAY_MATRIX is not null");
-        refresh();
-        getch();
-        
         for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
             for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
                 display_matrix[i][j] = DISPLAY_MATRIX[i][j];
@@ -216,6 +207,7 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
             }
         }
         mat = Grid(grid);
+        create_map();
     }
 }
 
