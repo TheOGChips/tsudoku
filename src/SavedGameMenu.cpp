@@ -57,14 +57,15 @@ void SavedGameMenu::read_saved_game () {
     ifstream infile (DIR + "/" + *selection);
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         string row;
-        std::getline(infile, row);
+        getline(infile, row);
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             size_t index;
-            saved_game[i][j] = stoi(row, &index);
+            saved_game[i][j] = stoi(row, &index);   //NOTE: Read in number
+            saved_color_codes[i][j] = row[index];         //NOTE: Read in color code character
             
-            //NOTE: index will cause a thrown out_of_range exception on the last number in the string
-            try { row = row.substr(index + 1); }
-            catch (const out_of_range) { row = row.substr(index); }
+            //NOTE: Drop over to next entry in string. Index will cause a thrown out_of_range exception on the last number in the string.
+            try { row = row.substr(index + 2); }
+            catch (const out_of_range) { row = row.substr(index + 1); }
         }
     }
     infile.close();
@@ -73,9 +74,11 @@ void SavedGameMenu::read_saved_game () {
 void SavedGameMenu::print_saved_game () {
     clear();
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        move(TOP_PADDING + i, LEFT_PADDING);
+        //move(TOP_PADDING + i, LEFT_PADDING);
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
-            printw("%c", saved_game[i][j]);
+            //printw("%c", saved_game[i][j]);
+            mvprintw(TOP_PADDING + i, LEFT_PADDING + j, "%c", saved_game[i][j]);
+            mvprintw(TOP_PADDING + i, LEFT_PADDING + j + 30, "%c", saved_color_codes[i][j]);
         }
     }
     refresh();
@@ -87,6 +90,7 @@ SavedPuzzle SavedGameMenu::get_saved_game() {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             saved_puzzle.puzzle[i][j] = saved_game[i][j];
+            saved_puzzle.color_codes[i][j] = saved_color_codes[i][j];
         }
     }
     return saved_puzzle;
@@ -96,6 +100,6 @@ options SavedGameMenu::menu () {
     generate_saved_games_list();
     select_saved_game();
     read_saved_game();  //TODO: Read in saved game based on selection
-    //print_saved_game();
+    print_saved_game();
     return options::NONE;
 }

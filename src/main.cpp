@@ -54,8 +54,8 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
                        
         case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
                                       saved_game_menu.menu();
-                                      Sudoku puzzle(true, saved_game_menu.get_saved_game().puzzle);
-                                      puzzle.start_game(use_in_game_menu);
+                                      //Sudoku puzzle(true, saved_game_menu.get_saved_game().puzzle);
+                                      //puzzle.start_game(use_in_game_menu);
                                       break;  //TODO
                                     }
                                    //instantiate Sudoku object

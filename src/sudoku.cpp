@@ -593,6 +593,7 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
+//TODO: See if there's a way to combine this and InGameMenu's save_game function
 void Sudoku::save_game () {
     string msg = "Enter save file name: ";
     const uint8_t NAME_SIZE = 16,
@@ -612,6 +613,22 @@ void Sudoku::save_game () {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             outfile << static_cast<uint16_t>(display_matrix[i][j]);
+            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
+            switch (ch & A_COLOR) {
+                case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
+                                          break;
+                                          
+                case COLOR_PAIR(GIVEN): outfile << color_code[GIVEN];
+                                        break;
+                                        
+                case COLOR_PAIR(CANDIDATES): outfile << color_code[CANDIDATES];
+                                             break;
+                                             
+                case COLOR_PAIR(GUESS): outfile << color_code[GUESS];
+                                        break;
+                                        
+                default: outfile << color_code[0];
+            }
             if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
         }
         outfile << endl;

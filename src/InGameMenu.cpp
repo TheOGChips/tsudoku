@@ -143,12 +143,10 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;
     outfile.open(FILENAME.c_str());
-    //TODO: How to determine color
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             outfile << static_cast<uint16_t>(display_matrix[i][j]);
-            //NOTE: Might not need to print out the color information
-            /*chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
+            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
             switch (ch & A_COLOR) {
                 case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
                                           break;
@@ -163,7 +161,7 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                                         break;
                                         
                 default: outfile << color_code[0];
-            }*/
+            }
             if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
         }
         outfile << endl;
