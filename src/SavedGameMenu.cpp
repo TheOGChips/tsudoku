@@ -100,6 +100,6 @@ options SavedGameMenu::menu () {
     generate_saved_games_list();
     select_saved_game();
     read_saved_game();  //TODO: Read in saved game based on selection
-    print_saved_game();
+    //print_saved_game();
     return options::NONE;
 }

@@ -130,15 +130,20 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
 
 void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     uint8_t display_offset = 5;
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter save file name: ");
+    
+    curs_set(true);
+    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!",
+             save_game(display_matrix).c_str());
+    curs_set(false);
+}
+
+string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_SIZE]) {
     const uint8_t NAME_SIZE = 16;
     char name[NAME_SIZE];
-    
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter save file name: ");
-    curs_set(true);
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
-    curs_set(false);
     
     const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;
@@ -168,7 +173,7 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     }
     outfile.close();
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!", name);
+    return string(name);
 }
 
 options InGameMenu::menu () {    

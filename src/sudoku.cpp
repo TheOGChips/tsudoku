@@ -593,51 +593,22 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
-//TODO: See if there's a way to combine this and InGameMenu's save_game function
 void Sudoku::save_game () {
-    string msg = "Enter save file name: ";
-    const uint8_t NAME_SIZE = 16,
-                  DISPLAY_LINE = ORIGIN.first + 31;
-    char name[NAME_SIZE];
+    const uint8_t DISPLAY_LINE = ORIGIN.first + 31;
     
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
-    ::printw("%s", msg.c_str());
-    echo();
-    getnstr(name, NAME_SIZE - 1);
-    noecho();
+    ::printw("Enter save file name: ");
     
-    const string FILENAME = DIR + "/" + name + ".csv";
-    ofstream outfile;
-    outfile.open(FILENAME.c_str());
+    uint8_t* display_matrix[DISPLAY_MATRIX_SIZE];
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
-            outfile << static_cast<uint16_t>(display_matrix[i][j]);
-            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
-            switch (ch & A_COLOR) {
-                case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
-                                          break;
-                                          
-                case COLOR_PAIR(GIVEN): outfile << color_code[GIVEN];
-                                        break;
-                                        
-                case COLOR_PAIR(CANDIDATES): outfile << color_code[CANDIDATES];
-                                             break;
-                                             
-                case COLOR_PAIR(GUESS): outfile << color_code[GUESS];
-                                        break;
-                                        
-                default: outfile << color_code[0];
-            }
-            if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
-        }
-        outfile << endl;
+        display_matrix[i] = this->display_matrix[i];
     }
-    outfile.close();
     
-    ::move(DISPLAY_LINE, 0);
+    const string NAME = InGameMenu::save_game(display_matrix);
+    ::move(DISPLAY_LINE, 1);
     clrtoeol();
-    mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", name);
+    mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
 }
 
 void Sudoku::start_game (const bool USE_IN_GAME_MENU)
