@@ -437,11 +437,27 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
 }
 
 void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
-    clear();
-    ::mvprintw(ORIGINy, ORIGINx, "Placeholder text to ensure this is working");
-    refresh();
-    getch();
-    //TODO
+    //BUG: The values does print out correctly, but cell traits aren't.
+    //BUG: This won't be able to tell the difference between givens and guesses.
+    for (uint8_t i = 0; i < 81; i++) {
+        const uint8_t ROW_NUMBER = map_row(i),                                  //map position to row
+                      COLUMN_NUMBER = map_column(i),                            //map position to column
+                      BOX_NUMBER = map_submatrix(ROW_NUMBER, COLUMN_NUMBER),    //map position to 3x3 box
+                      INDEX_ROW = get_row_index(i),
+                      INDEX_COLUMN = get_column_index(i),
+                      INDEX_BOX = get_submatrix_index(i),
+                      VALUE = GRID[i/9][i%9];
+                      
+        Row &row = get_row(ROW_NUMBER); //NOTE: why these require the ampersand, I'm not really sure
+        Column &column = get_column(COLUMN_NUMBER);
+        Box &box = get_submatrix(BOX_NUMBER);
+        
+        row.set_value(INDEX_ROW, VALUE);
+        column.set_value(INDEX_COLUMN, VALUE);
+        box.set_value(INDEX_BOX, VALUE);
+        
+        known_positions[i] = (VALUE == '?') ? false : true;
+    }
 }
 
 void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
