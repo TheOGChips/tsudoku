@@ -17,7 +17,7 @@ Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
     //      settings are added later)
-    //create_map(); //TODO: Move this to somewhere later on
+    create_map(); //TODO: Move this to somewhere later on
 
     //Start ncurses
     
@@ -28,50 +28,7 @@ Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
     noecho();
     keypad(stdscr, true);
 
-    if (DEBUG) {
-        //cout <<  << endl;
-        ::printw("Printing mapping...\n");
-        for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
-            ::printw("m[%u]: (%u, %u)", i, mat.get_map(i).first, mat.get_map(i).second);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
-        }
-        ::printw("\n\n");
-        for (uint8_t i = 0; i < _map_.size(); i++) {
-            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
-            ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
-        }
-        ::printw("\n\n");
-        for (uint8_t i = 0; i < _rev_map_.size(); i++) {
-            ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
-        }
-        //NOTE: The mapping appears to be correct according to the printout, so why is adding new values not working as expected?
-        refresh();  //TODO: Consider putting these three functions into one if used like this more often
-        getch();
-        clear();
-    }
-
-    if (DEBUG) {
-        enum print_by {row, column, submatrix};
-        for (uint8_t i = row; i <= submatrix; i++) {
-            ::printw("Printing by ");
-            if (i == submatrix) {
-                ::printw("submatrix...\n");
-            }
-            else if (i == column) {
-                ::printw("column...\n");
-            }
-            else {
-                ::printw("row...\n");
-            }
-            mat.printw(i & column, i & submatrix);
-            refresh();  //flush output to screen
-            getch();    //wait for user input
-            clear();    //clear the screen
-        }
-    }
+    
 
     /*if (DEBUG) {
         cout << "Printing out random numbers..." << endl;
@@ -96,7 +53,9 @@ void Sudoku::create_map()
     uint8_t row = 1,
             column = 1;
 
-    for (uint8_t i = 0; i < mat.get_map_size(); i++) {
+    //TODO: See if there's a better way to fix this.
+    //for (uint8_t i = 0; i < mat.get_map_size(); i++) {
+    for (uint8_t i = 0; i < 81; i++) {
         //m[i] = cell(row, column);
         _map_[i] = cell(row, column);
         _rev_map_[cell(row, column)] = i;
@@ -184,9 +143,9 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
                 display_matrix[i][j] = ' ';
             }
         }
-        //TODO: Will need to pass the display_matrix into Grid before this for loop runs
+        
         mat = Grid(nullptr);
-        create_map();
+        //create_map(); //NOTE: This actually works as originally intended, but the constructor call is currently used because of the catch-22 that occurs when resuming a game.
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
             display_matrix[coords.first][coords.second] = mat[i];
@@ -206,9 +165,66 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
                 grid[i][j] = SAVED_PUZZLE->puzzle[coords.first][coords.second];
             }
         }
-        //BUG: It looks like something isn't getting updated correctly in the Container objects when resuming a game.
+        
+        if (DEBUG) {
+            clear();
+            mvprintw(0, 0, "Printing grid...");
+            for (uint8_t i = 0; i < 9; i++) {
+                for (uint8_t j = 0; j < 9; j++) {
+                    mvprintw(i + 1, j, "%c", grid[i][j]);
+                    
+                }
+            }
+            refresh();
+            getch();
+        }
         mat = Grid(grid);
-        create_map();
+        //create_map(); //NOTE: This currently fails if run here. There's a sort of catch-22 where (to work as intended) the grid passed to mat needs _map_ to be filled, but _map_ also needs mat to be filled.
+    }
+    
+    if (DEBUG) {
+        //cout <<  << endl;
+        ::printw("Printing mapping...\n");
+        for (uint8_t i = 0; i < mat.get_map_size(); i++) {
+            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
+            ::printw("m[%u]: (%u, %u)", i, mat.get_map(i).first, mat.get_map(i).second);
+            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+        }
+        ::printw("\n\n");
+        for (uint8_t i = 0; i < _map_.size(); i++) {
+            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
+            ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
+            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+        }
+        ::printw("\n\n");
+        for (uint8_t i = 0; i < _rev_map_.size(); i++) {
+            ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
+            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+        }
+        //NOTE: The mapping appears to be correct according to the printout, so why is adding new values not working as expected?
+        refresh();  //TODO: Consider putting these three functions into one if used like this more often
+        getch();
+        clear();
+    }
+    
+    if (DEBUG) {
+        enum print_by {row, column, submatrix};
+        for (uint8_t i = row; i <= submatrix; i++) {
+            ::printw("Printing by ");
+            if (i == submatrix) {
+                ::printw("submatrix...\n");
+            }
+            else if (i == column) {
+                ::printw("column...\n");
+            }
+            else {
+                ::printw("row...\n");
+            }
+            mat.printw(i & column, i & submatrix);
+            refresh();  //flush output to screen
+            getch();    //wait for user input
+            clear();    //clear the screen
+        }
     }
 }
 
@@ -713,6 +729,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             reset_cursor();
             #endif
             if (evaluate()) {
+                //TODO: Delete the save file if resuming a game
                 string msg = "You win!";
                 ::mvprintw(ORIGIN.first + 31, 14, "%s", msg.c_str());
                 clrtoeol();
