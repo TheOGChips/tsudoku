@@ -1,9 +1,9 @@
-# sudoku-tui
+# tsudoku
 
 This will be a user-friendly implementation of the classic game of sudoku that you can play in your terminal. As such, it will be all text-based, but should be extremely easy to play. More in-depth explanations as far as how to play the game will be provided, assuming I remember to do so (I'm currently going through graduate school, so it's very likely that I'll forget to update this or will go long stretches of time without any updates).
 
-# Status update: 31 January 2023
+# Status update: 5 February 2023
 
-Games can now be saved both when the in-game menu is and isn't enabled. I've also made some other minor adjustments to the in-game menu display.
+Saving and resuming games is now fully integrated. The program is now technically completely playable, but there are still some TODOs I'd like to clean up before releasing it for play testing.
 
-Next is adding the ability to resume games. This will (hopefully) be the last difficult left to do. After that, it should just be cleaning up some leftover TODOs.
+After the minimal amount of those are finished, I plan on releasing the program to people I know for play testing. While that's happening, I'll clean up the rest of the remaining TODOs, work on Sphinx documentation, add some notes and comments, and do any other general cleaning up.
