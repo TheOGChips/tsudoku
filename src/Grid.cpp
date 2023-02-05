@@ -23,7 +23,7 @@ Grid::Grid (const uint8_t GRID[9][9])
     //generator = mt19937(seed);
     //dist = uniform_int_distribution<uint8_t>(1, 9);
     //set_starting_positions(17);   //TODO: Implement the following difficulty modes
-    if (not GRID) set_starting_positions(80);   //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+    if (not GRID) set_starting_positions(20);   //      EASY -> 40, MEDIUM -> 30, HARD -> 17
     else set_starting_positions(GRID);
 }                                   //NOTE: This appears to be more complicated than I at
                                     //      first thought. See note in

@@ -90,14 +90,16 @@ void Sudoku::set_color_pairs()
         //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GIVEN, COLOR_RED, COLOR_BLACK);
-        init_pair(CANDIDATES, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(CANDIDATES_Y, COLOR_YELLOW, COLOR_BLACK);
+        init_pair(CANDIDATES_B, COLOR_BLUE, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
         init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GIVEN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(CANDIDATES, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
         init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
@@ -252,7 +254,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
                     case 'r': color_pair = GIVEN;
                               break;
                               
-                    case 'y': color_pair = CANDIDATES;
+                    case 'y': color_pair = CANDIDATES_Y;
                               attron(A_BOLD);
                               break;
                               
@@ -590,27 +592,27 @@ void Sudoku::place_value (const uint16_t VALUE)
                 display_matrix[y][x] = ' ';
             }
             else {
-                //TODO: Try to figure out how to alternate colors
-                attron(COLOR_PAIR(CANDIDATES));
+                //TODO: Now that alternating colors seems to work, update the rest of the code appropriately to account for there being two candidate colors.
+                array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
+                uint8_t color_pair;
+                for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
+                    chtype ch = mvinch(border[i].first, border[i].second);
+                    if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or
+                        (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
+                        color_pair = (_rev_map_[display_matrix_offset[border[i]]] % 2) ? CANDIDATES_B : CANDIDATES_Y;
+                    }
+                }
+                reset_cursor();
+                
+                attron(COLOR_PAIR(color_pair));
                 attron(A_BOLD);
                 ::printw("%c", VALUE);
                 attroff(A_BOLD);
-                attroff(COLOR_PAIR(CANDIDATES));
+                attroff(COLOR_PAIR(color_pair));
                 
                 display_matrix[y][x] = VALUE;
             }
         }
-        /*
-         * TODO: There is a bug in here somewhere. The display matrix isn't alawys updated as
-         *       expected. The following have been observed:
-         *          - After deleting and replacing a guess with a '?', the surrounding cells remain 
-         *            in the display matrix structure, although they do not appear on screen
-         *          - Entering a correct guess and removing it will still allow a win when the Enter
-         *            key is pressed
-         *          - Using Backspace and Delete to remove numbers stores something else instead of
-         *            a space (the number 32)
-         */
-        
         refresh();
     }
     reset_cursor(); //have cursor maintain position after printing (maybe unnecessary now)

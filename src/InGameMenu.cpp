@@ -159,7 +159,7 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_SIZE]) {
                 case COLOR_PAIR(GIVEN): outfile << color_code[GIVEN];
                                         break;
                                         
-                case COLOR_PAIR(CANDIDATES): outfile << color_code[CANDIDATES];
+                case COLOR_PAIR(CANDIDATES_Y): outfile << color_code[CANDIDATES_Y];
                                              break;
                                              
                 case COLOR_PAIR(GUESS): outfile << color_code[GUESS];
