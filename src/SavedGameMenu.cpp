@@ -29,7 +29,7 @@ void SavedGameMenu::generate_saved_games_list () {
     saved_games.sort();
 }
 
-void SavedGameMenu::select_saved_game () {
+bool SavedGameMenu::select_saved_game () {
     uint16_t input,
              size_offset;
     selection = saved_games.begin();
@@ -51,6 +51,8 @@ void SavedGameMenu::select_saved_game () {
     refresh();
     while (getch() != KEY_ENTER);
     curs_set(true);
+        
+    return not saved_games.empty();
 }
 
 void SavedGameMenu::read_saved_game () {
@@ -100,8 +102,10 @@ SavedPuzzle SavedGameMenu::get_saved_game() {
 
 options SavedGameMenu::menu () {
     generate_saved_games_list();
-    select_saved_game();
-    read_saved_game();  //TODO: Read in saved game based on selection
-    //print_saved_game();
-    return options::NONE;
+    if (select_saved_game()) {
+        read_saved_game();  //TODO: Read in saved game based on selection
+        //print_saved_game();
+        return options::SAVE_READY;
+    }
+    else return options::NO_SAVES;
 }

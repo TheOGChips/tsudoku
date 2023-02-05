@@ -53,10 +53,11 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
                                     }
                        
         case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
-                                      saved_game_menu.menu();
-                                      SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
-                                      Sudoku puzzle(true, &saved_puzzle);
-                                      puzzle.start_game(use_in_game_menu, &saved_puzzle);
+                                      if (saved_game_menu.menu() == options::SAVE_READY) {
+                                        SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
+                                        Sudoku puzzle(true, &saved_puzzle);
+                                        puzzle.start_game(use_in_game_menu, &saved_puzzle);
+                                      }
                                       break;  //TODO
                                     }
                                    //instantiate Sudoku object

@@ -19,7 +19,7 @@ class SavedGameMenu : public Menu {
         
         void display_menu (const uint8_t, const uint8_t, const options) override;
         void generate_saved_games_list ();
-        void select_saved_game ();
+        bool select_saved_game ();
         void read_saved_game ();
         void print_saved_game ();
         
