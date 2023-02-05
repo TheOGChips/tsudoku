@@ -23,6 +23,7 @@ const std::string DIR = std::string(getenv("HOME")) + "/.tsudoku";
 struct SavedPuzzle {
     uint8_t puzzle[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
     char color_codes[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
+    std::string filename;
 };
 
 #endif

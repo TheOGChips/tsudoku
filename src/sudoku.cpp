@@ -6,6 +6,7 @@
 #include <chrono>
 #include <fstream>
 #include "InGameMenu.hpp"
+#include <filesystem>
 
 using namespace std;
 
@@ -737,6 +738,8 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
                 increment_completed_games();
                 quit_game = true;
                 this_thread::sleep_for(chrono::seconds(2));
+                
+                if (SAVED_PUZZLE) filesystem::remove(SAVED_PUZZLE->filename);
             }
             else {
                 string msg = "Puzzle incomplete!";  //TODO: Remove this result display after a delay

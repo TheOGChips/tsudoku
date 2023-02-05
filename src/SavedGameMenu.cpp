@@ -54,6 +54,7 @@ void SavedGameMenu::select_saved_game () {
 }
 
 void SavedGameMenu::read_saved_game () {
+    
     ifstream infile (DIR + "/" + *selection);
     for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         string row;
@@ -93,6 +94,7 @@ SavedPuzzle SavedGameMenu::get_saved_game() {
             saved_puzzle.color_codes[i][j] = saved_color_codes[i][j];
         }
     }
+    saved_puzzle.filename = DIR + "/" + *selection;
     return saved_puzzle;
 }
 
