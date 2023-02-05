@@ -437,8 +437,6 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
 }
 
 void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
-    //BUG: The values does print out correctly, but cell traits aren't.
-    //BUG: This won't be able to tell the difference between givens and guesses.
     for (uint8_t i = 0; i < 81; i++) {
         const uint8_t ROW_NUMBER = map_row(i),                                  //map position to row
                       COLUMN_NUMBER = map_column(i),                            //map position to column

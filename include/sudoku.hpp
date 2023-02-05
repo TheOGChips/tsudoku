@@ -33,8 +33,8 @@ class Sudoku {
         void set_color_pairs();
         //TODO: Start menu, accessed from constructor before generating a new puzzle.
         //      Can resume saved puzzle instead.
-        void init_display_matrix(const uint8_t[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]);
-        void printw(/*const bool, const bool*/);
+        void init_display_matrix(const SavedPuzzle*);
+        void printw(const SavedPuzzle*/*const bool, const bool*/);
         void move (const uint8_t, const uint8_t);
         void move (const uint16_t);
         void refresh();
@@ -51,10 +51,10 @@ class Sudoku {
         void save_game ();
         
     public:
-        Sudoku (bool, const uint8_t[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]);
+        Sudoku (bool, const SavedPuzzle*);
         ~Sudoku();
 
-        void start_game (const bool);
+        void start_game (const bool, const SavedPuzzle*);
 };
 
 #endif

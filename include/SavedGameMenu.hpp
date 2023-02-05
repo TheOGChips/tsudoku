@@ -8,10 +8,6 @@
 //enum class options { NONE };
 
 //NOTE: The address of a SavedPuzzle object and it's mat member matrix will be the same. This is here to make passing the matrix around easier.
-struct SavedPuzzle {
-    uint8_t puzzle[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
-    char color_codes[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
-};
 
 class SavedGameMenu : public Menu {
     private:

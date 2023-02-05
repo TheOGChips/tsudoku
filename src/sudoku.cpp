@@ -12,7 +12,7 @@ using namespace std;
 const bool DEBUG = false;
 
 //Grid sudoku_init()
-Sudoku::Sudoku (bool is_initscr, const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE])
+Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
 {
     //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
     //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
@@ -79,7 +79,7 @@ Sudoku::Sudoku (bool is_initscr, const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
             cout << mat.next()+0 << endl;
         }
     }*/
-    init_display_matrix(DISPLAY_MATRIX);
+    init_display_matrix(SAVED_PUZZLE);
 }
 
 Sudoku::~Sudoku()
@@ -143,7 +143,7 @@ void Sudoku::set_color_pairs()
     }
 }
 
-void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE])
+void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
 {
     /*
          0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
@@ -178,7 +178,7 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
     */
 
     //initialize display matrix with blank spaces
-    if (not DISPLAY_MATRIX) {
+    if (not SAVED_PUZZLE) {
         for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
             for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
                 display_matrix[i][j] = ' ';
@@ -195,7 +195,7 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
     else {
         for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
             for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
-                display_matrix[i][j] = DISPLAY_MATRIX[i][j];
+                display_matrix[i][j] = SAVED_PUZZLE->puzzle[i][j];
             }
         }
         
@@ -203,26 +203,56 @@ void Sudoku::init_display_matrix(const uint8_t DISPLAY_MATRIX[DISPLAY_MATRIX_SIZ
         for (uint8_t i = 0; i < 9; i++) {
             for (uint8_t j = 0; j < 9; j++) {
                 cell coords = _map_[i*9 + j];
-                grid[i][j] = DISPLAY_MATRIX[coords.first][coords.second];
+                grid[i][j] = SAVED_PUZZLE->puzzle[coords.first][coords.second];
             }
         }
+        //BUG: It looks like something isn't getting updated correctly in the Container objects when resuming a game.
         mat = Grid(grid);
         create_map();
     }
 }
 
-void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
+void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
 {
     if (DEBUG) {
         ::printw("Printing display matrix...\n");
     }
-
+    
     //::move(INIT_OFFSETY, INIT_OFFSETX);
-    for (uint8_t i = 0; i < 27; i++) {
+    //TODO: Will need to be sort of a copy of this loop
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
         move(i, 0);
-        for (uint8_t j = 0; j < 27; j++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
             map_display_matrix_offset(i, j);
+            
+            uint8_t color_pair;
+            if (SAVED_PUZZLE) {
+                switch (SAVED_PUZZLE->color_codes[i][j]) {
+                    //case 'n': 
+                    case 'u': color_pair = UNKNOWN;
+                              break;
+                              
+                    case 'r': color_pair = GIVEN;
+                              break;
+                              
+                    case 'y': color_pair = CANDIDATES;
+                              attron(A_BOLD);
+                              break;
+                              
+                    case 'g': color_pair = GUESS;
+                              break;
+                              
+                    default: color_pair = 0;
+                }
+                
+                attron(COLOR_PAIR(color_pair));
+            }
             ::printw("%c", display_matrix[i][j]);
+            if (SAVED_PUZZLE) {
+                attroff(COLOR_PAIR(color_pair));
+                attroff(A_BOLD);
+            }
+            
             if (j == 8 or j == 17) {
                 ::printw("|");
             }
@@ -236,23 +266,26 @@ void Sudoku::printw (/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING
             ::printw("---------|---------|---------");
         }
     }
-
-    //NOTE: Not needed currently, but probably will be later
-    /*uint16_t posx,
-             posy;
-    getyx(stdscr, posy, posx);*/
-    for (uint8_t i = 0; i < _map_.size(); i++) {
-        cell coords = _map_[i];
-        move(coords.first, coords.second);  //Move cursor to position
-        if (mat.is_known(i)) {
-            attron(COLOR_PAIR(GIVEN));  //Turn color scheme on
-            ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
-            attroff(COLOR_PAIR(GIVEN));//Turn color scheme off
-        }
-        else {
-            attron(COLOR_PAIR(UNKNOWN));
-            ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
-            attroff(COLOR_PAIR(UNKNOWN));
+    
+    if (not SAVED_PUZZLE) {
+        //NOTE: Not needed currently, but probably will be later
+        /*uint16_t posx,
+                posy;
+        getyx(stdscr, posy, posx);*/
+        for (uint8_t i = 0; i < _map_.size(); i++) {
+            cell coords = _map_[i];
+            move(coords.first, coords.second);  //Move cursor to position
+            
+            if (mat.is_known(i)) {
+                attron(COLOR_PAIR(GIVEN));  //Turn color scheme on
+                ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
+                attroff(COLOR_PAIR(GIVEN));//Turn color scheme off
+            }
+            else {
+                attron(COLOR_PAIR(UNKNOWN));
+                ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
+                attroff(COLOR_PAIR(UNKNOWN));
+            }
         }
     }
 }
@@ -611,10 +644,10 @@ void Sudoku::save_game () {
     mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
 }
 
-void Sudoku::start_game (const bool USE_IN_GAME_MENU)
+void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE)
 {
     //Load and display the new or saved puzzle
-    printw();
+    printw(SAVED_PUZZLE);
     InGameMenu* in_game_menu;
     if (not USE_IN_GAME_MENU) {
         in_game_menu = nullptr;
