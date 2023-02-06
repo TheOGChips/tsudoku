@@ -1,6 +1,8 @@
 #ifndef VALUES_HPP
 #define VALUES_HPP
 
+//TODO: Rename this to something like "misc.hpp" or "misc_values.hpp"
+
 #include <cstdint>  //uint8_t
 #include <utility>  //std::pair
 #include <string>
@@ -25,5 +27,7 @@ struct SavedPuzzle {
     char color_codes[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE];
     std::string filename;
 };
+
+enum class difficulty_level { EASY = 60, MEDIUM = 45, HARD = 30, EXPERT = 17 };
 
 #endif

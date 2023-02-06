@@ -10,10 +10,11 @@ MENU = Menu
 MAIN_MENU = MainMenu
 INGAME_MENU = InGameMenu
 SAVED_GAME_MENU = SavedGameMenu
+DIFFICULTY_MENU = DifficultyMenu
 SUDOKU = sudoku
 CONTAINER = Container
 GRID = Grid
-OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
+OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(DIFFICULTY_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
 COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/values.hpp
 TGT = $(SUDOKU).exe
 
@@ -36,6 +37,9 @@ $(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp
 
 $(LIB)/$(SAVED_GAME_MENU).o:	$(SRC)/$(SAVED_GAME_MENU).cpp $(INCLUDE)/$(SAVED_GAME_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
 				$(COMPILE) $(SRC)/$(SAVED_GAME_MENU).cpp
+
+$(LIB)/$(DIFFICULTY_MENU).o:	$(SRC)/$(DIFFICULTY_MENU).cpp $(INCLUDE)/$(DIFFICULTY_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
+				$(COMPILE) $(SRC)/$(DIFFICULTY_MENU).cpp
 
 $(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp $(COMMON_HDRS)
 			$(COMPILE) $<

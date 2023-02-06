@@ -7,6 +7,7 @@
 #include <fstream>
 #include "InGameMenu.hpp"
 #include <filesystem>
+#include "DifficultyMenu.hpp"
 
 using namespace std;
 
@@ -146,6 +147,9 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
                 display_matrix[i][j] = ' ';
             }
         }
+        //TODO: Retrieve difficulty level and send to Grid somehow
+        DifficultyMenu diff_menu;
+        diff_menu.menu();
         
         mat = Grid(nullptr);
         //create_map(); //NOTE: This actually works as originally intended, but the constructor call is currently used because of the catch-22 that occurs when resuming a game.
