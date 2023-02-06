@@ -37,6 +37,7 @@ class Grid {
         //TODO: A lot of these can probably be moved to private now
         Grid () {}
         Grid (const uint8_t[9][9]);
+        Grid (const difficulty_level);
         ~Grid() {}
         uint8_t map_row (const uint8_t);
         uint8_t map_column (const uint8_t);

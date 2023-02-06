@@ -23,11 +23,17 @@ Grid::Grid (const uint8_t GRID[9][9])
     //generator = mt19937(seed);
     //dist = uniform_int_distribution<uint8_t>(1, 9);
     //set_starting_positions(17);   //TODO: Implement the following difficulty modes
-    if (not GRID) set_starting_positions(20);   //      EASY -> 40, MEDIUM -> 30, HARD -> 17
-    else set_starting_positions(GRID);
+    //      EASY -> 40, MEDIUM -> 30, HARD -> 17
+    set_starting_positions(GRID);
 }                                   //NOTE: This appears to be more complicated than I at
                                     //      first thought. See note in
                                     //      set_starting_positions for more details.
+                                    
+Grid::Grid (const difficulty_level DIFF) {
+    _map_ = this->create_map();
+    init_positions();
+    set_starting_positions(static_cast<uint8_t>(DIFF));
+}
 #if false
 void Grid::print (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING)
 {
