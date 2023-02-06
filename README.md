@@ -1,9 +1,20 @@
 # tsudoku
 
-This will be a user-friendly implementation of the classic game of sudoku that you can play in your terminal. As such, it will be all text-based, but should be extremely easy to play. More in-depth explanations as far as how to play the game will be provided, assuming I remember to do so (I'm currently going through graduate school, so it's very likely that I'll forget to update this or will go long stretches of time without any updates).
+tsudoku is a user-friendly implementation of the classic game of sudoku that you can play in your terminal. (WARNING: I'm currently going through graduate school, so it's very likely that I'll forget to update this or will go long stretches of time without any updates).
 
-# Status update: 5 February 2023
+Requirements: g++ (tsudoku compiles using the C++17 standard)
+              ncurses
+              NOTE: These are likely already installed if you're running Linux or MacOS. If not, you should be able to download them easily. There is currently no support for Windows.
+              
+To run (from the directory tsudoku is in):
+    Normal mode:     $ ./tsudoku
+    No in-game menu: $ ./tsudoku -n
+                     $ ./tsudoku --no-in-game-menu
+    Display help:    $ ./tsudoku --help
+                     $ ./tsudoku -?
 
-Saving and resuming games is now fully integrated. The program is now technically completely playable, but there are still some TODOs I'd like to clean up before releasing it for play testing.
+# Status update: 6 February 2023
 
-After the minimal amount of those are finished, I plan on releasing the program to people I know for play testing. While that's happening, I'll clean up the rest of the remaining TODOs, work on Sphinx documentation, add some notes and comments, and do any other general cleaning up.
+Great news: tsudoku is now ready for play testing! Anyone who is playing tsudoku after this update is free to play and submit any feedback to myself as desired. I hope everyone likes it.
+
+I still have some stuff that I need/would like to do, but most of that will be transparent to the player (unless it completely breaks the game, in which case it will be opaque). Unless there are any game-breaking bugs that need to be fixed, the next update will follow once these remaining things are taken care of and tsudoku is ready for its first official release.
