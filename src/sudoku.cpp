@@ -258,6 +258,10 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
                               attron(A_BOLD);
                               break;
                               
+                    case 'b': color_pair = CANDIDATES_B;
+                              attron(A_BOLD);
+                              break;
+                              
                     case 'g': color_pair = GUESS;
                               break;
                               
