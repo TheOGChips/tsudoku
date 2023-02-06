@@ -54,15 +54,6 @@ void DifficultyMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, c
         if (diff == diff_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
-    /*uint8_t display_line = Y_EDGE;
-    clear();
-    mvprintw(display_line++, X_EDGE, "Saved Games:");
-    for (list_iter iter = saved_games.begin(); iter != saved_games.end(); iter++) {
-        if (*selection == *iter) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(++display_line, X_EDGE, "%s", iter->c_str());
-        if (*selection == *iter) attroff(COLOR_PAIR(MENU_SELECTION));
-    }
-    refresh();*/
 }
 
 void DifficultyMenu::set_difficulty_level (const difficulty_level diff) {
@@ -83,27 +74,7 @@ options DifficultyMenu::menu () {
                            
             case KEY_UP: diff--;
                          break;
-                            
-            /*case KEY_ENTER: 
-                switch (opt) {
-                    case difficulty_level::: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                         display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                         break;
-                                             
-                    case difficulty_level::: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                          display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                          break;
-                                              
-                    case difficulty_level::: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             //NOTE: Turn off highlighted option while entering in
-                                             //      save name
-                                             display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE,
-                                                          options::NONE);
-                                             save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                             break;
-                    
-                    default:;   //NOTE: opt will never be NONE based on this logic
-                }*/
+                         
             default:;
         }
     } while (input != KEY_ENTER);
