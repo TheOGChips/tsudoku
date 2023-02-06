@@ -22,7 +22,7 @@ Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
     create_map(); //TODO: Move this to somewhere later on
 
     //Start ncurses
-    
+    //TODO: These ncurses functions can probably be deleted since MainMenu takes care of it all now
     if (not is_initscr) initscr();
     //establish color support and color pairs
     set_color_pairs();
@@ -43,9 +43,9 @@ Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
 
 Sudoku::~Sudoku()
 {
-    echo();
-    nocbreak();
-    endwin();   //terminate ncurses session
+    //echo();
+    //nocbreak();
+    //endwin();   //terminate ncurses session
 }
 
 //map<uint8_t, cell> Sudoku::create_map()

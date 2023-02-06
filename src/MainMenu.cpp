@@ -26,12 +26,13 @@ void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT
     const string TITLE = "MAIN MENU";
     const uint8_t Y_CENTER = Y / 2,
                   X_CENTER = X/2 - TITLE.size()/2,
-                  NUM_OPTS = 3;
-    const string OPTS[NUM_OPTS] = { "New Game", "Resume Game", "Show # Finished Games" };
+                  NUM_OPTS = 4;
+    const string OPTS[NUM_OPTS] = { "New Game", "Resume Game", "Show # Finished Games", "Exit" };
     map<uint8_t, options> opt_map;
     opt_map[0] = options::NEW_GAME;
     opt_map[1] = options::RESUME_GAME;
     opt_map[2] = options::SHOW_STATS;
+    opt_map[3] = options::EXIT;
            
     mvprintw(Y_CENTER - 2, X_CENTER, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
@@ -68,36 +69,41 @@ options MainMenu::menu (const bool USE_IN_GAME_MENU) {
 options MainMenu::menu () {
     uint8_t x_max,
             y_max;
+    static bool first_pass = true;
     getmaxyx(stdscr, y_max, x_max);
-    while (y_max < WINDOW_YMIN or x_max < WINDOW_XMIN) {
-        uint8_t x_curr,
-                y_curr;
+    curs_set(false);
+
+    if (first_pass) {
+        while (y_max < WINDOW_YMIN or x_max < WINDOW_XMIN) {
+            uint8_t x_curr,
+                    y_curr;
+            ::clear();
+            string msg1 = "The current window is too small",
+                msg4 = "Resize the terminal window and press Enter twice to continue";
+            stringstream msg2,
+                        msg3;
+            msg2 << "Required dimensions: " << WINDOW_XMIN+0 << " x " << WINDOW_YMIN+0;
+            msg3 << "Current dimensions: " << x_max+0 << " x " << y_max+0;
+            mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       "%s", msg1.c_str());
+            mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, "%s", msg2.str().c_str());
+            mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, "%s", msg3.str().c_str());
+            mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       "%s", msg4.c_str());
+            refresh();
+            getmaxyx(stdscr, y_max, x_max);
+            while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be pressed
+        }                                   //      twice here
         ::clear();
-        string msg1 = "The current window is too small",
-               msg4 = "Resize the terminal window and press Enter twice to continue";
-        stringstream msg2,
-                     msg3;
-        msg2 << "Required dimensions: " << WINDOW_XMIN+0 << " x " << WINDOW_YMIN+0;
-        msg3 << "Current dimensions: " << x_max+0 << " x " << y_max+0;
-        mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       "%s", msg1.c_str());
-        mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, "%s", msg2.str().c_str());
-        mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, "%s", msg3.str().c_str());
-        mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       "%s", msg4.c_str());
+        
+        string msg1 = "The window is now an appropriate size",
+            msg2 = "Press Enter to continue";
+        mvprintw(y_max/2,     x_max/2 - msg1.size()/2, "%s", msg1.c_str());
+        mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
         refresh();
-        getmaxyx(stdscr, y_max, x_max);
-        while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be pressed
-    }                                   //      twice here
+        while (getch() != KEY_ENTER);
+        first_pass = false;
+    }
     ::clear();
     
-    string msg1 = "The window is now an appropriate size",
-           msg2 = "Press Enter to continue";
-    mvprintw(y_max/2,     x_max/2 - msg1.size()/2, "%s", msg1.c_str());
-    mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
-    refresh();
-    while (getch() != KEY_ENTER);
-    ::clear();
-    
-    curs_set(0);
     options opt = options::NEW_GAME;
     display_menu(y_max, x_max, opt);
     
@@ -116,15 +122,42 @@ options MainMenu::menu () {
             default:;
         }
     } while (input != KEY_ENTER);
+    
     ::clear();
-    curs_set(1);
+    curs_set(true);
     return opt;
 }
 
 options operator ++ (options& opt) {
-    return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
+    //return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
+    switch (opt) {
+        case options::NEW_GAME: opt = options::RESUME_GAME;
+                                     break;
+                                     
+        case options::RESUME_GAME: opt = options::SHOW_STATS;
+                                       break;
+                                       
+        case options::SHOW_STATS: opt = options::EXIT;
+                                     break;
+                                     
+        default: opt = options::EXIT;
+    }
+    return opt;
 }
 
 options operator -- (options& opt) {
-    return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
+    //return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
+    switch (opt) {
+        case options::EXIT: opt = options::SHOW_STATS;
+                                     break;
+                                     
+        case options::SHOW_STATS: opt = options::RESUME_GAME;
+                                       break;
+                                       
+        case options::RESUME_GAME: opt = options::NEW_GAME;
+                                     break;
+                                     
+        default: opt = options::NEW_GAME;
+    }
+    return opt;
 }

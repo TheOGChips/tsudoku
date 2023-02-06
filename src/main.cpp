@@ -41,33 +41,37 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
     create_dir();
     
     MainMenu main_menu;
-    options opt = main_menu.menu(use_in_game_menu);
+    options opt;
     
-    switch (opt) {
-        case options::NEW_GAME:  {
-                                        Sudoku puzzle(true, nullptr);    //TODO: Consider making this a
-                                                                //      static function, depending
-                                                                //      on how resuming games works
-                                        puzzle.start_game(use_in_game_menu, nullptr);
-                                        break;
-                                    }
-                       
-        case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
-                                      if (saved_game_menu.menu() == options::SAVE_READY) {
-                                        SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
-                                        Sudoku puzzle(true, &saved_puzzle);
-                                        puzzle.start_game(use_in_game_menu, &saved_puzzle);
-                                      }
-                                      break;  //TODO
-                                    }
-                                   //instantiate Sudoku object
-                                   //puzzle.start_game(use_in_game_menu);
+    do {
+        opt = main_menu.menu(use_in_game_menu);
         
-        case options::SHOW_STATS: display_completed_puzzles();
-                                     break;
-                         
-        default:;
-    }
+        switch (opt) {
+            case options::NEW_GAME:  {
+                                            Sudoku puzzle(true, nullptr);    //TODO: Consider making this a
+                                                                    //      static function, depending
+                                                                    //      on how resuming games works
+                                            puzzle.start_game(use_in_game_menu, nullptr);
+                                            break;
+                                        }
+                        
+            case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
+                                        if (saved_game_menu.menu() == options::SAVE_READY) {
+                                            SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
+                                            Sudoku puzzle(true, &saved_puzzle);
+                                            puzzle.start_game(use_in_game_menu, &saved_puzzle);
+                                        }
+                                        break;  //TODO
+                                        }
+                                    //instantiate Sudoku object
+                                    //puzzle.start_game(use_in_game_menu);
+            
+            case options::SHOW_STATS: display_completed_puzzles();
+                                        break;
+                            
+            default:;
+        }
+    } while (opt != options::EXIT);
     
     clear();
     printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));  //TODO: This can be deleted later
@@ -120,11 +124,13 @@ void display_completed_puzzles () {
             x_max;
     getmaxyx(stdscr, y_max, x_max);
     
+    curs_set(false);
     clear();
     mvprintw(y_max/2, x_max/2 - sstr.str().size()/2, "%s", sstr.str().c_str());
     mvprintw(y_max/2 + 2, x_max/2 - str.size()/2, "%s", str.c_str());
     refresh();
     while (getch() != KEY_ENTER);
+    curs_set(true);
 }
 
 //TODO: Make a struct that will be returned with the saved puzzle contents inside it. This will be
