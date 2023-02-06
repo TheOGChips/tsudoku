@@ -13,6 +13,7 @@ enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
 
 void create_dir ();
 void display_completed_puzzles ();
+void print_help ();
 void print_err_msg (err_msg);
 
 int main (int argc, char** argv) //TODO: The majority of this code will need to be in a loop
@@ -25,6 +26,11 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
         case 2: if (not strcmp(argv[1], "--no-in-game-menu") or
                     not strcmp(argv[1], "-n")) use_in_game_menu = false;
                 //TODO: Add a --help/-? option
+                else if (not strcmp(argv[1], "--help") or
+                         not strcmp(argv[1], "-?")) {
+                    print_help();
+                    return 0;
+                }
                 //TODO: Add a --info option
                 else {
                     print_err_msg(err_msg::INVALID_ARG);
@@ -79,6 +85,15 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
     refresh();
     getch();
     return 0;
+}
+
+void print_help () {
+    printf("\nUsage: $ ./tsudoku OPTION\n\n");
+    printf("OPTIONS\n\n");
+    printf("    -n, --no-in-game-menu");
+    printf("\tRun tsudoku without the in-game menu\n");
+    printf("    -?, --help");
+    printf("\t\t\tDisplay this help menu\n\n");
 }
 
 void print_err_msg (err_msg err) {
