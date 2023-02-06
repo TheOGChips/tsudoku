@@ -359,7 +359,7 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9
 array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
     array<uint8_t, 81> soln;
     uint8_t soln_matrix[9][9];
-    mt19937 generator(0);   //TODO: Replace this with seed when the time comes
+    mt19937 generator(seed);
     uniform_int_distribution<uint8_t> dist (1, 9);
     uint8_t values[9];
     for (uint8_t i = 0; i < 9; i++) {
