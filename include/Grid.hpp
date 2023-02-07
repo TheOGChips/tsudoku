@@ -1,37 +1,34 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
-//#include "values.hpp"
-//#include "Box.hpp"
-//#include "Row.hpp"
-//#include "Column.hpp"
-#include "Container.hpp"
-#include <random>   //mt19937(), uniform_int_distribution<>(),
-#include <array>
-#include <map>
+#include "Container.hpp"    //Box, Column, Row
+#include <random>           //mt19937(), uniform_int_distribution<>(),
+#include <array>            //std::array
+#include <map>              //std::map
 
 using namespace std;
 
 const uint8_t GRID_SIZE = 81;
 
+/* NOTE:
+ * Class: Grid
+ * Purpose: Represents a 9x9 Sudoku grid.
+ * Private variables:
+ *      arr -> Internal array housing the container's contents.
+ */
 class Grid {
     private:
-        Box matrices[NUM_CONTAINERS];
+        Box matrices[NUM_CONTAINERS];   //TODO: Change this name to boxes
         Row rows[NUM_CONTAINERS];
         Column cols[NUM_CONTAINERS];
         bool known_positions[GRID_SIZE];
-        //mt19937 //position_generator,
-                //generator;
-        //uniform_int_distribution<uint8_t> //position_dist,
-                                          //dist;
-        map<uint8_t, cell> _map_;   //maps 81 positions to positions on 9x9 matrix
+        //TODO: Change this name to pos2cell, grid_map, or grid_pos
+        map<uint8_t, cell> _map_;   //NOTE: Maps 81 positions to positions on 9x9 matrix
 
         void init_positions();
         array<uint8_t, GRID_SIZE> generate_solved_puzzle (time_t);
         void set_starting_positions (uint8_t);
         void set_starting_positions (const uint8_t[NUM_CONTAINERS][NUM_CONTAINERS]);
-        //uint8_t next_position();
-        //uint8_t next_value();
         map<uint8_t, cell> create_map();
         bool solve(uint8_t, uint8_t, Row[NUM_CONTAINERS], Column[NUM_CONTAINERS], Box[NUM_CONTAINERS]);
 
@@ -55,11 +52,10 @@ class Grid {
         void printw (const bool, const bool);
         const cell get_map (uint8_t);
         uint8_t get_map_size() const;
-        uint8_t at (uint8_t);           //TODO: Virtual function candidate
-        uint8_t operator [] (uint8_t);  //TODO: Virtual function candidate
+        uint8_t at (uint8_t);
+        uint8_t operator [] (uint8_t);
         bool is_known (uint8_t);
-        bool evaluate();                //TODO: Virtual function candidate
-                                        //TODO: value_exists and set_value virtual candidates missing
+        bool evaluate();
 };
 
 #endif
