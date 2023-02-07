@@ -22,7 +22,7 @@ uint8_t Container::operator [] (uint8_t index) {
 }
 
 bool Container::value_exists (const uint8_t VALUE) {
-    const uint8_t CONVERTED = (VALUE == '?') ? VALUE : VALUE + 48;
+    const uint8_t CONVERTED = (VALUE == '?') ? VALUE : VALUE + ZERO;
     for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
         if (at(i) == CONVERTED) {
             return true;

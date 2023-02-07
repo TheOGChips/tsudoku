@@ -333,9 +333,9 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS], Col
                 submatrix_index = get_submatrix_index(available_pos.front()),
                 next_submatrix,
                 next_value;
-        rows[row_number].set_value(row_index, value + 48);
-        columns[column_number].set_value(column_index, value + 48);
-        submatrices[submatrix_number].set_value(submatrix_index, value + 48);
+        rows[row_number].set_value(row_index, value + ZERO);
+        columns[column_number].set_value(column_index, value + ZERO);
+        submatrices[submatrix_number].set_value(submatrix_index, value + ZERO);
         known_positions[available_pos.front()] = true;
         
         if (submatrix == 7 and value == 9) return true;
@@ -380,7 +380,7 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
         uint8_t count = 0;
         for (uint8_t j = i; j < i + 3; j++) {
             for (uint8_t k = i; k < i + 3; k++) {
-                soln_matrix[j][k] = values[count] + 48;
+                soln_matrix[j][k] = values[count] + ZERO;
                 count++;
                 //printf("j: %u, k: %u\n", j, k);
             }
@@ -559,7 +559,7 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         index_row = get_row_index(pos);
         index_column = get_column_index(pos);
         index_submatrix = get_submatrix_index(pos);
-        //value += 48;    //convert in order to display proper character
+        //value += ZERO;    //convert in order to display proper character
         value = solved_puzzle[pos];
         row.set_value(index_row, value);
         column.set_value(index_column, value);

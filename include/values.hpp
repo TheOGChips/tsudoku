@@ -18,8 +18,7 @@ const uint8_t KEY_ENTER = 10,
               CONTAINER_SIZE = 9,
               NUM_CONTAINERS = 9;
 
-enum Values { ONE = '1', TWO, THREE, FOUR, FIVE,
-                         SIX, SEVEN, EIGHT, NINE};
+enum Values { ZERO = '0', ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
                          
 typedef std::pair<uint8_t, uint8_t> cell;
 
