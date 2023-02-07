@@ -2,7 +2,6 @@
 #define DIFFICULTYMENU_HPP
 
 #include "Menu.hpp"
-#include "values.hpp"
 #include "colors.hpp"
 
 class DifficultyMenu : public Menu {
