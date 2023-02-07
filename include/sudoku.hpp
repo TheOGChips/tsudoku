@@ -14,7 +14,7 @@ using namespace std;
 
 class Sudoku {
     private:
-        uint8_t display_matrix[27][27] = {};
+        uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         Grid mat;   //TODO: Change this name to grid
         map<uint8_t, cell> _map_;   //maps 81 positions to positions in 27x27 display matrix
         map<cell, uint8_t> _rev_map_;

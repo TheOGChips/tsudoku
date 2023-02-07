@@ -5,11 +5,11 @@
 
 class Container {
     private:
-        char arr[9];
+        char arr[CONTAINER_SIZE];
         
     public:
         Container ();
-        Container (uint8_t[9]);
+        Container (uint8_t[CONTAINER_SIZE]);
         ~Container () {}
         
         uint8_t at (uint8_t);

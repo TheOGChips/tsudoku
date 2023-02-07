@@ -13,7 +13,7 @@ using namespace std;
 
 const bool DEBUG = false;
 
-Grid::Grid (const uint8_t GRID[9][9])
+Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS])
 {
     _map_ = this->create_map();
     init_positions();
@@ -147,7 +147,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
     //getyx(stdscr, y, x);
 
     if (SUBMATRIX_PRINTING) {   //for printing from a submatrix
-        for (uint8_t i = 0; i < 9; i += 3) {
+        for (uint8_t i = 0; i < CONTAINER_SIZE; i += 3) {
             uint8_t count = 0,
                     offset = 0;
             while (count < 3) {
@@ -185,9 +185,9 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
         }
     }
     else {  //for printing using either rows or columns
-        for (uint8_t i = 0; i < 9; i++) {
+        for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
             move(y, x);
-            for (uint8_t j = 0; j < 9; j++) {
+            for (uint8_t j = 0; j < CONTAINER_SIZE; j++) {
                 if (COLUMN_PRINTING) {
                     if (get_column(j)[i] >= ONE and get_column(j)[i] <= NINE) {
                         attron(COLOR_PAIR(GIVEN));
@@ -243,7 +243,7 @@ Column& Grid::get_column (uint8_t index)
 
 void Grid::init_positions()
 {
-    for (uint8_t i = 0; i < 81; i++) {
+    for (uint8_t i = 0; i < GRID_SIZE; i++) {
         known_positions[i] = false;
     }
 }
@@ -264,9 +264,9 @@ void Grid::init_positions()
  *    remove value from row, column, and submatrix if recursive call <- false
  * end do-while
  */
-bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9], Box submatrices[9]) {
+bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS], Column columns[NUM_CONTAINERS], Box submatrices[NUM_CONTAINERS]) {
     queue<uint8_t> available_pos;
-    uint8_t positions[9];
+    uint8_t positions[CONTAINER_SIZE];
     //Figure out positions in submatrix based on submatrix number
     //Start with upper right
     /*
@@ -288,8 +288,8 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9
     positions[0] += 3 * (submatrix % 3);
     
     //Figure out remaining 8 positions in submatrix
-    for (uint8_t i = 1; i < 9; i++) {
-        positions[i] = positions[0] + 9 * (i / 3) + i % 3;
+    for (uint8_t i = 1; i < CONTAINER_SIZE; i++) {
+        positions[i] = positions[0] + CONTAINER_SIZE * (i / 3) + i % 3;
     }
     
     #if false
@@ -302,7 +302,7 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9
     
     //Figure out positions value can and can't be placed
     //map row and column (submatrix shouldn't be needed)
-    for (uint8_t i = 0; i < 9; i++) {
+    for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
         uint8_t row_number = map_row(positions[i]),
                 column_number = map_column(positions[i]);
         if (not rows[row_number].value_exists(value) and
@@ -356,25 +356,25 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[9], Column columns[9
     }
 }
 
-array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
-    array<uint8_t, 81> soln;
-    uint8_t soln_matrix[9][9];
+array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
+    array<uint8_t, GRID_SIZE> soln;
+    uint8_t soln_matrix[NUM_CONTAINERS][NUM_CONTAINERS];
     mt19937 generator(seed);
-    uniform_int_distribution<uint8_t> dist (1, 9);
-    uint8_t values[9];
-    for (uint8_t i = 0; i < 9; i++) {
+    uniform_int_distribution<uint8_t> dist (1, CONTAINER_SIZE);
+    uint8_t values[CONTAINER_SIZE];
+    for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
         values[i] = i + 1;
     }
 
     //Initialize matrix with '?' placeholders
-    for (uint8_t i = 0; i < 9; i++) {
-        for (uint8_t j = 0; j < 9; j++) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
             soln_matrix[i][j] = '?';
         }
     }
 
     //Fill in submatrices along the diagonal first
-    for (uint8_t i = 0; i < 9; i += 3) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i += 3) {
     //for (uint8_t i = 0; i < 3; i += 3) {
         shuffle(begin(values), end(values), generator);
         uint8_t count = 0;
@@ -388,26 +388,26 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
     }
 
     //Create row, column, and submatrix objects from partial solution matrix
-    Row soln_rows[9];
-    Column soln_columns[9];
-    Box soln_matrices[9];
+    Row soln_rows[NUM_CONTAINERS];
+    Column soln_columns[NUM_CONTAINERS];
+    Box soln_matrices[NUM_CONTAINERS];
 
-    for (uint8_t i = 0; i < 9; i++) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         soln_rows[i] = Row(soln_matrix[i]);
     }
 
-    uint8_t temp_col[9];
-    for (uint8_t i = 0; i < 9; i++) {
-        for (uint8_t j = 0; j < 9; j++) {
+    uint8_t temp_col[NUM_CONTAINERS];
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
             temp_col[j] = soln_matrix[j][i];
         }
         soln_columns[i] = Column(temp_col);
     }
 
-    uint8_t temp_submat[9];
+    uint8_t temp_submat[NUM_CONTAINERS];
     uint8_t count = 0;
-    for (uint8_t i = 1; i < 9; i += 3) {
-        for (uint8_t j = 1; j < 9; j += 3) {
+    for (uint8_t i = 1; i < NUM_CONTAINERS; i += 3) {
+        for (uint8_t j = 1; j < NUM_CONTAINERS; j += 3) {
             temp_submat[0] = soln_matrix[i-1][j-1];
             temp_submat[1] = soln_matrix[i-1][j];
             temp_submat[2] = soln_matrix[i-1][j+1];
@@ -424,8 +424,8 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
     
     bool soln_found = solve(1, 1, soln_rows, soln_columns, soln_matrices);
     
-    for (uint8_t i = 0; i < 9; i++) {
-        for (uint8_t j = 0; j < 9; j++) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
             if (soln_matrix[i][j] == '?') {
                 soln_matrix[i][j] = soln_rows[i][j];
             //if (soln_matrix[j][i] == '?') {
@@ -434,23 +434,23 @@ array<uint8_t, 81> Grid::generate_solved_puzzle (time_t seed) {
         }
     }
     
-    for (uint8_t i = 0; i < 9; i++) {
-        for (uint8_t j = 0; j < 9; j++) {
-            soln[i * 9 + j] = soln_matrix[i][j];
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
+            soln[i * CONTAINER_SIZE + j] = soln_matrix[i][j];
         }
     }
     return soln;
 }
 
-void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
-    for (uint8_t i = 0; i < 81; i++) {
+void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
+    for (uint8_t i = 0; i < GRID_SIZE; i++) {
         const uint8_t ROW_NUMBER = map_row(i),                                  //map position to row
                       COLUMN_NUMBER = map_column(i),                            //map position to column
                       BOX_NUMBER = map_submatrix(ROW_NUMBER, COLUMN_NUMBER),    //map position to 3x3 box
                       INDEX_ROW = get_row_index(i),
                       INDEX_COLUMN = get_column_index(i),
                       INDEX_BOX = get_submatrix_index(i),
-                      VALUE = GRID[i/9][i%9];
+                      VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
                       
         Row &row = get_row(ROW_NUMBER); //NOTE: why these require the ampersand, I'm not really sure
         Column &column = get_column(COLUMN_NUMBER);
@@ -466,7 +466,7 @@ void Grid::set_starting_positions (const uint8_t GRID[9][9]) {
 
 void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
     time_t seed = time(nullptr);
-    array<uint8_t, 81> solved_puzzle = generate_solved_puzzle(seed);
+    array<uint8_t, GRID_SIZE> solved_puzzle = generate_solved_puzzle(seed);
     
     #if false
         printf("\n");
@@ -479,9 +479,9 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         exit(EXIT_SUCCESS);
     #endif
         
-    uint8_t positions[81]/*,
+    uint8_t positions[GRID_SIZE]/*,
             values[9]*/;
-    for (uint8_t i = 0; i < 81; i++) positions[i] = i;
+    for (uint8_t i = 0; i < GRID_SIZE; i++) positions[i] = i;
     //for (uint8_t i = 0; i < 9; i++) values[i] = i + 1;
     shuffle(begin(positions), end(positions), mt19937(seed));
     
@@ -578,7 +578,7 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
     }
     
     //NOTE: For some reason, this is actually required, even though it seems redundant.
-    for (uint8_t i = NUM_POSITIONS; i < 81; i++) {
+    for (uint8_t i = NUM_POSITIONS; i < GRID_SIZE; i++) {
         known_positions[positions[i]] = false;
     }
     
@@ -600,12 +600,12 @@ uint8_t Grid::next_position()
 #endif
 uint8_t Grid::map_row (const uint8_t POS)
 {
-    return POS / 9;
+    return POS / NUM_CONTAINERS;
 }
 
 uint8_t Grid::map_column (const uint8_t POS)
 {
-    return POS % 9;
+    return POS % NUM_CONTAINERS;
 }
 
 uint8_t Grid::map_submatrix (const uint8_t ROW, const uint8_t COLUMN)
@@ -682,13 +682,13 @@ uint8_t Grid::get_row_index (const uint8_t POS)
         72 73 74 | 75 76 77 | 78 79 80      80 81 82 | 83 84 85 | 86 87 88
     */
     //map row index
-    return POS % 9;
+    return POS % CONTAINER_SIZE;
 }
 
 uint8_t Grid::get_column_index (const uint8_t POS)
 {
     //map column index
-    return POS / 9;
+    return POS / CONTAINER_SIZE;
 }
 
 uint8_t Grid::get_submatrix_index (const uint8_t POS)
@@ -703,10 +703,10 @@ map<uint8_t, cell> Grid::create_map()
 {
     map<uint8_t, cell> m;
 
-    for (uint8_t i = 0; i < 9; i++) {
-        for (uint8_t j = 0; j < 9; j++) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
             //m[i * 9 + j] = pair<uint8_t, uint8_t>(i, j);
-            m[i * 9 + j] = cell(i, j);
+            m[i * CONTAINER_SIZE + j] = cell(i, j);
         }
     }
 
@@ -740,7 +740,7 @@ bool Grid::is_known (uint8_t index) {
 }
 
 bool Grid::evaluate () {
-    for (uint8_t i = 0; i < 9; i++) {
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         //Row &row = mat.get_row(i);
         //Column &column = mat.get_column(i);
         //Box &submatrix = mat.get_submatrix(i);

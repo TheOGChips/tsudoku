@@ -14,8 +14,8 @@ class SavedGameMenu : public Menu {
         typedef std::list<std::string>::iterator list_iter;
         std::list<std::string> saved_games;
         list_iter selection;
-        uint8_t saved_game[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE] = {};
-        char saved_color_codes[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE] = {};
+        uint8_t saved_game[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
+        char saved_color_codes[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         
         void display_menu (const uint8_t, const uint8_t, const options) override;
         void generate_saved_games_list ();

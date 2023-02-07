@@ -8,8 +8,9 @@
 class InGameMenu : public Menu {
     private:
         const uint8_t IN_GAME_MENU_TITLE_SPACING = 1,   //y-axis, blank lines below menu title
-                      IN_GAME_MENU_LEFT_EDGE = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER;
-        uint8_t* display_matrix[DISPLAY_MATRIX_SIZE];    //NOTE: This must be a pointer so that the display matrix will properly update when saving a game in the in-game menu.
+                      IN_GAME_MENU_LEFT_EDGE = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER,
+                      NUM_OPTS = 3;
+        uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];    //NOTE: This must be a pointer so that the display matrix will properly update when saving a game in the in-game menu.
         
         void display_menu (const uint8_t, const uint8_t, const options) override;
         void clear (const uint8_t, const uint8_t);
@@ -19,10 +20,10 @@ class InGameMenu : public Menu {
         void save_game (const uint8_t, const uint8_t);
         
     public:
-        InGameMenu (uint8_t[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]);
+        InGameMenu (uint8_t[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS]);
         ~InGameMenu () {}
         options menu () override;
-        static std::string save_game (uint8_t*[DISPLAY_MATRIX_SIZE]);
+        static std::string save_game (uint8_t*[DISPLAY_MATRIX_COLUMNS]);
 };
 
 options operator ++ (options&, int);

@@ -7,8 +7,8 @@
 using namespace std;
 
 //TODO: This might need to be dynamically allocated instead
-InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_SIZE][DISPLAY_MATRIX_SIZE]) {
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS]) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_COLUMNS; i++) {
         this->display_matrix[i] = display_matrix[i];
     }
 }
@@ -34,7 +34,7 @@ void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const
 }
 
 void InGameMenu::clear (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
-    for (uint8_t y = Y_EDGE + IN_GAME_MENU_TITLE_SPACING + 5; y < getmaxy(stdscr); y++) {
+    for (uint8_t y = Y_EDGE + IN_GAME_MENU_TITLE_SPACING + NUM_OPTS + 2; y < getmaxy(stdscr); y++) {
         move(y, X_EDGE);
         clrtoeol();
     }
@@ -53,7 +53,7 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                  
     const uint8_t NUM_RULES = 4;
     string rules_text[NUM_RULES] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
-    uint8_t display_offset = 5;
+    uint8_t display_offset = NUM_OPTS + 2;
     
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_RULES; i++) {
@@ -94,7 +94,7 @@ void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     const uint8_t NUM_MANUAL = 6;
     string manual_text[NUM_MANUAL] = { MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS,
                                        MANUAL_NUM, MANUAL_ENTER };
-    uint8_t display_offset = 5;
+    uint8_t display_offset = NUM_OPTS + 2;
     
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_MANUAL; i++) {
@@ -129,7 +129,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
 }
 
 void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
-    uint8_t display_offset = 5;
+    uint8_t display_offset = NUM_OPTS + 2;
     mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter save file name: ");
     
     curs_set(true);
@@ -138,7 +138,7 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     curs_set(false);
 }
 
-string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_SIZE]) {
+string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
     const uint8_t NAME_SIZE = 16;
     char name[NAME_SIZE];
     echo();
@@ -148,10 +148,10 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_SIZE]) {
     const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;
     outfile.open(FILENAME.c_str());
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             outfile << static_cast<uint16_t>(display_matrix[i][j]);
-            chtype ch = mvinch(i + ORIGINy + i / 9, j + ORIGINx + j / 9);
+            chtype ch = mvinch(i + ORIGINy + i / CONTAINER_SIZE, j + ORIGINx + j / CONTAINER_SIZE);
             switch (ch & A_COLOR) {
                 case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
                                           break;
@@ -170,7 +170,7 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_SIZE]) {
                                         
                 default: outfile << color_code[0];
             }
-            if (j < DISPLAY_MATRIX_SIZE - 1) outfile << ",";
+            if (j < DISPLAY_MATRIX_COLUMNS - 1) outfile << ",";
         }
         outfile << endl;
     }

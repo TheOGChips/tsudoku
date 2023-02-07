@@ -58,10 +58,10 @@ bool SavedGameMenu::select_saved_game () {
 void SavedGameMenu::read_saved_game () {
     
     ifstream infile (DIR + "/" + *selection);
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         string row;
         getline(infile, row);
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             size_t index;
             saved_game[i][j] = stoi(row, &index);   //NOTE: Read in number
             saved_color_codes[i][j] = row[index];         //NOTE: Read in color code character
@@ -76,9 +76,9 @@ void SavedGameMenu::read_saved_game () {
 
 void SavedGameMenu::print_saved_game () {
     clear();
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         //move(TOP_PADDING + i, LEFT_PADDING);
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             //printw("%c", saved_game[i][j]);
             mvprintw(TOP_PADDING + i, LEFT_PADDING + j, "%c", saved_game[i][j]);
             mvprintw(TOP_PADDING + i, LEFT_PADDING + j + 30, "%c", saved_color_codes[i][j]);
@@ -90,8 +90,8 @@ void SavedGameMenu::print_saved_game () {
 
 SavedPuzzle SavedGameMenu::get_saved_game() {
     SavedPuzzle saved_puzzle;
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             saved_puzzle.puzzle[i][j] = saved_game[i][j];
             saved_puzzle.color_codes[i][j] = saved_color_codes[i][j];
         }

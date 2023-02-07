@@ -57,13 +57,13 @@ void Sudoku::create_map()
 
     //TODO: See if there's a better way to fix this.
     //for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-    for (uint8_t i = 0; i < 81; i++) {
+    for (uint8_t i = 0; i < GRID_SIZE; i++) {
         //m[i] = cell(row, column);
         _map_[i] = cell(row, column);
         _rev_map_[cell(row, column)] = i;
         column += 3;
-        if (column / 27) {
-            column %= 27;
+        if (column / DISPLAY_MATRIX_COLUMNS) {
+            column %= DISPLAY_MATRIX_COLUMNS;
             row += 3;
         }
     }
@@ -142,8 +142,8 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
 
     //initialize display matrix with blank spaces
     if (not SAVED_PUZZLE) {
-        for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-            for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+        for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+            for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
                 display_matrix[i][j] = ' ';
             }
         }
@@ -159,16 +159,16 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         }
     }
     else {
-        for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
-            for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+        for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+            for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
                 display_matrix[i][j] = SAVED_PUZZLE->puzzle[i][j];
             }
         }
         
-        uint8_t grid[9][9] = {};
-        for (uint8_t i = 0; i < 9; i++) {
-            for (uint8_t j = 0; j < 9; j++) {
-                cell coords = _map_[i*9 + j];
+        uint8_t grid[NUM_CONTAINERS][NUM_CONTAINERS] = {};
+        for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+            for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
+                cell coords = _map_[i*CONTAINER_SIZE + j];
                 grid[i][j] = SAVED_PUZZLE->puzzle[coords.first][coords.second];
             }
         }
@@ -176,8 +176,8 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         if (DEBUG) {
             clear();
             mvprintw(0, 0, "Printing grid...");
-            for (uint8_t i = 0; i < 9; i++) {
-                for (uint8_t j = 0; j < 9; j++) {
+            for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
+                for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
                     mvprintw(i + 1, j, "%c", grid[i][j]);
                     
                 }
@@ -195,18 +195,18 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         for (uint8_t i = 0; i < mat.get_map_size(); i++) {
             //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
             ::printw("m[%u]: (%u, %u)", i, mat.get_map(i).first, mat.get_map(i).second);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+            (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
         for (uint8_t i = 0; i < _map_.size(); i++) {
             //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
             ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+            (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
         for (uint8_t i = 0; i < _rev_map_.size(); i++) {
             ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
-            (i+1) % 9 ? ::printw("\t") : ::printw("\n");
+            (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         //NOTE: The mapping appears to be correct according to the printout, so why is adding new values not working as expected?
         refresh();  //TODO: Consider putting these three functions into one if used like this more often
@@ -243,9 +243,9 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
     
     //::move(INIT_OFFSETY, INIT_OFFSETX);
     //TODO: Will need to be sort of a copy of this loop
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(i, 0);
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_SIZE; j++) {
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             map_display_matrix_offset(i, j);
             
             uint8_t color_pair;
@@ -286,8 +286,8 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
         }
         //::printw("\n");
         if (i == 8 or i == 17) {
-            //::move(i + INIT_OFFSETY + (i / 9) + 1, INIT_OFFSETX);
-            ::move(i + ORIGIN.first + (i / 9) + 1, ORIGIN.second);
+            //::move(i + INIT_OFFSETY + (i / CONTAINER_SIZE) + 1, INIT_OFFSETX);
+            ::move(i + ORIGIN.first + (i / CONTAINER_SIZE) + 1, ORIGIN.second);
             //move(i, 0);
             //::printw("---------|---------|---------\n");
             ::printw("---------|---------|---------");
@@ -319,8 +319,8 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
 
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
 {
-    uint8_t total_offsety = YCOORD + ORIGIN.first + (YCOORD / 9),
-            total_offsetx = XCOORD + ORIGIN.second + (XCOORD / 9);
+    uint8_t total_offsety = YCOORD + ORIGIN.first + (YCOORD / CONTAINER_SIZE),
+            total_offsetx = XCOORD + ORIGIN.second + (XCOORD / CONTAINER_SIZE);
 
     ::move(total_offsety, total_offsetx);
     getyx(stdscr, cursor_pos.first, cursor_pos.second); //update cursor_pos after moving
@@ -328,8 +328,8 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
 
 void Sudoku::move (const uint16_t KEY)
 {
-    static const uint8_t MAX_YBOUNDARY = ORIGIN.first + 28,
-                         MAX_XBOUNDARY = ORIGIN.second + 28;
+    static const uint8_t MAX_YBOUNDARY = ORIGIN.first + DISPLAY_MATRIX_ROWS + 1,
+                         MAX_XBOUNDARY = ORIGIN.second + DISPLAY_MATRIX_COLUMNS + 1;
 
     switch (KEY) {
         case KEY_DOWN:  if (cursor_pos.first < MAX_YBOUNDARY) {
@@ -654,14 +654,14 @@ void Sudoku::increment_completed_games () {
 }
 
 void Sudoku::save_game () {
-    const uint8_t DISPLAY_LINE = ORIGIN.first + 31;
+    const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 4;
     
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
     ::printw("Enter save file name: ");
     
-    uint8_t* display_matrix[DISPLAY_MATRIX_SIZE];
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_SIZE; i++) {
+    uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_COLUMNS; i++) {
         display_matrix[i] = this->display_matrix[i];
     }
     
@@ -742,7 +742,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             if (evaluate()) {
                 //TODO: Delete the save file if resuming a game
                 string msg = "You win!";
-                ::mvprintw(ORIGIN.first + 31, 14, "%s", msg.c_str());
+                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + 4, 14, "%s", msg.c_str());
                 clrtoeol();
                 refresh();
                 increment_completed_games();
@@ -753,7 +753,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             }
             else {
                 string msg = "Puzzle incomplete!";  //TODO: Remove this result display after a delay
-                ::mvprintw(ORIGIN.first + 31, 14, "%s", msg.c_str());
+                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + 4, 14, "%s", msg.c_str());
                 refresh();
                 reset_cursor();
             }
