@@ -18,7 +18,7 @@ const uint8_t GRID_SIZE = 81;
  */
 class Grid {
     private:
-        Box matrices[NUM_CONTAINERS];   //TODO: Change this name to boxes
+        Box boxes[NUM_CONTAINERS];
         Row rows[NUM_CONTAINERS];
         Column cols[NUM_CONTAINERS];
         bool known_positions[GRID_SIZE];

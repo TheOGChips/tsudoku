@@ -144,7 +144,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
  * Parameters: 
  */
 Box& Grid::get_submatrix (uint8_t index) {
-    return matrices[index];
+    return boxes[index];
 }
 
 /* NOTE:
@@ -620,7 +620,7 @@ bool Grid::evaluate () {
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         Row row = rows[i];
         Column column = cols[i];
-        Box submatrix = matrices[i];
+        Box submatrix = boxes[i];
         
         if (not row.evaluate() or not column.evaluate() or not submatrix.evaluate()) return false;
     }
