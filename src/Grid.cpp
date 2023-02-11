@@ -40,11 +40,11 @@ Grid::Grid (const difficulty_level DIFF) {
  * Purpose: 
  * Parameters: 
  */
-void Grid::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING) {
+void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
     uint8_t y,
             x;
     getyx(stdscr, y, x);
-    mvprintw(y, x, COLUMN_PRINTING, SUBMATRIX_PRINTING);
+    mvprintw(y, x, COLUMN_PRINTING, BOX_PRINTING);
 }
 
 /* NOTE:
@@ -53,7 +53,7 @@ void Grid::printw (const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING) {
  * Parameters: 
  */
 void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING,
-                     const bool SUBMATRIX_PRINTING) {
+                     const bool BOX_PRINTING) {
     /*  NOTE: (i,j) mapping of sudoku grid
      * 
      *        NUMBERED (ROW x COLUMN)
@@ -72,7 +72,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
     uint8_t y = YCOORD,
             x = XCOORD;
 
-    if (SUBMATRIX_PRINTING) {   //NOTE: For printing from a box
+    if (BOX_PRINTING) {   //NOTE: For printing from a box
         for (uint8_t i = 0; i < CONTAINER_SIZE; i += 3) {
             uint8_t count = 0,
                     offset = 0;
@@ -89,9 +89,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
                         else ::printw("%c", box[k + offset]);
                     }
 
-                    if (j != 2 and j != 5 and j != 8) {
-                        ::printw("|");
-                    }
+                    if (j != 2 and j != 5 and j != 8) ::printw("|");
                 }
                 
                 count++;
@@ -143,8 +141,8 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
  * Purpose: 
  * Parameters: 
  */
-Box& Grid::get_box (uint8_t index) {
-    return boxes[index];
+Box& Grid::get_box (const uint8_t INDEX) {
+    return boxes[INDEX];
 }
 
 /* NOTE:
@@ -152,8 +150,8 @@ Box& Grid::get_box (uint8_t index) {
  * Purpose: 
  * Parameters: 
  */
-Row& Grid::get_row (uint8_t index) {
-    return rows[index];
+Row& Grid::get_row (const uint8_t INDEX) {
+    return rows[INDEX];
 }
 
 /* NOTE:
@@ -161,8 +159,8 @@ Row& Grid::get_row (uint8_t index) {
  * Purpose: 
  * Parameters: 
  */
-Column& Grid::get_column (uint8_t index) {
-    return cols[index];
+Column& Grid::get_column (const uint8_t INDEX) {
+    return cols[INDEX];
 }
 
 /* NOTE:
@@ -197,7 +195,7 @@ void Grid::init_positions() {
  * Purpose: 
  * Parameters: 
  */
-bool Grid::solve(uint8_t box, uint8_t value, Row rows[NUM_CONTAINERS],
+bool Grid::solve(const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINERS],
                  Column columns[NUM_CONTAINERS], Box boxes[NUM_CONTAINERS]) {
     /* NOTE: Figure out positions in box based on box number.
      *       Start with upper right.
@@ -217,24 +215,24 @@ bool Grid::solve(uint8_t box, uint8_t value, Row rows[NUM_CONTAINERS],
     
     queue<uint8_t> available_pos;
     uint8_t positions[CONTAINER_SIZE];
-    for (uint8_t i = box; i >= 3; i -= 3) {
+    for (uint8_t i = BOX; i >= 3; i -= 3) {
         positions[0] += 27;
     }
-    positions[0] += 3 * (box % 3);
+    positions[0] += 3 * (BOX % 3);
     
     //Figure out remaining 8 positions in box
     for (uint8_t i = 1; i < CONTAINER_SIZE; i++) {
         positions[i] = positions[0] + CONTAINER_SIZE * (i / 3) + i % 3;
     }
     
-    /* NOTE: Figure out positions value can and can't be placed
+    /* NOTE: Figure out positions VALUE can and can't be placed
      *       Map row and column (box shouldn't be needed)
      */
     for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
-        uint8_t row_number = map_row(positions[i]),
-                column_number = map_column(positions[i]);
-        if (not rows[row_number].value_exists(value) and
-            not columns[column_number].value_exists(value) and not is_known(positions[i])) {
+        const uint8_t ROW_NUMBER = map_row(positions[i]),
+                      COLUMN_NUMBER = map_column(positions[i]);
+        if (not rows[ROW_NUMBER].value_exists(VALUE) and
+            not columns[COLUMN_NUMBER].value_exists(VALUE) and not is_known(positions[i])) {
             available_pos.push(positions[i]);
         }
     }
@@ -243,31 +241,31 @@ bool Grid::solve(uint8_t box, uint8_t value, Row rows[NUM_CONTAINERS],
     while (true) {  //NOTE: Doing it this way gets rid of a compiler warning
         if (available_pos.empty()) return false;
         
-        uint8_t row_number = map_row(available_pos.front()),
-                column_number = map_column(available_pos.front()),
-                box_number = box,
-                row_index = get_row_index(available_pos.front()),
-                column_index = get_column_index(available_pos.front()),
-                box_index = get_box_index(available_pos.front()),
-                next_box,
+        const uint8_t ROW_NUMBER = map_row(available_pos.front()),
+                      COLUMN_NUMBER = map_column(available_pos.front()),
+                      BOX_NUMBER = BOX,
+                      ROW_INDEX = get_row_index(available_pos.front()),
+                      COLUMN_INDEX = get_column_index(available_pos.front()),
+                      BOX_INDEX = get_box_index(available_pos.front());
+        uint8_t next_box,
                 next_value;
-        rows[row_number].set_value(row_index, value + ZERO);
-        columns[column_number].set_value(column_index, value + ZERO);
-        boxes[box_number].set_value(box_index, value + ZERO);
+        rows[ROW_NUMBER].set_value(ROW_INDEX, VALUE + ZERO);
+        columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, VALUE + ZERO);
+        boxes[BOX_NUMBER].set_value(BOX_INDEX, VALUE + ZERO);
         known_positions[available_pos.front()] = true;
         
-        if (box == 7 and value == 9) return true;
+        if (BOX == 7 and VALUE == 9) return true;
         
-        if (box == 3) next_box = 5;
-        else if (box == 7) next_box = 1;
-        else next_box = box + 1;
-        next_value = (box == 7) ? value + 1 : value;
+        if (BOX == 3) next_box = 5;
+        else if (BOX == 7) next_box = 1;
+        else next_box = BOX + 1;
+        next_value = (BOX == 7) ? VALUE + 1 : VALUE;
         
         if ((soln = solve(next_box, next_value, rows, columns, boxes))) return soln;
         else {
-            rows[row_number].set_value(row_index, '?');
-            columns[column_number].set_value(column_index, '?');
-            boxes[box_number].set_value(box_index, '?');
+            rows[ROW_NUMBER].set_value(ROW_INDEX, '?');
+            columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, '?');
+            boxes[BOX_NUMBER].set_value(BOX_INDEX, '?');
             known_positions[available_pos.front()] = false;
             available_pos.pop();
         }
@@ -279,10 +277,10 @@ bool Grid::solve(uint8_t box, uint8_t value, Row rows[NUM_CONTAINERS],
  * Purpose: 
  * Parameters: 
  */
-array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
+array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
     array<uint8_t, GRID_SIZE> soln;
     uint8_t soln_matrix[NUM_CONTAINERS][NUM_CONTAINERS];
-    mt19937 generator(seed);
+    mt19937 generator(SEED);
     uniform_int_distribution<uint8_t> dist (1, CONTAINER_SIZE);
     uint8_t values[CONTAINER_SIZE];
     for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
@@ -311,7 +309,7 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
     //NOTE: Create row, column, and box objects from partial solution matrix
     Row soln_rows[NUM_CONTAINERS];
     Column soln_columns[NUM_CONTAINERS];
-    Box soln_matrices[NUM_CONTAINERS];
+    Box soln_boxes[NUM_CONTAINERS];
 
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         soln_rows[i] = Row(soln_matrix[i]);
@@ -338,12 +336,12 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
             temp_submat[6] = soln_matrix[i+1][j-1];
             temp_submat[7] = soln_matrix[i+1][j];
             temp_submat[8] = soln_matrix[i+1][j+1];
-            soln_matrices[count] = Box(temp_submat);
+            soln_boxes[count] = Box(temp_submat);
             count++;
         }
     }
     
-    bool soln_found = solve(1, 1, soln_rows, soln_columns, soln_matrices);
+    bool soln_found = solve(1, 1, soln_rows, soln_columns, soln_boxes);
     
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
@@ -411,13 +409,13 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         
         const uint8_t ROW_NUMBER = map_row(pos),
                       COLUMN_NUMBER = map_column(pos),
-                      SUBMATRIX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER);
+                      BOX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER);
                       
         //NOTE: Check the row, column, and box for the value.
         //NOTE: Why these require the ampersand, I'm not really sure...
         Row &row = get_row(ROW_NUMBER);
         Column &column = get_column(COLUMN_NUMBER);
-        Box &box = get_box(SUBMATRIX_NUMBER);
+        Box &box = get_box(BOX_NUMBER);
 
         //NOTE: Get indeces for particular row, column, and box
         index_row = get_row_index(pos);
@@ -542,10 +540,9 @@ uint8_t Grid::get_column_index (const uint8_t POS) {
  * Parameters: 
  */
 uint8_t Grid::get_box_index (const uint8_t POS) {
-    //TODO; Make these const
-    uint8_t row = get_row_index(POS),
-            column = get_column_index (POS);
-    return 3 * (column % 3) + row % 3;
+    const uint8_t ROW = get_row_index(POS),
+                  COLUMN = get_column_index (POS);
+    return 3 * (COLUMN % 3) + ROW % 3;
 }
 
 /* NOTE:
@@ -568,8 +565,8 @@ map<uint8_t, cell> Grid::create_map() {
  * Purpose: 
  * Parameters: 
  */
-const cell Grid::get_map (uint8_t index) {
-    return grid_map[index];
+const cell Grid::get_map (const uint8_t INDEX) {
+    return grid_map[INDEX];
 }
 
 /* NOTE:
@@ -586,10 +583,10 @@ uint8_t Grid::get_map_size() const {
  * Purpose: 
  * Parameters: 
  */
-uint8_t Grid::at(uint8_t index) {
-    return get_row(map_row(index))[get_row_index(index)];
-    //return get_column(map_column(index))[get_column_index(index)];
-    //return get_box(map_box_index(index))[get_box_index(index)];
+uint8_t Grid::at(const uint8_t INDEX) {
+    return get_row(map_row(INDEX))[get_row_index(INDEX)];
+    //return get_column(map_column(INDEX))[get_column_index(INDEX)];
+    //return get_box(map_box_index(INDEX))[get_box_index(INDEX)];
 }
 
 /* NOTE:
@@ -597,9 +594,8 @@ uint8_t Grid::at(uint8_t index) {
  * Purpose: 
  * Parameters: 
  */
-//TODO: Make parameter const in all classes with this operator
-uint8_t Grid::operator [] (uint8_t index) {
-    return at(index);
+uint8_t Grid::operator [] (const uint8_t INDEX) {
+    return at(INDEX);
 }
 
 /* NOTE:
