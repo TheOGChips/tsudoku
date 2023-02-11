@@ -79,7 +79,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
             while (count < 3) {
                 move(y, x);
                 for (uint8_t j = i; j < i + 3; j++) {
-                    Box submatrix = get_submatrix(j);
+                    Box submatrix = get_box(j);
                     for (uint8_t k = 0; k < 3; k++) {
                         if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
                             attron(COLOR_PAIR(GIVEN));
@@ -143,7 +143,7 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
  * Purpose: 
  * Parameters: 
  */
-Box& Grid::get_submatrix (uint8_t index) {
+Box& Grid::get_box (uint8_t index) {
     return boxes[index];
 }
 
@@ -248,7 +248,7 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS],
                 submatrix_number = submatrix,
                 row_index = get_row_index(available_pos.front()),
                 column_index = get_column_index(available_pos.front()),
-                submatrix_index = get_submatrix_index(available_pos.front()),
+                submatrix_index = get_box_index(available_pos.front()),
                 next_submatrix,
                 next_value;
         rows[row_number].set_value(row_index, value + ZERO);
@@ -368,17 +368,17 @@ void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAI
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
         const uint8_t ROW_NUMBER = map_row(i),
                       COLUMN_NUMBER = map_column(i),
-                      BOX_NUMBER = map_submatrix(ROW_NUMBER, COLUMN_NUMBER),
+                      BOX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER),
                       INDEX_ROW = get_row_index(i),
                       INDEX_COLUMN = get_column_index(i),
-                      INDEX_BOX = get_submatrix_index(i),
+                      INDEX_BOX = get_box_index(i),
                       VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
                       
         //NOTE: Check the row, column, and submatrix for the value.
         //NOTE: Why these require the ampersand, I'm not really sure.
         Row &row = get_row(ROW_NUMBER);
         Column &column = get_column(COLUMN_NUMBER);
-        Box &box = get_submatrix(BOX_NUMBER);
+        Box &box = get_box(BOX_NUMBER);
         
         //NOTE: Add value from solved puzzle to empty puzzle
         row.set_value(INDEX_ROW, VALUE);
@@ -411,18 +411,18 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         
         const uint8_t ROW_NUMBER = map_row(pos),
                       COLUMN_NUMBER = map_column(pos),
-                      SUBMATRIX_NUMBER = map_submatrix(ROW_NUMBER, COLUMN_NUMBER);
+                      SUBMATRIX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER);
                       
         //NOTE: Check the row, column, and submatrix for the value.
         //NOTE: Why these require the ampersand, I'm not really sure...
         Row &row = get_row(ROW_NUMBER);
         Column &column = get_column(COLUMN_NUMBER);
-        Box &submatrix = get_submatrix(SUBMATRIX_NUMBER);
+        Box &submatrix = get_box(SUBMATRIX_NUMBER);
 
         //NOTE: Get indeces for particular row, column, and submatrix
         index_row = get_row_index(pos);
         index_column = get_column_index(pos);
-        index_submatrix = get_submatrix_index(pos);
+        index_submatrix = get_box_index(pos);
         
         //NOTE: Add value from solved puzzle to empty puzzle
         value = solved_puzzle[pos];
@@ -469,7 +469,7 @@ uint8_t Grid::map_column (const uint8_t POS) {
  * Purpose: 
  * Parameters: 
  */
-uint8_t Grid::map_submatrix (const uint8_t ROW, const uint8_t COLUMN) {
+uint8_t Grid::map_box (const uint8_t ROW, const uint8_t COLUMN) {
     /* NOTE: Side-by-side numbering of array-like positions and matrix-like positions
      * 
      *           NUMBERED (0-80)                NUMBERED (ROW x COLUMN)
@@ -541,7 +541,7 @@ uint8_t Grid::get_column_index (const uint8_t POS) {
  * Purpose: 
  * Parameters: 
  */
-uint8_t Grid::get_submatrix_index (const uint8_t POS) {
+uint8_t Grid::get_box_index (const uint8_t POS) {
     //TODO; Make these const
     uint8_t row = get_row_index(POS),
             column = get_column_index (POS);

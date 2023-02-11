@@ -537,7 +537,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                     
             Row &row = mat.get_row(row_number);
             Column &column = mat.get_column(column_number);
-            Box &submatrix = mat.get_submatrix(mat.map_submatrix(row_number, column_number));
+            Box &submatrix = mat.get_box(mat.map_box(row_number, column_number));
             
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
@@ -547,7 +547,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                     
                     row.set_value(mat.get_row_index(index), '?');
                     column.set_value(mat.get_column_index(index), '?');
-                    submatrix.set_value(mat.get_submatrix_index(index), '?');
+                    submatrix.set_value(mat.get_box_index(index), '?');
                     display_matrix[y][x] = '?';
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
@@ -561,7 +561,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                 //TODO: Maybe put the next 3 lines in Grid.cpp
                 row.set_value(mat.get_row_index(index), VALUE);
                 column.set_value(mat.get_column_index(index), VALUE);
-                submatrix.set_value(mat.get_submatrix_index(index), VALUE);
+                submatrix.set_value(mat.get_box_index(index), VALUE);
                 display_matrix[y][x] = VALUE;
                 
                 if (DEBUG) {

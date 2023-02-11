@@ -33,21 +33,20 @@ class Grid {
         uint8_t at (uint8_t);
 
     public:
-        //TODO: A lot of these can probably be moved to private now
         Grid () {}
         Grid (const uint8_t[NUM_CONTAINERS][NUM_CONTAINERS]);
         Grid (const difficulty_level);
         ~Grid() {}
         
-        uint8_t map_submatrix (const uint8_t, const uint8_t);
+        uint8_t map_box (const uint8_t, const uint8_t);
         uint8_t map_row (const uint8_t);
         uint8_t map_column (const uint8_t);
-        Box& get_submatrix (uint8_t);
+        Box& get_box (uint8_t);
         Row& get_row (uint8_t);
         Column& get_column (uint8_t);
         uint8_t get_row_index (const uint8_t);
         uint8_t get_column_index (const uint8_t);
-        uint8_t get_submatrix_index (const uint8_t);
+        uint8_t get_box_index (const uint8_t);
         void mvprintw (const uint8_t, const uint8_t, const bool, const bool);
         void printw (const bool, const bool);
         const cell get_map (uint8_t);
