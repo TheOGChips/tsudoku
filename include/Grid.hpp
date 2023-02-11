@@ -22,8 +22,7 @@ class Grid {
         Row rows[NUM_CONTAINERS];
         Column cols[NUM_CONTAINERS];
         bool known_positions[GRID_SIZE];
-        //TODO: Change this name to pos2cell, grid_map, or grid_pos
-        map<uint8_t, cell> _map_;   //NOTE: Maps 81 positions to positions on 9x9 matrix
+        map<uint8_t, cell> grid_map;   //NOTE: Maps 81 positions to positions on 9x9 matrix
 
         void init_positions();
         array<uint8_t, GRID_SIZE> generate_solved_puzzle (time_t);

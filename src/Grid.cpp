@@ -19,7 +19,7 @@ const bool DEBUG = false;
  * Parameters: None
  */
 Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
-    _map_ = this->create_map();
+    grid_map = this->create_map();
     init_positions();
     set_starting_positions(GRID);
 }
@@ -30,7 +30,7 @@ Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
  * Parameters: 
  */
 Grid::Grid (const difficulty_level DIFF) {
-    _map_ = this->create_map();
+    grid_map = this->create_map();
     init_positions();
     set_starting_positions(static_cast<uint8_t>(DIFF));
 }
@@ -569,7 +569,7 @@ map<uint8_t, cell> Grid::create_map() {
  * Parameters: 
  */
 const cell Grid::get_map (uint8_t index) {
-    return _map_[index];
+    return grid_map[index];
 }
 
 /* NOTE:
@@ -578,7 +578,7 @@ const cell Grid::get_map (uint8_t index) {
  * Parameters: 
  */
 uint8_t Grid::get_map_size() const {
-    return _map_.size();
+    return grid_map.size();
 }
 
 /* NOTE:
