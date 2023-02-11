@@ -72,21 +72,21 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
     uint8_t y = YCOORD,
             x = XCOORD;
 
-    if (SUBMATRIX_PRINTING) {   //NOTE: For printing from a submatrix
+    if (SUBMATRIX_PRINTING) {   //NOTE: For printing from a box
         for (uint8_t i = 0; i < CONTAINER_SIZE; i += 3) {
             uint8_t count = 0,
                     offset = 0;
             while (count < 3) {
                 move(y, x);
                 for (uint8_t j = i; j < i + 3; j++) {
-                    Box submatrix = get_box(j);
+                    Box box = get_box(j);
                     for (uint8_t k = 0; k < 3; k++) {
-                        if (submatrix[k + offset] >= ONE and submatrix[k + offset] <= NINE) {
+                        if (box[k + offset] >= ONE and box[k + offset] <= NINE) {
                             attron(COLOR_PAIR(GIVEN));
-                            ::printw("%c", submatrix[k + offset]);
+                            ::printw("%c", box[k + offset]);
                             attroff(COLOR_PAIR(GIVEN));
                         }
-                        else ::printw("%c", submatrix[k + offset]);
+                        else ::printw("%c", box[k + offset]);
                     }
 
                     if (j != 2 and j != 5 and j != 8) {
@@ -178,18 +178,18 @@ void Grid::init_positions() {
 
 /*
  * NOTE: ALGORITHM FOR SOLVING SUDOKU PUZZLE (essentially Bowman's Bingo technique)
- * args <- submatrix # [1-3, 5-7], value # [1-9], row array, column array, submatrix array
+ * args <- box # [1-3, 5-7], value # [1-9], row array, column array, box array
  * queue <- available positions on board [0-80]
  * do next_pos <- queue.pop() while recursive call <- false
- *    add value to next_pos in appropriate row, column, and submatrix if possible
- *    return true if submatrix=7, value=9, queue not empty
+ *    add value to next_pos in appropriate row, column, and box if possible
+ *    return true if box=7, value=9, queue not empty
  *    return false otherwise (queue empty)
- *    next_submatrix <- 5 if submatrix=3
- *                   <- 1 if submatrix=7
- *                   <- submatrix+1 otherwise
- *    next_value <- value+1 if submatrix=7
+ *    next_box <- 5 if box=3
+ *                   <- 1 if box=7
+ *                   <- box+1 otherwise
+ *    next_value <- value+1 if box=7
  *               <- same otherwise
- *    remove value from row, column, and submatrix if recursive call <- false
+ *    remove value from row, column, and box if recursive call <- false
  * end do-while
  */
 /* NOTE:
@@ -197,9 +197,9 @@ void Grid::init_positions() {
  * Purpose: 
  * Parameters: 
  */
-bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS],
-                 Column columns[NUM_CONTAINERS], Box submatrices[NUM_CONTAINERS]) {
-    /* NOTE: Figure out positions in submatrix based on submatrix number.
+bool Grid::solve(uint8_t box, uint8_t value, Row rows[NUM_CONTAINERS],
+                 Column columns[NUM_CONTAINERS], Box boxes[NUM_CONTAINERS]) {
+    /* NOTE: Figure out positions in box based on box number.
      *       Start with upper right.
      *
      * 0   | 3   | 6
@@ -217,18 +217,18 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS],
     
     queue<uint8_t> available_pos;
     uint8_t positions[CONTAINER_SIZE];
-    for (uint8_t i = submatrix; i >= 3; i -= 3) {
+    for (uint8_t i = box; i >= 3; i -= 3) {
         positions[0] += 27;
     }
-    positions[0] += 3 * (submatrix % 3);
+    positions[0] += 3 * (box % 3);
     
-    //Figure out remaining 8 positions in submatrix
+    //Figure out remaining 8 positions in box
     for (uint8_t i = 1; i < CONTAINER_SIZE; i++) {
         positions[i] = positions[0] + CONTAINER_SIZE * (i / 3) + i % 3;
     }
     
     /* NOTE: Figure out positions value can and can't be placed
-     *       Map row and column (submatrix shouldn't be needed)
+     *       Map row and column (box shouldn't be needed)
      */
     for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
         uint8_t row_number = map_row(positions[i]),
@@ -245,29 +245,29 @@ bool Grid::solve(uint8_t submatrix, uint8_t value, Row rows[NUM_CONTAINERS],
         
         uint8_t row_number = map_row(available_pos.front()),
                 column_number = map_column(available_pos.front()),
-                submatrix_number = submatrix,
+                box_number = box,
                 row_index = get_row_index(available_pos.front()),
                 column_index = get_column_index(available_pos.front()),
-                submatrix_index = get_box_index(available_pos.front()),
-                next_submatrix,
+                box_index = get_box_index(available_pos.front()),
+                next_box,
                 next_value;
         rows[row_number].set_value(row_index, value + ZERO);
         columns[column_number].set_value(column_index, value + ZERO);
-        submatrices[submatrix_number].set_value(submatrix_index, value + ZERO);
+        boxes[box_number].set_value(box_index, value + ZERO);
         known_positions[available_pos.front()] = true;
         
-        if (submatrix == 7 and value == 9) return true;
+        if (box == 7 and value == 9) return true;
         
-        if (submatrix == 3) next_submatrix = 5;
-        else if (submatrix == 7) next_submatrix = 1;
-        else next_submatrix = submatrix + 1;
-        next_value = (submatrix == 7) ? value + 1 : value;
+        if (box == 3) next_box = 5;
+        else if (box == 7) next_box = 1;
+        else next_box = box + 1;
+        next_value = (box == 7) ? value + 1 : value;
         
-        if ((soln = solve(next_submatrix, next_value, rows, columns, submatrices))) return soln;
+        if ((soln = solve(next_box, next_value, rows, columns, boxes))) return soln;
         else {
             rows[row_number].set_value(row_index, '?');
             columns[column_number].set_value(column_index, '?');
-            submatrices[submatrix_number].set_value(submatrix_index, '?');
+            boxes[box_number].set_value(box_index, '?');
             known_positions[available_pos.front()] = false;
             available_pos.pop();
         }
@@ -296,7 +296,7 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
         }
     }
 
-    //NOTE: Fill in submatrices along the diagonal first
+    //NOTE: Fill in boxes along the diagonal first
     for (uint8_t i = 0; i < NUM_CONTAINERS; i += 3) {
         shuffle(begin(values), end(values), generator);
         uint8_t count = 0;
@@ -308,7 +308,7 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (time_t seed) {
         }
     }
 
-    //NOTE: Create row, column, and submatrix objects from partial solution matrix
+    //NOTE: Create row, column, and box objects from partial solution matrix
     Row soln_rows[NUM_CONTAINERS];
     Column soln_columns[NUM_CONTAINERS];
     Box soln_matrices[NUM_CONTAINERS];
@@ -374,7 +374,7 @@ void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAI
                       INDEX_BOX = get_box_index(i),
                       VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
                       
-        //NOTE: Check the row, column, and submatrix for the value.
+        //NOTE: Check the row, column, and box for the value.
         //NOTE: Why these require the ampersand, I'm not really sure.
         Row &row = get_row(ROW_NUMBER);
         Column &column = get_column(COLUMN_NUMBER);
@@ -407,28 +407,28 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
                 value,
                 index_row,
                 index_column,
-                index_submatrix;
+                index_box;
         
         const uint8_t ROW_NUMBER = map_row(pos),
                       COLUMN_NUMBER = map_column(pos),
                       SUBMATRIX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER);
                       
-        //NOTE: Check the row, column, and submatrix for the value.
+        //NOTE: Check the row, column, and box for the value.
         //NOTE: Why these require the ampersand, I'm not really sure...
         Row &row = get_row(ROW_NUMBER);
         Column &column = get_column(COLUMN_NUMBER);
-        Box &submatrix = get_box(SUBMATRIX_NUMBER);
+        Box &box = get_box(SUBMATRIX_NUMBER);
 
-        //NOTE: Get indeces for particular row, column, and submatrix
+        //NOTE: Get indeces for particular row, column, and box
         index_row = get_row_index(pos);
         index_column = get_column_index(pos);
-        index_submatrix = get_box_index(pos);
+        index_box = get_box_index(pos);
         
         //NOTE: Add value from solved puzzle to empty puzzle
         value = solved_puzzle[pos];
         row.set_value(index_row, value);
         column.set_value(index_column, value);
-        submatrix.set_value(index_submatrix, value);
+        box.set_value(index_box, value);
         
         known_positions[pos] = true;
 
@@ -589,7 +589,7 @@ uint8_t Grid::get_map_size() const {
 uint8_t Grid::at(uint8_t index) {
     return get_row(map_row(index))[get_row_index(index)];
     //return get_column(map_column(index))[get_column_index(index)];
-    //return get_submatrix(map_submatrix_index(index))[get_submatrix_index(index)];
+    //return get_box(map_box_index(index))[get_box_index(index)];
 }
 
 /* NOTE:
@@ -620,9 +620,9 @@ bool Grid::evaluate () {
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         Row row = rows[i];
         Column column = cols[i];
-        Box submatrix = boxes[i];
+        Box box = boxes[i];
         
-        if (not row.evaluate() or not column.evaluate() or not submatrix.evaluate()) return false;
+        if (not row.evaluate() or not column.evaluate() or not box.evaluate()) return false;
     }
     return true;
 }

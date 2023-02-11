@@ -215,11 +215,11 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
     }
     
     if (DEBUG) {
-        enum print_by {row, column, submatrix};
-        for (uint8_t i = row; i <= submatrix; i++) {
+        enum print_by {row, column, box};
+        for (uint8_t i = row; i <= box; i++) {
             ::printw("Printing by ");
-            if (i == submatrix) {
-                ::printw("submatrix...\n");
+            if (i == box) {
+                ::printw("box...\n");
             }
             else if (i == column) {
                 ::printw("column...\n");
@@ -227,7 +227,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             else {
                 ::printw("row...\n");
             }
-            mat.printw(i & column, i & submatrix);
+            mat.printw(i & column, i & box);
             refresh();  //flush output to screen
             getch();    //wait for user input
             clear();    //clear the screen
@@ -502,7 +502,7 @@ void Sudoku::place_value (const uint16_t VALUE)
      *      place value in display matrix
      *      clear 8 surrounding cells
      *      refresh
-     *      place into appropriate spot in appropriate row, column, and 3x3 submatrix
+     *      place into appropriate spot in appropriate row, column, and box
      */
     //clear();
     // Get the 8 cells around the current cursor position
@@ -537,7 +537,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                     
             Row &row = mat.get_row(row_number);
             Column &column = mat.get_column(column_number);
-            Box &submatrix = mat.get_box(mat.map_box(row_number, column_number));
+            Box &box = mat.get_box(mat.map_box(row_number, column_number));
             
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
@@ -547,7 +547,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                     
                     row.set_value(mat.get_row_index(index), '?');
                     column.set_value(mat.get_column_index(index), '?');
-                    submatrix.set_value(mat.get_box_index(index), '?');
+                    box.set_value(mat.get_box_index(index), '?');
                     display_matrix[y][x] = '?';
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
@@ -561,7 +561,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                 //TODO: Maybe put the next 3 lines in Grid.cpp
                 row.set_value(mat.get_row_index(index), VALUE);
                 column.set_value(mat.get_column_index(index), VALUE);
-                submatrix.set_value(mat.get_box_index(index), VALUE);
+                box.set_value(mat.get_box_index(index), VALUE);
                 display_matrix[y][x] = VALUE;
                 
                 if (DEBUG) {
@@ -572,12 +572,12 @@ void Sudoku::place_value (const uint16_t VALUE)
             }
 
             if (DEBUG) {
-                enum print_by {row, column, submatrix};
-                for (uint8_t i = row; i <= submatrix; i++) {
+                enum print_by {row, column, box};
+                for (uint8_t i = row; i <= box; i++) {
                     //::mvprintw(9, 40 + 20 * i, "Printing by ");
                     ::move(9, 40 + 20 * i);
-                    if (i == submatrix) {
-                        ::printw("submatrix");
+                    if (i == box) {
+                        ::printw("box");
                     }
                     else if (i == column) {
                         ::printw("column");
@@ -585,7 +585,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                     else {
                         ::printw("row");
                     }
-                    mat.mvprintw(10, 40 + 20 * i, i & column, i & submatrix);
+                    mat.mvprintw(10, 40 + 20 * i, i & column, i & box);
                     refresh();  //flush output to screen
                     //getch();    //wait for user input
                     //clear();    //clear the screen
