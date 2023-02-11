@@ -50,7 +50,7 @@ class Grid {
         uint8_t get_box_index (const uint8_t);
         void mvprintw (const uint8_t, const uint8_t, const bool, const bool);
         void printw (const bool, const bool);
-        const cell get_map (const uint8_t);   //TODO: Change this function name to get_position
+        const cell get_position (const uint8_t);
         uint8_t get_map_size() const;
         uint8_t operator [] (const uint8_t);
         bool is_known (uint8_t);

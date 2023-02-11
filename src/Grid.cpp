@@ -565,7 +565,7 @@ map<uint8_t, cell> Grid::create_map() {
  * Purpose: 
  * Parameters: 
  */
-const cell Grid::get_map (const uint8_t INDEX) {
+const cell Grid::get_position (const uint8_t INDEX) {
     return grid_map[INDEX];
 }
 

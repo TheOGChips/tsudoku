@@ -193,8 +193,8 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         //cout <<  << endl;
         ::printw("Printing mapping...\n");
         for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
-            ::printw("m[%u]: (%u, %u)", i, mat.get_map(i).first, mat.get_map(i).second);
+            //cout << "m[" << i+0 << "]: (" << get_position(i).first+0 << ", " << get_position(i).second+0 << ")" << endl;
+            ::printw("m[%u]: (%u, %u)", i, mat.get_position(i).first, mat.get_position(i).second);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
