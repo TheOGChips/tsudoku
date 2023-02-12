@@ -14,7 +14,12 @@ const uint8_t GRID_SIZE = 81;
  * Class: Grid
  * Purpose: Represents a 9x9 Sudoku grid.
  * Private variables:
- *      arr -> Internal array housing the container's contents.
+ *      boxes -> Array of each Box container in the grid.
+ *      rows -> Array of each Row container in the grid.
+ *      cols -> Array of each Column container in the grid.
+ *      known_positions -> Boolean array of known positions in the grid. Positions are numbered 0-80.
+ *      grid_map -> Map of 81 sudoku grid positions (0-80) to (i,j) cell positions. i and j both lie
+ *                  in the range [0-8].
  */
 class Grid {
     private:
@@ -24,20 +29,20 @@ class Grid {
         bool known_positions[GRID_SIZE];
         map<uint8_t, cell> grid_map;   //NOTE: Maps 81 positions to positions on 9x9 matrix
 
-        void init_positions();
+        void init_known_positions ();
         array<uint8_t, GRID_SIZE> generate_solved_puzzle (const time_t);
         void set_starting_positions (uint8_t);
         void set_starting_positions (const uint8_t[NUM_CONTAINERS][NUM_CONTAINERS]);
-        map<uint8_t, cell> create_map();
-        bool solve(const uint8_t, const uint8_t, Row[NUM_CONTAINERS], Column[NUM_CONTAINERS],
-                   Box[NUM_CONTAINERS]);
+        map<uint8_t, cell> create_map ();
+        bool solve (const uint8_t, const uint8_t, Row[NUM_CONTAINERS], Column[NUM_CONTAINERS],
+                    Box[NUM_CONTAINERS]);
         uint8_t at (const uint8_t);
 
     public:
-        Grid () {}
+        Grid () {}  //NOTE: Default constructor. Does nothing.
         Grid (const uint8_t[NUM_CONTAINERS][NUM_CONTAINERS]);
         Grid (const difficulty_level);
-        ~Grid() {}
+        ~Grid () {}  //NOTE: Default destructor. Does nothing.
         
         uint8_t map_box (const uint8_t, const uint8_t);
         uint8_t map_row (const uint8_t);
@@ -51,10 +56,10 @@ class Grid {
         void mvprintw (const uint8_t, const uint8_t, const bool, const bool);
         void printw (const bool, const bool);
         const cell get_position (const uint8_t);
-        uint8_t get_map_size() const;
+        uint8_t get_map_size () const;
         uint8_t operator [] (const uint8_t);
         bool is_known (uint8_t);
-        bool evaluate();
+        bool evaluate ();
 };
 
 #endif

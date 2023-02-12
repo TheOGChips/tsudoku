@@ -14,13 +14,15 @@ using namespace std;
 const bool DEBUG = false;
 
 /* NOTE:
- * Name: Class Constructor (default)
+ * Name: Class Constructor (overloaded)
  * Purpose: Initializes internal array to all '?'.
- * Parameters: None
+ * Parameters:
+ *      GRID -> Array of values that fill in the values of the Grid's Box, Row, and Column member
+ *              variables.
  */
 Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
     grid_map = this->create_map();
-    init_positions();
+    init_known_positions();
     set_starting_positions(GRID);
 }
 
@@ -31,7 +33,7 @@ Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
  */
 Grid::Grid (const difficulty_level DIFF) {
     grid_map = this->create_map();
-    init_positions();
+    init_known_positions();
     set_starting_positions(static_cast<uint8_t>(DIFF));
 }
 
@@ -168,7 +170,7 @@ Column& Grid::get_column (const uint8_t INDEX) {
  * Purpose: 
  * Parameters: 
  */
-void Grid::init_positions() {
+void Grid::init_known_positions () {
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
         known_positions[i] = false;
     }
@@ -195,8 +197,8 @@ void Grid::init_positions() {
  * Purpose: 
  * Parameters: 
  */
-bool Grid::solve(const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINERS],
-                 Column columns[NUM_CONTAINERS], Box boxes[NUM_CONTAINERS]) {
+bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINERS],
+                  Column columns[NUM_CONTAINERS], Box boxes[NUM_CONTAINERS]) {
     /* NOTE: Figure out positions in box based on box number.
      *       Start with upper right.
      *
