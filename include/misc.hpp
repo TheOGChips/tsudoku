@@ -7,6 +7,8 @@
 
 // NOTE: This file contains miscellaneous values and data structures needed across some or all files.
 
+#define DEBUG false
+
 #define PURE_VIRTUAL 0  //NOTE: A more helpful note when declaring a pure virtual function. Gives an
                         //      error if used as a regular constant instead of a macro
 

@@ -11,8 +11,6 @@
 
 using namespace std;
 
-const bool DEBUG = false;
-
 //Grid sudoku_init()
 Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
 {
@@ -173,7 +171,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             }
         }
         
-        if (DEBUG) {
+        #if DEBUG
             clear();
             mvprintw(0, 0, "Printing grid...");
             for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
@@ -184,12 +182,12 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             }
             refresh();
             getch();
-        }
+        #endif
         mat = Grid(grid);
         //create_map(); //NOTE: This currently fails if run here. There's a sort of catch-22 where (to work as intended) the grid passed to mat needs _map_ to be filled, but _map_ also needs mat to be filled.
     }
     
-    if (DEBUG) {
+    #if DEBUG
         //cout <<  << endl;
         ::printw("Printing mapping...\n");
         for (uint8_t i = 0; i < mat.get_map_size(); i++) {
@@ -212,9 +210,9 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         refresh();  //TODO: Consider putting these three functions into one if used like this more often
         getch();
         clear();
-    }
+    #endif
     
-    if (DEBUG) {
+    #if DEBUG
         enum print_by {row, column, box};
         for (uint8_t i = row; i <= box; i++) {
             ::printw("Printing by ");
@@ -232,14 +230,14 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             getch();    //wait for user input
             clear();    //clear the screen
         }
-    }
+    #endif
 }
 
 void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
 {
-    if (DEBUG) {
+    #if DEBUG
         ::printw("Printing display matrix...\n");
-    }
+    #endif
     
     //::move(INIT_OFFSETY, INIT_OFFSETX);
     //TODO: Will need to be sort of a copy of this loop
@@ -564,14 +562,14 @@ void Sudoku::place_value (const uint16_t VALUE)
                 box.set_value(mat.get_box_index(index), VALUE);
                 display_matrix[y][x] = VALUE;
                 
-                if (DEBUG) {
+                #if DEBUG
                     ::mvprintw(25, 40 + 20, "index: %d", index);
                     ::mvprintw(26, 40 + 20, "row #: %d", row_number);
                     ::mvprintw(27, 40 + 20, "col #: %d", column_number);
-                }
+                #endif
             }
 
-            if (DEBUG) {
+            #if DEBUG
                 enum print_by {row, column, box};
                 for (uint8_t i = row; i <= box; i++) {
                     //::mvprintw(9, 40 + 20 * i, "Printing by ");
@@ -592,7 +590,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                 }
 
                 refresh();
-            }
+            #endif
         }
         else {
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {

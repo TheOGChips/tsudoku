@@ -11,8 +11,6 @@
 
 using namespace std;
 
-const bool DEBUG = false;
-
 /* NOTE:
  * Name: Class Constructor (overloaded)
  * Purpose: Begins initialization of internal Container data structures using the GRID parameter.
@@ -189,9 +187,6 @@ Column& Grid::get_column (const uint8_t INDEX) {
 /* NOTE:
  * Name: init_known_positions
  * Purpose: Initializes the Grid's internal boolean array known_positions to all false values.
- *          TODO: It has just occurred to me that appending " = {};" to the declaration in
- *                "Grid.hpp" should have the same effect, and this function could be removed.
- *                Consider changing to this method.
  * Parameters: None
  */
 void Grid::init_known_positions () {
@@ -483,12 +478,12 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
         
         known_positions[pos] = true;
 
-        if (DEBUG) {    //TODO: Change this to use a macro
+        #if DEBUG
             clear();
             printw(false, false);
             this_thread::sleep_for(chrono::seconds(1));
             refresh();
-        }
+        #endif
     }
     
     //NOTE: For some reason, this is actually required, even though it seems redundant.
