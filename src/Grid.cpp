@@ -15,7 +15,7 @@ const bool DEBUG = false;
 
 /* NOTE:
  * Name: Class Constructor (overloaded)
- * Purpose: Initializes internal array to all '?'.
+ * Purpose: Begins initialization of internal Container data structures using the GRID parameter.
  * Parameters:
  *      GRID -> Array of values that fill in the values of the Grid's Box, Row, and Column member
  *              variables.
@@ -27,9 +27,11 @@ Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
 }
 
 /* NOTE:
- * Name: Class Constructor (default)
- * Purpose: 
- * Parameters: 
+ * Name: Class Constructor (overloaded)
+ * Purpose: Begins initialization of internal Container data structures based on the difficulty
+ *          level chosen by the user.
+ * Parameters:
+ *      DIFF -> Enum value of difficulty level chosen by the user from the main menu.
  */
 Grid::Grid (const difficulty_level DIFF) {
     grid_map = this->create_map();
@@ -38,9 +40,13 @@ Grid::Grid (const difficulty_level DIFF) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: printw
+ * Purpose: Prints out current Grid contents at the current cursor location based on how they are
+ *          stored as either Rows, Columns, or Boxes. This is a wrapper for NCurses's printw
+ *          function.
+ * Parameters:
+ *      COLUMN_PRINTING -> Boolean informing whether to print using Columns.
+ *      BOX_PRINTING -> Boolean informing whether to print using Boxes.
  */
 void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
     uint8_t y,
@@ -50,9 +56,15 @@ void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: mvprintw
+ * Purpose: Moves cursor to a position and prints out current Grid contents based on how they are
+ *          stored as either Rows, Columns, or Boxes. This is a wrapper for NCurses's printw
+ *          function.
+ * Parameters:
+ *      YCOORD -> Line where cursor is moved to before printing.
+ *      XCOORD -> Column where cursor is moved to before printing.
+ *      COLUMN_PRINTING -> Boolean informing whether to print using Columns.
+ *      BOX_PRINTING -> Boolean informing whether to print using Boxes.
  */
 void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING,
                      const bool BOX_PRINTING) {
@@ -139,36 +151,48 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_box
+ * Purpose: Returns an address to the Box Container from this Grid's internal Box array. This allows
+ *          the Box object to be mutable from the Grid when an input is passed from the Sudoku
+ *          object.
+ * Parameters:
+ *      INDEX -> The index to return from the Grid's internal Box array.
  */
 Box& Grid::get_box (const uint8_t INDEX) {
     return boxes[INDEX];
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_row
+ * Purpose: Returns an address to the Row Container from this Grid's internal Row array. This allows
+ *          the Row object to be mutable from the Grid when an input is passed from the Sudoku
+ *          object.
+ * Parameters:
+ *      INDEX -> The index to return from the Grid's internal Row array.
  */
 Row& Grid::get_row (const uint8_t INDEX) {
     return rows[INDEX];
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_column
+ * Purpose: Returns an address to the Column Container from this Grid's internal Column array. This
+ *          allows the Column object to be mutable from the Grid when an input is passed from the
+ *          Sudoku object.
+ * Parameters:
+ *      INDEX -> The index to return from the Grid's internal Row array.
  */
 Column& Grid::get_column (const uint8_t INDEX) {
     return cols[INDEX];
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: init_known_positions
+ * Purpose: Initializes the Grid's internal boolean array known_positions to all false values.
+ *          TODO: It has just occurred to me that appending " = {};" to the declaration in
+ *                "Grid.hpp" should have the same effect, and this function could be removed.
+ *                Consider changing to this method.
+ * Parameters: None
  */
 void Grid::init_known_positions () {
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
@@ -176,26 +200,43 @@ void Grid::init_known_positions () {
     }
 }
 
-/*
- * NOTE: ALGORITHM FOR SOLVING SUDOKU PUZZLE (essentially Bowman's Bingo technique)
+/* NOTE:
+ * Name: solve
+ * Purpose: Recursively generates a solved sudoku puzzle using the Bowman's Bingo technique. The
+ *          algorithm recursively focuses on placing the same value into each box before working to
+ *          place the next value (i.e. each box is iterated through placing a 1 in a valid position,
+ *          then the same is done for 2, followed by 3, etc.). Even though it is technically
+ *          possible for false to be returned up the recursive chain to generate_solved_puzzle,
+ *          indicating that a solved puzzle couldn't be generated, this logically should never
+ *          happen (i.e. this function always returns a solved puzzle). The solved puzzle is
+ *          "returned" in the sense that the Row, Column, and Box parameters will be filled after
+ *          this function successfully returns. The algorithm for this is described below the
+ *          parameters list, but like all good algorithms is coded in practice slightly out of
+ *          order.
+ * Parameters:
+ *      BOX -> Box number of the current recursive iteration.
+ *      VALUE -> The numerical value 1-9 being placed in the current Box.
+ *      rows -> Array of Row objects each representing a row of the solved puzzle. All recursive
+ *              iterations have access to the same array.
+ *      columns -> Array of Column objects each representing a column of the solved puzzle. All
+ *                 recursive iterations have access to the same array.
+ *      boxes -> Array of Box objects each representing a box of the solved puzzle. All recursive
+ *               iterations have access to the same array.
+ * 
+ * Bowman's Bingo Algorithm:
  * args <- box # [1-3, 5-7], value # [1-9], row array, column array, box array
  * queue <- available positions on board [0-80]
  * do next_pos <- queue.pop() while recursive call <- false
- *    add value to next_pos in appropriate row, column, and box if possible
- *    return true if box=7, value=9, queue not empty
- *    return false otherwise (queue empty)
- *    next_box <- 5 if box=3
- *                   <- 1 if box=7
- *                   <- box+1 otherwise
- *    next_value <- value+1 if box=7
+ *    add value to next_pos in appropriate row, column, and box if possible     STEP 1
+ *    return true if box=7, value=9, queue not empty                            STEP 2
+ *    return false otherwise (queue empty)                                      STEP 3
+ *    next_box <- 5 if box=3                                                    STEP 4
+ *             <- 1 if box=7
+ *             <- box+1 otherwise
+ *    next_value <- value+1 if box=7                                            STEP 5
  *               <- same otherwise
- *    remove value from row, column, and box if recursive call <- false
+ *    remove value from row, column, and box if recursive call <- false         STEP 6
  * end do-while
- */
-/* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
  */
 bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINERS],
                   Column columns[NUM_CONTAINERS], Box boxes[NUM_CONTAINERS]) {
@@ -241,7 +282,7 @@ bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINER
     
     bool soln;
     while (true) {  //NOTE: Doing it this way gets rid of a compiler warning
-        if (available_pos.empty()) return false;
+        if (available_pos.empty()) return false;                        //NOTE: STEP 3
         
         const uint8_t ROW_NUMBER = map_row(available_pos.front()),
                       COLUMN_NUMBER = map_column(available_pos.front()),
@@ -251,21 +292,21 @@ bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINER
                       BOX_INDEX = get_box_index(available_pos.front());
         uint8_t next_box,
                 next_value;
-        rows[ROW_NUMBER].set_value(ROW_INDEX, VALUE + ZERO);
+        rows[ROW_NUMBER].set_value(ROW_INDEX, VALUE + ZERO);            //NOTE: STEP 1
         columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, VALUE + ZERO);
         boxes[BOX_NUMBER].set_value(BOX_INDEX, VALUE + ZERO);
         known_positions[available_pos.front()] = true;
         
-        if (BOX == 7 and VALUE == 9) return true;
+        if (BOX == 7 and VALUE == 9) return true;                       //NOTE: STEP 2
         
-        if (BOX == 3) next_box = 5;
+        if (BOX == 3) next_box = 5;                                     //NOTE: STEP 4
         else if (BOX == 7) next_box = 1;
         else next_box = BOX + 1;
-        next_value = (BOX == 7) ? VALUE + 1 : VALUE;
+        next_value = (BOX == 7) ? VALUE + 1 : VALUE;                    //NOTE: STEP 5
         
         if ((soln = solve(next_box, next_value, rows, columns, boxes))) return soln;
         else {
-            rows[ROW_NUMBER].set_value(ROW_INDEX, '?');
+            rows[ROW_NUMBER].set_value(ROW_INDEX, '?');                 //NOTE: STEP 6
             columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, '?');
             boxes[BOX_NUMBER].set_value(BOX_INDEX, '?');
             known_positions[available_pos.front()] = false;
@@ -275,15 +316,20 @@ bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINER
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: generate_solved_puzzle
+ * Purpose: Generates and returns a solved sudoku puzzle. This puzzle is later used to created a
+ *          solvable puzzle. The puzzle is generated randomly using a Mersenne-Twister engine.
+ * Parameters:
+ *      SEED -> Seed for the psuedo-random number sequence.
  */
 array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
     array<uint8_t, GRID_SIZE> soln;
     uint8_t soln_matrix[NUM_CONTAINERS][NUM_CONTAINERS];
-    mt19937 generator(SEED);
-    uniform_int_distribution<uint8_t> dist (1, CONTAINER_SIZE);
+    mt19937 generator(SEED);    //NOTE: Start a psuedo-random number generator using a
+                                //      Mersenne-Twister engine
+    uniform_int_distribution<uint8_t> dist (1, CONTAINER_SIZE); //NOTE: Random numbers with values
+                                                                //      of 1-81 will be uniformly
+                                                                //      distributed.
     uint8_t values[CONTAINER_SIZE];
     for (uint8_t i = 0; i < CONTAINER_SIZE; i++) {
         values[i] = i + 1;
@@ -296,10 +342,11 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
         }
     }
 
-    //NOTE: Fill in boxes along the diagonal first
+    //NOTE: Fill in boxes along the diagonal first. On an empty puzzle, boxes 1, 5, and 9 are
+    //      independent of each other, and can be randomly filled in a more trivial manner.
     for (uint8_t i = 0; i < NUM_CONTAINERS; i += 3) {
-        shuffle(begin(values), end(values), generator);
-        uint8_t count = 0;
+        shuffle(begin(values), end(values), generator); //NOTE: All grid positions 1-81 are randomly
+        uint8_t count = 0;                              //      shuffled.
         for (uint8_t j = i; j < i + 3; j++) {
             for (uint8_t k = i; k < i + 3; k++) {
                 soln_matrix[j][k] = values[count] + ZERO;
@@ -308,7 +355,8 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
         }
     }
 
-    //NOTE: Create row, column, and box objects from partial solution matrix
+    //NOTE: Create row, column, and box objects from partial solution matrix. These arrays will be
+    //      used to finish solving the sudoku puzzle recursively.
     Row soln_rows[NUM_CONTAINERS];
     Column soln_columns[NUM_CONTAINERS];
     Box soln_boxes[NUM_CONTAINERS];
@@ -351,18 +399,19 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
         }
     }
     
-    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
-        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
-            soln[i * CONTAINER_SIZE + j] = soln_matrix[i][j];
-        }
+    for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {              //NOTE: Transfer solution matrix to
+        for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {          //      std::array to simplify
+            soln[i * CONTAINER_SIZE + j] = soln_matrix[i][j];   //      returning back to the
+        }                                                       //      caller.
     }
     return soln;
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: set_starting_positions (overloaded)
+ * Purpose: Set starting grid positions using a previously saved game.
+ * Parameters:
+ *      GRID -> Matrix containing values at all 81 positions from a previously saved game.
  */
 void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
@@ -390,9 +439,11 @@ void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAI
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: set_starting_positions (overloaded)
+ * Purpose: Set starting grid positions for a new game from a randomly generated solved puzzle.
+ * Parameters:
+ *      NUM_POSITIONS -> The number of given positions to initialize the puzzle. This value will be
+ *                       based on difficulty level chosen by the user from the main menu.
  */
 void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
     time_t seed = time(nullptr);
@@ -447,27 +498,35 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: map_row
+ * Purpose: Returns the row number based on the grid position.
+ * Parameters:
+ *      POS -> Grid position 0-80 used to map the appropriate row number.
  */
 uint8_t Grid::map_row (const uint8_t POS) {
     return POS / NUM_CONTAINERS;
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: map_column
+ * Purpose: Returns the column number based on the grid position.
+ * Parameters:
+ *      POS -> Grid position 0-80 used to map the appropriate column number.
  */
 uint8_t Grid::map_column (const uint8_t POS) {
     return POS % NUM_CONTAINERS;
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: map_box
+ * Purpose: Returns the box number based on the grid position. This function is reliant on the row
+ *          and column having been mapped prior to being called. This simplifies mapping the box
+ *          number as the row and column numbers aren't calculated a second time, and is logically
+ *          sound since there is never a situation where boxes are mapped independently of rows and
+ *          columns.
+ * Parameters:
+ *      ROW -> Previously mapped row number 0-8 used to map the appropriate box.
+ *      COLUMN -> Previously mapped column number 0-8 used to map the appropriate box.
  */
 uint8_t Grid::map_box (const uint8_t ROW, const uint8_t COLUMN) {
     /* NOTE: Side-by-side numbering of array-like positions and matrix-like positions
@@ -504,9 +563,10 @@ uint8_t Grid::map_box (const uint8_t ROW, const uint8_t COLUMN) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_row_index
+ * Purpose: Returns the index of a Row object based on the grid position.
+ * Parameters:
+ *      POS -> Grid position 0-80 used to map the appropriate Row index.
  */
 uint8_t Grid::get_row_index (const uint8_t POS) {
     /* NOTE: Side-by-side numbering of array-like positions and matrix-like positions
@@ -528,18 +588,22 @@ uint8_t Grid::get_row_index (const uint8_t POS) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_column_index
+ * Purpose: Returns the index of a Column object based on the grid position.
+ * Parameters:
+ *      POS -> Grid position 0-80 used to map the appropriate Column index.
  */
 uint8_t Grid::get_column_index (const uint8_t POS) {
     return POS / CONTAINER_SIZE;
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_box_index
+ * Purpose: Returns the index of a Box object based on the grid position. This function can't
+ *          benefit in a similar manner as map_box since there are times when box indeces are needed
+ *          independent of rows and columns.
+ * Parameters:
+ *      POS -> Grid position 0-80 used to map the appropriate Box index.
  */
 uint8_t Grid::get_box_index (const uint8_t POS) {
     const uint8_t ROW = get_row_index(POS),
@@ -548,9 +612,9 @@ uint8_t Grid::get_box_index (const uint8_t POS) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: create_map
+ * Purpose: Creates a mapping of all 81 grid positions to a 9x9 matrix.
+ * Parameters: None
  */
 map<uint8_t, cell> Grid::create_map() {
     map<uint8_t, cell> m;
@@ -563,27 +627,32 @@ map<uint8_t, cell> Grid::create_map() {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_position
+ * Purpose: Returns the cell mapped to the grid index as mapped in the internal grid_map.
+ * Parameters:
+ *      INDEX -> Index 0-80 used to return the correct cell based on the mapping in grid_map.
  */
 const cell Grid::get_position (const uint8_t INDEX) {
     return grid_map[INDEX];
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: get_map_size
+ * Purpose: Returns the size of the internal grid_map. This function is technically unnecessarily
+ *          since the size of grid_map will always be 81.
+ * Parameters: None
  */
 uint8_t Grid::get_map_size() const {
     return grid_map.size();
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: at
+ * Purpose: Returns the value at a given index from the Grid. This can be done using Rows, Columns,
+ *          or Boxes. Rows are used for simplicity, although all three have been tested for
+ *          correctness.
+ * Parameters:
+ *      INDEX -> Index of the grid to return the value from.
  */
 uint8_t Grid::at(const uint8_t INDEX) {
     return get_row(map_row(INDEX))[get_row_index(INDEX)];
@@ -592,27 +661,33 @@ uint8_t Grid::at(const uint8_t INDEX) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: Operator [] (overloaded)
+ * Purpose: Returns the value at a given index from the Grid.
+ * Parameters:
+ *      INDEX -> Index of the Grid to return the value from.
  */
 uint8_t Grid::operator [] (const uint8_t INDEX) {
     return at(INDEX);
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: is_known
+ * Purpose: Returns whether a value at a given Grid index is known. Known values correspond to given
+ *          values from when the puzzle was first generated.
+ * Parameters:
+ *      INDEX -> Index of the Grid to check.
  */
 bool Grid::is_known (uint8_t index) {
     return known_positions[index];
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters: 
+ * Name: evaluate
+ * Purpose: Evaluates whether the Grid's internal Container arrays values are valid for a solved
+ *          sudoku puzzle (i.e. exactly one each of the values 1-9 in each array). These can each be
+ *          checked independently for correctness. Any remaining '?' values in any array
+ *          automatically result in a return value of false.
+ * Parameters: None
  */
 bool Grid::evaluate () {
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {

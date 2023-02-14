@@ -18,6 +18,7 @@ const uint8_t GRID_SIZE = 81;
  *      rows -> Array of each Row container in the grid.
  *      cols -> Array of each Column container in the grid.
  *      known_positions -> Boolean array of known positions in the grid. Positions are numbered 0-80.
+ *                         True values will correspond to cells with given values.
  *      grid_map -> Map of 81 sudoku grid positions (0-80) to (i,j) cell positions. i and j both lie
  *                  in the range [0-8].
  */
@@ -53,8 +54,8 @@ class Grid {
         uint8_t get_row_index (const uint8_t);
         uint8_t get_column_index (const uint8_t);
         uint8_t get_box_index (const uint8_t);
-        void mvprintw (const uint8_t, const uint8_t, const bool, const bool);
-        void printw (const bool, const bool);
+        void mvprintw (const uint8_t, const uint8_t, const bool, const bool);   //put under DEBUG
+        void printw (const bool, const bool);   //put under DEBUG
         const cell get_position (const uint8_t);
         uint8_t get_map_size () const;
         uint8_t operator [] (const uint8_t);
