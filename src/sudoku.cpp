@@ -11,41 +11,46 @@
 
 using namespace std;
 
-//Grid sudoku_init()
-Sudoku::Sudoku (bool is_initscr, const SavedPuzzle* SAVED_PUZZLE)
-{
-    //NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that need to be
-    //      filled in in order to create a uniquely-solvable puzzle is 17 (this will later be HARD difficulty if diffuculty
-    //      settings are added later)
-    create_map(); //TODO: Move this to somewhere later on
-
-    //Start ncurses
-    //TODO: These ncurses functions can probably be deleted since MainMenu takes care of it all now
-    if (not is_initscr) initscr();
-    //establish color support and color pairs
-    set_color_pairs();
-    cbreak();   //TODO: Will need to account for signal handling
-    noecho();
-    keypad(stdscr, true);
-
-    
-
-    /*if (DEBUG) {
-        cout << "Printing out random numbers..." << endl;
-        for (uint8_t i = 0; i < 10; i++) {
-            cout << mat.next()+0 << endl;
-        }
-    }*/
+/* NOTE:
+ * Name: Class Constructor (overloaded)
+ * Purpose: Coordinates setup of color mappings and display matrix initialization.
+ * Parameters:
+ *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved game. If
+ *                      the user has selected to start a new game, this will be a nullptr. If the
+ *                      user has selected to resume a saved game, this object will be read in
+ *                      beforehand.
+ */
+Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
+    //TODO: Move this note to the location where the difficulty setting is chosen
+    /* NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the
+     *       minimum amount of tiles that need to be filled in in order to create a uniquely
+     *       solvable puzzle is 17 (this will later be HARD difficulty if diffuculty settings are
+     *       added later)
+     */
+    create_map();
+    set_color_pairs();  //NOTE: Establish color pairs for display matrix
+    //TODO: Will need to account for signal handling
     init_display_matrix(SAVED_PUZZLE);
 }
 
+/* NOTE:
+ * Name: Class Destructor
+ * Purpose: 
+ * Parameters:
+ */
 Sudoku::~Sudoku()
 {
+    //TODO: Remove this and leave it as a default destructor in the header file.
     //echo();
     //nocbreak();
     //endwin();   //terminate ncurses session
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 //map<uint8_t, cell> Sudoku::create_map()
 void Sudoku::create_map()
 {
@@ -69,6 +74,11 @@ void Sudoku::create_map()
     //return m;
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX)
 {
     uint8_t y,
@@ -79,9 +89,14 @@ void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XIND
     display_matrix_offset[coords] = display_indeces;
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::set_color_pairs()
 { 
-    start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
+    //start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
                     //      terminal to test this out on, and this is the simplest thing to do without adding
                     //      checks everywhere. If someone else knows or finds that this function doesn't work
                     //      as intended, feel free to correct it.
@@ -92,7 +107,7 @@ void Sudoku::set_color_pairs()
         init_pair(CANDIDATES_Y, COLOR_YELLOW, COLOR_BLACK);
         init_pair(CANDIDATES_B, COLOR_BLUE, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
-        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
+        //init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
     else {  //monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
@@ -100,10 +115,15 @@ void Sudoku::set_color_pairs()
         init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
         init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
-        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
+        //init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
 {
     /*
@@ -233,6 +253,11 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
     #endif
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
 {
     #if DEBUG
@@ -315,6 +340,11 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
     }
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
 {
     uint8_t total_offsety = YCOORD + ORIGIN.first + (YCOORD / CONTAINER_SIZE),
@@ -324,6 +354,11 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
     getyx(stdscr, cursor_pos.first, cursor_pos.second); //update cursor_pos after moving
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::move (const uint16_t KEY)
 {
     static const uint8_t MAX_YBOUNDARY = ORIGIN.first + DISPLAY_MATRIX_ROWS + 1,
@@ -374,27 +409,52 @@ void Sudoku::move (const uint16_t KEY)
     }
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::refresh ()
 {
     ::refresh();
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 uint16_t Sudoku::getch()
 {
     return ::wgetch(stdscr);
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::clear()
 {
     ::clear();
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
 {
     chtype ch = mvinch(YCOORD, XCOORD);
     return ((ch == '|') | (ch == '-'));
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
 {
     //reset_cursor();
@@ -426,6 +486,11 @@ array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
     return border;
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 bool Sudoku::do_nothing()
 {
     // Get the 8 cells around the current cursor position
@@ -462,6 +527,11 @@ bool Sudoku::do_nothing()
            ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(GIVEN));*/
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::clear_surrounding_cells()
 {
     //reset_cursor();
@@ -487,6 +557,11 @@ void Sudoku::clear_surrounding_cells()
     //reset_cursor();
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::place_value (const uint16_t VALUE)
 {
     /*
@@ -626,15 +701,30 @@ void Sudoku::place_value (const uint16_t VALUE)
 
 
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::reset_cursor ()
 {
     ::move(cursor_pos.first, cursor_pos.second);
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 bool Sudoku::evaluate() {
     return mat.evaluate();
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::increment_completed_games () {
     string HOME = getenv("HOME"),
            filename = HOME + "/.tsudoku/completed_puzzles.txt";
@@ -651,6 +741,11 @@ void Sudoku::increment_completed_games () {
     outfile.close();
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::save_game () {
     const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 4;
     
@@ -669,6 +764,11 @@ void Sudoku::save_game () {
     mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
 }
 
+/* NOTE:
+ * Name: 
+ * Purpose: 
+ * Parameters:
+ */
 void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE)
 {
     //Load and display the new or saved puzzle

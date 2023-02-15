@@ -54,7 +54,7 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
         
         switch (opt) {
             case options::NEW_GAME:  {
-                                            Sudoku puzzle(true, nullptr);    //TODO: Consider making this a
+                                            Sudoku puzzle(/*true, */nullptr);    //TODO: Consider making this a
                                                                     //      static function, depending
                                                                     //      on how resuming games works
                                             puzzle.start_game(use_in_game_menu, nullptr);
@@ -64,7 +64,7 @@ int main (int argc, char** argv) //TODO: The majority of this code will need to 
             case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
                                         if (saved_game_menu.menu() == options::SAVE_READY) {
                                             SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
-                                            Sudoku puzzle(true, &saved_puzzle);
+                                            Sudoku puzzle(/*true, */&saved_puzzle);
                                             puzzle.start_game(use_in_game_menu, &saved_puzzle);
                                         }
                                         break;  //TODO
