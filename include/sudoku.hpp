@@ -75,7 +75,7 @@ class Sudoku {
         
     public:
         Sudoku (const SavedPuzzle*);
-        ~Sudoku ();
+        ~Sudoku () {}
 
         void start_game (const bool, const SavedPuzzle*);
 };

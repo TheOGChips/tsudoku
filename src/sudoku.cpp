@@ -34,19 +34,6 @@ Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
 }
 
 /* NOTE:
- * Name: Class Destructor
- * Purpose: 
- * Parameters:
- */
-Sudoku::~Sudoku()
-{
-    //TODO: Remove this and leave it as a default destructor in the header file.
-    //echo();
-    //nocbreak();
-    //endwin();   //terminate ncurses session
-}
-
-/* NOTE:
  * Name: 
  * Purpose: 
  * Parameters:
