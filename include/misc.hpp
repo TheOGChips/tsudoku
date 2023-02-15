@@ -22,7 +22,7 @@ const uint8_t KEY_ENTER = 10,   //      NCurses value doesn't seem to work.
               NUM_CONTAINERS = 9;
               
 //NOTE: A more helpful way of using the character versions of the 10 digits
-enum Values { ZERO = '0', ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE};
+enum Values { ZERO = '0', ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE };
                          
 typedef std::pair<uint8_t, uint8_t> cell;   //NOTE: A cell in the NCurses terminal display
 
