@@ -61,6 +61,7 @@ void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
  * Parameters:
  *      YCOORD -> Line where cursor is moved to before printing.
  *      XCOORD -> Column where cursor is moved to before printing.
+ *      TODO: Actually using a cell object here might be a better idea
  *      COLUMN_PRINTING -> Boolean informing whether to print using Columns.
  *      BOX_PRINTING -> Boolean informing whether to print using Boxes.
  */
@@ -611,7 +612,7 @@ uint8_t Grid::get_box_index (const uint8_t POS) {
  * Purpose: Creates a mapping of all 81 grid positions to a 9x9 matrix.
  * Parameters: None
  */
-map<uint8_t, cell> Grid::create_map() {
+map<uint8_t, cell> Grid::create_map () {
     map<uint8_t, cell> m;
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
@@ -637,7 +638,7 @@ const cell Grid::get_position (const uint8_t INDEX) {
  *          since the size of grid_map will always be 81.
  * Parameters: None
  */
-uint8_t Grid::get_map_size() const {
+uint8_t Grid::get_map_size () const {
     return grid_map.size();
 }
 
@@ -649,7 +650,7 @@ uint8_t Grid::get_map_size() const {
  * Parameters:
  *      INDEX -> Index of the grid to return the value from.
  */
-uint8_t Grid::at(const uint8_t INDEX) {
+uint8_t Grid::at (const uint8_t INDEX) {
     return get_row(map_row(INDEX))[get_row_index(INDEX)];
     //return get_column(map_column(INDEX))[get_column_index(INDEX)];
     //return get_box(map_box_index(INDEX))[get_box_index(INDEX)];
