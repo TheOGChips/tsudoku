@@ -34,9 +34,11 @@ Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: create_map
+ * Purpose: Creates a mapping between the 81 cells in a grid to their positions in the display
+ *          matrix. A reverse mapping is also created simultaneously. This mapping assumes a display
+ *          matrix origin of (0, 0), and a offset is applied later during actual display.
+ * Parameters: None
  */
 void Sudoku::create_map () {
     uint8_t row = 1,
@@ -54,9 +56,17 @@ void Sudoku::create_map () {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: map_display_matrix_offset
+ * Purpose: Creates a mapping between a cell in the display matrix and it's actual location on the
+ *          screen. A call to this function is made for one cell at a time during the initial
+ *          printing of the display matrix to the screen.
  * Parameters:
+ *      YINDEX -> Display line number.
+ *      XINDEX -> Display column number.
+ *      TODO: Actually using a cell object here might be a better idea
+ * 
+ * NOTE: This looks like it doesn't work as expected, but the use of the overloaded Sudoku::move in
+ *       printw takes care of applying the offset before this function is called.
  */
 void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX) {
     uint8_t y,
@@ -68,11 +78,15 @@ void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XIND
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: set_color_pairs
+ * Purpose: Establishes the color pairs used while printing anywhere in the display matrix. The
+ *          color pair MENU_SELECTION is defined inside MainMenu.cpp, and its value is carried over
+ *          throughout the rest of the program. In the case coloring is not available (in the event
+ *          this somehow finds its way onto some old machine), a monochrome mode is also provided
+ *          where everything is the same color.
+ * Parameters: None
  */
-void Sudoku::set_color_pairs() { 
+void Sudoku::set_color_pairs () { 
     /* NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
      *       terminal to test this out on, and this is the simplest thing to do without adding
      *       checks everywhere. If someone else knows or finds that this function doesn't work as
@@ -88,16 +102,20 @@ void Sudoku::set_color_pairs() {
     else {  //NOTE: Monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GIVEN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
-        init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);  //TODO: Reverse the coloring for either
+        init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);  //      the candidate or guess cells.
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
     }
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: init_display_matrix
+ * Purpose: Initialiizes the display matrix with either a newly generated puzzle or a saved game.
  * Parameters:
+ *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved game. If
+ *                      the user has selected to start a new game, this will be a nullptr. If the
+ *                      user has selected to resume a saved game, this object will be read in
+ *                      beforehand.
  */
 void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
     /* NOTE: This is a display matrix indeces "cheat sheet", with Grid cells mapped out. This will
@@ -234,9 +252,13 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: printw (NCurses library function overload)
+ * Purpose: Prints the entire sudoku puzzle (the display matrix) to the screen for initial viewing.
  * Parameters:
+ *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved game. If
+ *                      the user has selected to start a new game, this will be a nullptr. If the
+ *                      user has selected to resume a saved game, this object will be read in
+ *                      beforehand.
  */
 void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     #if DEBUG
@@ -244,7 +266,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     #endif
     
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
-        move(i, 0);
+        move(i, 0); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             map_display_matrix_offset(i, j);
             
@@ -279,9 +301,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
                 attroff(A_BOLD);
             }
             
-            if (j == 8 or j == 17) {
-                ::printw("|");
-            }
+            if (j == 8 or j == 17) ::printw("|");
         }
         if (i == 8 or i == 17) {
             ::move(i + ORIGIN.first + (i / CONTAINER_SIZE) + 1, ORIGIN.second);
@@ -309,9 +329,14 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: move (NCurses library function overload #1)
+ * Purpose: Moves the cursor to its offset position for the initial printing of the display matrix
+ *          from Sudoku::printw. This is necessary so that the the display matrix offset can be
+ *          mapped correctly. This has the same parameter prototype as NCurses's printw.
  * Parameters:
+ *      YCOORD -> Pre-offset display line number.
+ *      XCOORD -> Pre-offset display column number.
+ *      TODO: Actually using a cell object here might be a better idea
  */
 void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD) {
     const uint8_t TOTAL_OFFSETY = YCOORD + ORIGIN.first  + (YCOORD / CONTAINER_SIZE),
@@ -322,9 +347,13 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: move (NCurses library function overload #2)
+ * Purpose: Moves the cursor around the display matrix based on the user's input key. This variant
+ *          is called during interactive play after the display matrix has already been rendered to
+ *          the screen. All other inputs other than an arrow key are ignored.
  * Parameters:
+ *      KEY -> An integer corresponding to a key pressed by the user. The mappings for keys are
+ *             handled by NCurses.
  */
 void Sudoku::move (const uint16_t KEY) {
     static const uint8_t MAX_YBOUNDARY = ORIGIN.first + DISPLAY_MATRIX_ROWS + 1,
@@ -374,36 +403,47 @@ void Sudoku::move (const uint16_t KEY) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: refresh (NCurses library function overload)
+ * Purpose: Updates the terminal display with any changes. This is a wrapper around the NCurses
+ *          function of the same name.
+ * Parameters: None
  */
 void Sudoku::refresh () {
     ::refresh();
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: getch (NCurses library function overload)
+ * Purpose: Returns the character at the current cursor position. This is a wrapper around the
+ *          NCurses function of the same name. Since NCurses getch is really a macro, it has been
+ *          undefined in misc.hpp in order for this function to be defined here. The underlying call
+ *          to NCurses wgetch(stdscr) seen here is the same functionality as the original NCurses
+ *          getch.
+ * Parameters: None
  */
 uint16_t Sudoku::getch () {
     return ::wgetch(stdscr);
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: clear (NCurses library function overload)
+ * Purpose: Clears the terminal of all output. This is a wrapper around the NCurses function of the
+ *          same name.
+ * Parameters: None
  */
 void Sudoku::clear () {
     ::clear();
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: is_border
+ * Purpose: Determines whether a cell contains a box border character. This is what enables the
+ *          cursor to skip over such a cell when moving. Returns true if the character is either a
+ *          '|' or '-'; false otherwise.
  * Parameters:
+ *      YCOORD -> Line number of the cell to be checked.
+ *      XCOORD -> Column number of the cell to be checked.
+ *      TODO: Actually using a cell object here might be a better idea
  */
 bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD) {
     chtype ch = mvinch(YCOORD, XCOORD);
@@ -411,9 +451,10 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: get_surrounding_cells
+ * Purpose: Returns an array containing the surrounding the cell objects representing the cells
+ *          surrounding the cursor's current position.
+ * Parameters: None
  */
 array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells () {
     /* NOTE: This has to be done this way, or else the array initialization doesn't work for some
@@ -433,26 +474,31 @@ array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells () {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: do_nothing
+ * Purpose: Determines whether no action should be taken based on the cursor's current position.
+ *          Returns true if the cursor's position or any of the 8 surrounding cells contain a given
+ *          number; false otherwise.
+ * Parameters: None
  */
 bool Sudoku::do_nothing () {
     //NOTE: Get the 8 cells around the current cursor position
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
-
+    
+    //NOTE: Check all surrounding cells for given number
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(GIVEN)) return true;
     }
     reset_cursor();
     
+    //NOTE: Lastly, check if cursor's current position contains a given number.
     return (inch() & A_COLOR) == COLOR_PAIR(GIVEN);
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: clear_surrounding_cells
+ * Purpose: Clears the surrounding cells of the cursor's position of their values. This is only done
+ *          when entering a number into a guess cell, but not when removing.
+ * Parameters: None
  */
 void Sudoku::clear_surrounding_cells () {
     //NOTE: Get the 8 cells around the current cursor position
@@ -467,12 +513,29 @@ void Sudoku::clear_surrounding_cells () {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: place_value
+ * Purpose: Places or removes a value in the display matrix with the appropriate coloring if the
+ *          cursor's current position is a valid cell for input. The appropriate Row, Column, and
+ *          Box from the internal Grid member is updated with the value if the cursor's position is
+ *          over a guess cell (i.e. a cell that is also mapped by the Grid's own internal map).
  * Parameters:
+ *      VALUE -> The value to be placed into the display matrix and (possibly) the appropriate Row,
+ *               Column, and Box of this game's Grid member variable. If the value corresponds to
+ *               that of the Delete or Backspace keys, this function performs a removal instead.
+ * 
+ * TODO: I've noticed that probably a more preferred way this should work would be to just update
+ *       the display matrix and then call a generic update/refresh function that updates the display
+ *       instead of having individual printw lines here. This way does only update the specific
+ *       cells and is potentially more efficient (the simplest way to implement the proposed method
+ *       would be to simply reprint the entire display matrix every time), but the current
+ *       implementation also doesn't take advantage of having the display matrix also being updated.
+ *       In other words, the smarter way to go about this would be to just update the display
+ *       matrix, and then have an update/refresh function that handles actually updating the display
+ *       based on the display matrix. Whether that's worth doing at this point is debatable, though.
  */
 void Sudoku::place_value (const uint16_t VALUE) {
-    /*
+    /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
+     * 
      * if value is red (starting value)
      *      ignore, do nothing
      * if position is not mapped to position in 9x9 matrix
@@ -569,7 +632,8 @@ void Sudoku::place_value (const uint16_t VALUE) {
                     chtype ch = mvinch(border[i].first, border[i].second);
                     if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or
                         (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-                        color_pair = (_rev_map_[display_matrix_offset[border[i]]] % 2) ? CANDIDATES_B : CANDIDATES_Y;
+                        color_pair = (_rev_map_[display_matrix_offset[border[i]]] % 2) ?
+                                     CANDIDATES_B : CANDIDATES_Y;
                     }
                 }
                 reset_cursor();
@@ -589,27 +653,34 @@ void Sudoku::place_value (const uint16_t VALUE) {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: reset_cursor
+ * Purpose: Resets the cursor to its last officially recorded position. This is mainly used after
+ *          needing to temporarily move to another cell to read or remove a value and gives the
+ *          appearance that the cursor never moved at all.
+ * Parameters: None
  */
 void Sudoku::reset_cursor () {
     ::move(cursor_pos.first, cursor_pos.second);
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: evaluate
+ * Purpose: Calls the Grid member to evaluate its Rows, Columns, and Boxes for validity (i.e. a
+ *          valid solution or solved puzzle). Returns true only if the puzzle currently has a valid
+ *          solution.
+ * Parameters: None
  */
 bool Sudoku::evaluate () {
     return mat.evaluate();
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: increment_completed_games
+ * Purpose: Increments the number of completed games recorded by 1. This is only called once the
+ *          user has solved the current puzzle. Ensuring file pathname validity (whether the file
+ *          and its directory exist) is handled elsewhere at the start of the program before the
+ *          main menu appears.
+ * Parameters: None
  */
 void Sudoku::increment_completed_games () {
     string HOME = getenv("HOME"),
@@ -628,9 +699,12 @@ void Sudoku::increment_completed_games () {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
- * Parameters:
+ * Name: save_game
+ * Purpose: Saves the current state of the puzzle to a file. The name of the file is chosen by the
+ *          user, but is restricted to 15 characters. Actual saving is handled by a call to
+ *          InGameMenu's static save_game function. This function just provides compatibility for
+ *          when the in-game menu is disabled.
+ * Parameters: None
  */
 void Sudoku::save_game () {
     const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 4;
@@ -639,11 +713,13 @@ void Sudoku::save_game () {
     clrtoeol();
     ::printw("Enter save file name: ");
     
+    //NOTE: Copy the display matrix into a pointer in order to pass along to InGameMenu's save_game.
     uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];
     for (uint8_t i = 0; i < DISPLAY_MATRIX_COLUMNS; i++) {
         display_matrix[i] = this->display_matrix[i];
     }
     
+    //NOTE: Display confirmation that the game has been saved.
     const string NAME = InGameMenu::save_game(display_matrix);
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
@@ -651,9 +727,20 @@ void Sudoku::save_game () {
 }
 
 /* NOTE:
- * Name: 
- * Purpose: 
+ * Name: start_game
+ * Purpose: Starts and runs a game of sudoku until the user either wins or decides to quit.
+ *          Dispatches calls to the in-game menu (when enabled), to directly save the game (when the
+ *          in-game menu isn't enabled), to exit, to move the cursor, or to handle input values for
+ *          the display matrix and Grid member. This function also handles removing the saved game
+ *          file and updating the number of games completed if the user solves the current puzzle.
  * Parameters:
+ *      USE_IN_GAME_MENU -> Boolean controlling whether or not the in-game menu is enabled. This is
+ *                          determined based on whether or not the user runs this program with the
+ *                          "--no-in-game-menu" or "-n" command line options.
+ *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved game. If
+ *                      the user has selected to start a new game, this will be a nullptr. If the
+ *                      user has selected to resume a saved game, this object will be read in
+ *                      beforehand.
  */
 void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE) {
     printw(SAVED_PUZZLE);
