@@ -38,17 +38,11 @@ Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
  * Purpose: 
  * Parameters:
  */
-//map<uint8_t, cell> Sudoku::create_map()
-void Sudoku::create_map()
-{
-    //map<uint8_t, cell> m;
+void Sudoku::create_map () {
     uint8_t row = 1,
             column = 1;
 
-    //TODO: See if there's a better way to fix this.
-    //for (uint8_t i = 0; i < mat.get_map_size(); i++) {
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
-        //m[i] = cell(row, column);
         _map_[i] = cell(row, column);
         _rev_map_[cell(row, column)] = i;
         column += 3;
@@ -57,8 +51,6 @@ void Sudoku::create_map()
             row += 3;
         }
     }
-
-    //return m;
 }
 
 /* NOTE:
@@ -66,8 +58,7 @@ void Sudoku::create_map()
  * Purpose: 
  * Parameters:
  */
-void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX)
-{
+void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX) {
     uint8_t y,
             x;
     getyx(stdscr, y, x);
@@ -81,28 +72,25 @@ void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XIND
  * Purpose: 
  * Parameters:
  */
-void Sudoku::set_color_pairs()
-{ 
-    //start_color();  //NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
-                    //      terminal to test this out on, and this is the simplest thing to do without adding
-                    //      checks everywhere. If someone else knows or finds that this function doesn't work
-                    //      as intended, feel free to correct it.
-    if (has_colors()) { //color mode
-        //init_pair(UNKNOWN, COLOR_BLACK, COLOR_WHITE);
+void Sudoku::set_color_pairs() { 
+    /* NOTE: I'm guessing this should work like this, but I don't have a non-color-supported
+     *       terminal to test this out on, and this is the simplest thing to do without adding
+     *       checks everywhere. If someone else knows or finds that this function doesn't work as
+     *       intended, feel free to correct it.
+     */
+    if (has_colors()) { //NOTE: Color mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GIVEN, COLOR_RED, COLOR_BLACK);
         init_pair(CANDIDATES_Y, COLOR_YELLOW, COLOR_BLACK);
         init_pair(CANDIDATES_B, COLOR_BLUE, COLOR_BLACK);
         init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
-        //init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
-    else {  //monochrome mode
+    else {  //NOTE: Monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
         init_pair(GIVEN, COLOR_WHITE, COLOR_BLACK);
         init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
         init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
-        //init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
     }
 }
 
@@ -111,41 +99,42 @@ void Sudoku::set_color_pairs()
  * Purpose: 
  * Parameters:
  */
-void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
-{
-    /*
-         0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
-         1,0  1,1            1,4            1,7      |       1,10              1,13              1,16       |        1,19              1,22              1,25
-         2,0                                         |                                                      |
-         3,0                                         |                                                      |
-         4,0  4,1            4,4            4,7      |       4,10              4,13              4,16       |        4,19              4,22              4,25
-         5,0                                         |                                                      |
-         6,0                                         |                                                      |
-         7,0  7,1            7,4            7,7      |       7,10              7,13              7,16       |        7,19              7,22              7,25
-         8,0                                         |                                                      |
-         --------------------------------------------|------------------------------------------------------|------------------------------------------------------
-         9,0                                         |                                                      |
-        10,0 10,1           10,4           10,7      |      10,10             10,13             10,16       |       10,19             10,22             10,25
-        11,0                                         |                                                      |
-        12,0                                         |                                                      |
-        13,0 13,1           13,4           13,7      |      13,10             13,13             13,16       |       13,19             13,22             13,25
-        14,0                                         |                                                      |
-        15,0                                         |                                                      |
-        16,0 16,1           16,4           16,7      |      16,10             16,13             16,16       |       16,19             16,22             16,25
-        17,0                                         |                                                      |
-        ---------------------------------------------|------------------------------------------------------|------------------------------------------------------
-        18,0                                         |                                                      |
-        19,0 19,1           19,4           19,7      |      19,10             19,13             19,16       |       19,19             19,22             19,25
-        20,0                                         |                                                      |
-        21,0                                         |                                                      |
-        22,0 22,1           22,4           22,7      |      22,10             22,13             22,16       |       22,19             22,22             22,25
-        23,0                                         |                                                      |
-        24,0                                         |                                                      |
-        25,0 25,1           25,4           25,7      |      25,10             25,13             25,16       |       25,19             25,22             25,25
-        26,0                                         |                                                      |
-    */
+void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
+    /* NOTE: This is a display matrix indeces "cheat sheet", with Grid cells mapped out. This will
+     *       display as intended if looking at it full screen with 1920x1080 screen dimensions.
+     * 
+     *   0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
+     *   1,0  1,1            1,4            1,7      |       1,10              1,13              1,16       |        1,19              1,22              1,25
+     *   2,0                                         |                                                      |
+     *   3,0                                         |                                                      |
+     *   4,0  4,1            4,4            4,7      |       4,10              4,13              4,16       |        4,19              4,22              4,25
+     *   5,0                                         |                                                      |
+     *   6,0                                         |                                                      |
+     *   7,0  7,1            7,4            7,7      |       7,10              7,13              7,16       |        7,19              7,22              7,25
+     *   8,0                                         |                                                      |
+     *  ---------------------------------------------|------------------------------------------------------|------------------------------------------------------
+     *   9,0                                         |                                                      |
+     *  10,0 10,1           10,4           10,7      |      10,10             10,13             10,16       |       10,19             10,22             10,25
+     *  11,0                                         |                                                      |
+     *  12,0                                         |                                                      |
+     *  13,0 13,1           13,4           13,7      |      13,10             13,13             13,16       |       13,19             13,22             13,25
+     *  14,0                                         |                                                      |
+     *  15,0                                         |                                                      |
+     *  16,0 16,1           16,4           16,7      |      16,10             16,13             16,16       |       16,19             16,22             16,25
+     *  17,0                                         |                                                      |
+     *  ---------------------------------------------|------------------------------------------------------|------------------------------------------------------
+     *  18,0                                         |                                                      |
+     *  19,0 19,1           19,4           19,7      |      19,10             19,13             19,16       |       19,19             19,22             19,25
+     *  20,0                                         |                                                      |
+     *  21,0                                         |                                                      |
+     *  22,0 22,1           22,4           22,7      |      22,10             22,13             22,16       |       22,19             22,22             22,25
+     *  23,0                                         |                                                      |
+     *  24,0                                         |                                                      |
+     *  25,0 25,1           25,4           25,7      |      25,10             25,13             25,16       |       25,19             25,22             25,25
+     *  26,0                                         |                                                      |
+     */
 
-    //initialize display matrix with blank spaces
+    //NOTE: Initialize display matrix with blank spaces
     if (not SAVED_PUZZLE) {
         for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
             for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
@@ -157,7 +146,11 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
         diff_menu.menu();
         
         mat = Grid(diff_menu.get_difficulty_level());
-        //create_map(); //NOTE: This actually works as originally intended, but the constructor call is currently used because of the catch-22 that occurs when resuming a game.
+        /* NOTE: This call to create_map() actually works as originally intended, but the
+         *       constructor call is currently used because of the catch-22 that occurs when
+         *       resuming a game.
+         */
+        //create_map();
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
             display_matrix[coords.first][coords.second] = mat[i];
@@ -191,20 +184,21 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             getch();
         #endif
         mat = Grid(grid);
-        //create_map(); //NOTE: This currently fails if run here. There's a sort of catch-22 where (to work as intended) the grid passed to mat needs _map_ to be filled, but _map_ also needs mat to be filled.
+        /* NOTE: This call to create_map() currently fails if run here. There's a sort of catch-22
+         *       where (to work as intended) the grid passed to mat needs _map_ to be filled, but
+         *       _map_ also needs mat to be filled.
+         */
+        //create_map();
     }
     
     #if DEBUG
-        //cout <<  << endl;
         ::printw("Printing mapping...\n");
         for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-            //cout << "m[" << i+0 << "]: (" << get_position(i).first+0 << ", " << get_position(i).second+0 << ")" << endl;
             ::printw("m[%u]: (%u, %u)", i, mat.get_position(i).first, mat.get_position(i).second);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
         for (uint8_t i = 0; i < _map_.size(); i++) {
-            //cout << "m[" << i+0 << "]: (" << get_map(i).first+0 << ", " << get_map(i).second+0 << ")" << endl;
             ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
@@ -213,8 +207,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
             ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
-        //NOTE: The mapping appears to be correct according to the printout, so why is adding new values not working as expected?
-        refresh();  //TODO: Consider putting these three functions into one if used like this more often
+        refresh();
         getch();
         clear();
     #endif
@@ -233,9 +226,9 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
                 ::printw("row...\n");
             }
             mat.printw(i & column, i & box);
-            refresh();  //flush output to screen
-            getch();    //wait for user input
-            clear();    //clear the screen
+            refresh();
+            getch();
+            clear();
         }
     #endif
 }
@@ -245,14 +238,11 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE)
  * Purpose: 
  * Parameters:
  */
-void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING, const bool SUBMATRIX_PRINTING*/)
-{
+void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     #if DEBUG
         ::printw("Printing display matrix...\n");
     #endif
     
-    //::move(INIT_OFFSETY, INIT_OFFSETX);
-    //TODO: Will need to be sort of a copy of this loop
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(i, 0);
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
@@ -261,7 +251,6 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
             uint8_t color_pair;
             if (SAVED_PUZZLE) {
                 switch (SAVED_PUZZLE->color_codes[i][j]) {
-                    //case 'n': 
                     case 'u': color_pair = UNKNOWN;
                               break;
                               
@@ -279,7 +268,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
                     case 'g': color_pair = GUESS;
                               break;
                               
-                    default: color_pair = 0;
+                    default: color_pair = 0;    //NOTE: case 'n'
                 }
                 
                 attron(COLOR_PAIR(color_pair));
@@ -294,33 +283,25 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
                 ::printw("|");
             }
         }
-        //::printw("\n");
         if (i == 8 or i == 17) {
-            //::move(i + INIT_OFFSETY + (i / CONTAINER_SIZE) + 1, INIT_OFFSETX);
             ::move(i + ORIGIN.first + (i / CONTAINER_SIZE) + 1, ORIGIN.second);
-            //move(i, 0);
-            //::printw("---------|---------|---------\n");
             ::printw("---------|---------|---------");
         }
     }
     
     if (not SAVED_PUZZLE) {
-        //NOTE: Not needed currently, but probably will be later
-        /*uint16_t posx,
-                posy;
-        getyx(stdscr, posy, posx);*/
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
-            move(coords.first, coords.second);  //Move cursor to position
+            move(coords.first, coords.second);
             
             if (mat.is_known(i)) {
-                attron(COLOR_PAIR(GIVEN));  //Turn color scheme on
-                ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
-                attroff(COLOR_PAIR(GIVEN));//Turn color scheme off
+                attron(COLOR_PAIR(GIVEN));
+                ::printw("%c", display_matrix[coords.first][coords.second]);
+                attroff(COLOR_PAIR(GIVEN));
             }
             else {
                 attron(COLOR_PAIR(UNKNOWN));
-                ::printw("%c", display_matrix[coords.first][coords.second]);    //Print value
+                ::printw("%c", display_matrix[coords.first][coords.second]);
                 attroff(COLOR_PAIR(UNKNOWN));
             }
         }
@@ -332,13 +313,12 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE/*const bool COLUMN_PRINTING
  * Purpose: 
  * Parameters:
  */
-void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
-{
-    uint8_t total_offsety = YCOORD + ORIGIN.first + (YCOORD / CONTAINER_SIZE),
-            total_offsetx = XCOORD + ORIGIN.second + (XCOORD / CONTAINER_SIZE);
+void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD) {
+    const uint8_t TOTAL_OFFSETY = YCOORD + ORIGIN.first  + (YCOORD / CONTAINER_SIZE),
+                  TOTAL_OFFSETX = XCOORD + ORIGIN.second + (XCOORD / CONTAINER_SIZE);
 
-    ::move(total_offsety, total_offsetx);
-    getyx(stdscr, cursor_pos.first, cursor_pos.second); //update cursor_pos after moving
+    ::move(TOTAL_OFFSETY, TOTAL_OFFSETX);
+    getyx(stdscr, cursor_pos.first, cursor_pos.second); //NOTE: Update cursor_pos after moving
 }
 
 /* NOTE:
@@ -346,53 +326,50 @@ void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD)
  * Purpose: 
  * Parameters:
  */
-void Sudoku::move (const uint16_t KEY)
-{
+void Sudoku::move (const uint16_t KEY) {
     static const uint8_t MAX_YBOUNDARY = ORIGIN.first + DISPLAY_MATRIX_ROWS + 1,
                          MAX_XBOUNDARY = ORIGIN.second + DISPLAY_MATRIX_COLUMNS + 1;
 
     switch (KEY) {
-        case KEY_DOWN:  if (cursor_pos.first < MAX_YBOUNDARY) {
-                            if (is_border(cursor_pos.first + 1, cursor_pos.second)) {
-                                ::move(cursor_pos.first + 2, cursor_pos.second);
-                            }
-                            else {
-                                ::move(cursor_pos.first + 1, cursor_pos.second);
-                            }
-                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
-                        }
-                        break;
-        case KEY_UP:    if (cursor_pos.first > ORIGIN.first) {
-                            if (is_border(cursor_pos.first - 1, cursor_pos.second)) {
-                                ::move(cursor_pos.first - 2, cursor_pos.second);
-                            }
-                            else {
-                                ::move(cursor_pos.first - 1, cursor_pos.second);
-                            }
-                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
-                        }
-                        break;
-        case KEY_LEFT:  if (cursor_pos.second > ORIGIN.second) {
-                            if (is_border(cursor_pos.first, cursor_pos.second - 1)) {
-                                ::move(cursor_pos.first, cursor_pos.second - 2);
-                            }
-                            else {
-                                ::move(cursor_pos.first, cursor_pos.second - 1);
-                            }
-                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
-                        }
-                        break;
-        case KEY_RIGHT: if (cursor_pos.second < MAX_XBOUNDARY) {
-                            if (is_border(cursor_pos.first, cursor_pos.second + 1)) {
-                                ::move(cursor_pos.first, cursor_pos.second + 2);
-                            }
-                            else {
-                                ::move(cursor_pos.first, cursor_pos.second + 1);
-                            }
-                            getyx(stdscr, cursor_pos.first, cursor_pos.second);
-                        }
-                        break;
-        default:;   //This shouldn't ever be run because the of the switch statement in start_game
+        case KEY_DOWN:
+            if (cursor_pos.first < MAX_YBOUNDARY) {
+                if (is_border(cursor_pos.first + 1, cursor_pos.second)) {
+                    ::move(cursor_pos.first + 2, cursor_pos.second);
+                }
+                else ::move(cursor_pos.first + 1, cursor_pos.second);
+                getyx(stdscr, cursor_pos.first, cursor_pos.second);
+            }
+            break;
+        case KEY_UP:
+            if (cursor_pos.first > ORIGIN.first) {
+                if (is_border(cursor_pos.first - 1, cursor_pos.second)) {
+                    ::move(cursor_pos.first - 2, cursor_pos.second);
+                }
+                else ::move(cursor_pos.first - 1, cursor_pos.second);
+                    getyx(stdscr, cursor_pos.first, cursor_pos.second);
+                }
+                break;
+        case KEY_LEFT:
+            if (cursor_pos.second > ORIGIN.second) {
+                if (is_border(cursor_pos.first, cursor_pos.second - 1)) {
+                    ::move(cursor_pos.first, cursor_pos.second - 2);
+                }
+                else ::move(cursor_pos.first, cursor_pos.second - 1);
+                getyx(stdscr, cursor_pos.first, cursor_pos.second);
+            }
+            break;
+        case KEY_RIGHT:
+            if (cursor_pos.second < MAX_XBOUNDARY) {
+                if (is_border(cursor_pos.first, cursor_pos.second + 1)) {
+                    ::move(cursor_pos.first, cursor_pos.second + 2);
+                }
+                else ::move(cursor_pos.first, cursor_pos.second + 1);
+                getyx(stdscr, cursor_pos.first, cursor_pos.second);
+            }
+            break;
+        default:;   /* NOTE: This shouldn't ever be run because the of the switch statement in
+                     *       start_game().
+                     */
     }
 }
 
@@ -401,8 +378,7 @@ void Sudoku::move (const uint16_t KEY)
  * Purpose: 
  * Parameters:
  */
-void Sudoku::refresh ()
-{
+void Sudoku::refresh () {
     ::refresh();
 }
 
@@ -411,8 +387,7 @@ void Sudoku::refresh ()
  * Purpose: 
  * Parameters:
  */
-uint16_t Sudoku::getch()
-{
+uint16_t Sudoku::getch () {
     return ::wgetch(stdscr);
 }
 
@@ -421,8 +396,7 @@ uint16_t Sudoku::getch()
  * Purpose: 
  * Parameters:
  */
-void Sudoku::clear()
-{
+void Sudoku::clear () {
     ::clear();
 }
 
@@ -431,8 +405,7 @@ void Sudoku::clear()
  * Purpose: 
  * Parameters:
  */
-bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
-{
+bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD) {
     chtype ch = mvinch(YCOORD, XCOORD);
     return ((ch == '|') | (ch == '-'));
 }
@@ -442,11 +415,10 @@ bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD)
  * Purpose: 
  * Parameters:
  */
-array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
-{
-    //reset_cursor();
-    //NOTE: This has to be done this way, or else the array initialization doesn't work for some weird
-    //      reason.
+array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells () {
+    /* NOTE: This has to be done this way, or else the array initialization doesn't work for some
+     *       weird reason.
+     */
     cell tl = {cursor_pos.first - 1, cursor_pos.second - 1};
     cell t  = {cursor_pos.first - 1, cursor_pos.second};
     cell tr = {cursor_pos.first - 1, cursor_pos.second + 1};
@@ -457,19 +429,6 @@ array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
     cell br = {cursor_pos.first + 1, cursor_pos.second + 1};
     array<cell, NUM_BORDER_POSITIONS> border = {tl, t, tr, l, r, bl, b, br};
 
-    /*::mvprintw(4, 40, "%d,%d", cursor_pos.first - 1, cursor_pos.second - 1);
-    ::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
-    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
-    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
-    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
-    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
-    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
-    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
-    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
-    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
-    refresh();
-    getch();*/
-
     return border;
 }
 
@@ -478,40 +437,16 @@ array<cell, Sudoku::NUM_BORDER_POSITIONS> Sudoku::get_surrounding_cells()
  * Purpose: 
  * Parameters:
  */
-bool Sudoku::do_nothing()
-{
-    // Get the 8 cells around the current cursor position
+bool Sudoku::do_nothing () {
+    //NOTE: Get the 8 cells around the current cursor position
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
-    //chtype ch = inch();
 
-    /*::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
-    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
-    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
-    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
-    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
-    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
-    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
-    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
-    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
-    refresh();
-    getch();*/
-
-    //if ((inch() & A_COLOR) == COLOR_PAIR(GIVEN)) return true;
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         if ((mvinch(border[i].first, border[i].second) & A_COLOR) == COLOR_PAIR(GIVEN)) return true;
     }
     reset_cursor();
-    //return ((inch() & A_COLOR) == COLOR_PAIR(GIVEN)) ? true : false;
+    
     return (inch() & A_COLOR) == COLOR_PAIR(GIVEN);
-    /*return ((mvinch(TL.first, TL.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch( T.first,  T.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch(TR.first, TR.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch( L.first,  L.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((ch & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch( R.first,  R.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch(BL.first, BL.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch( B.first,  B.second) & A_COLOR) == COLOR_PAIR(GIVEN)) |
-           ((mvinch(BR.first, BR.second) & A_COLOR) == COLOR_PAIR(GIVEN));*/
 }
 
 /* NOTE:
@@ -519,21 +454,9 @@ bool Sudoku::do_nothing()
  * Purpose: 
  * Parameters:
  */
-void Sudoku::clear_surrounding_cells()
-{
-    //reset_cursor();
-    // Get the 8 cells around the current cursor position
+void Sudoku::clear_surrounding_cells () {
+    //NOTE: Get the 8 cells around the current cursor position
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
-    /*::mvprintw(5, 40, "%d,%d", border[TL].first, border[TL].second);
-    ::mvprintw(5, 46, "%d,%d", border[T].first, border[T].second);
-    ::mvprintw(5, 52, "%d,%d", border[TR].first, border[TR].second);
-    ::mvprintw(6, 40, "%d,%d", border[L].first, border[L].second);
-    ::mvprintw(6, 46, "%d,%d", cursor_pos.first, cursor_pos.second);
-    ::mvprintw(6, 52, "%d,%d", border[R].first, border[R].second);
-    ::mvprintw(7, 40, "%d,%d", border[BL].first, border[BL].second);
-    ::mvprintw(7, 46, "%d,%d", border[B].first, border[B].second);
-    ::mvprintw(7, 52, "%d,%d", border[BR].first, border[BR].second);
-    refresh();*/
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         mvprintw(border[i].first, border[i].second, " ");
         //TODO: Make these const later
@@ -541,7 +464,6 @@ void Sudoku::clear_surrounding_cells()
                 x = display_matrix_offset[border[i]].second;
         display_matrix[y][x] = ' ';
     }
-    //reset_cursor();
 }
 
 /* NOTE:
@@ -549,8 +471,7 @@ void Sudoku::clear_surrounding_cells()
  * Purpose: 
  * Parameters:
  */
-void Sudoku::place_value (const uint16_t VALUE)
-{
+void Sudoku::place_value (const uint16_t VALUE) {
     /*
      * if value is red (starting value)
      *      ignore, do nothing
@@ -564,25 +485,8 @@ void Sudoku::place_value (const uint16_t VALUE)
      *      refresh
      *      place into appropriate spot in appropriate row, column, and box
      */
-    //clear();
-    // Get the 8 cells around the current cursor position
-    /*cell TL = {cursor_pos.first - 1, cursor_pos.second - 1},
-         T  = {cursor_pos.first - 1, cursor_pos.second},
-         TR = {cursor_pos.first - 1, cursor_pos.second + 1},
-         L  = {cursor_pos.first,     cursor_pos.second - 1},
-         R  = {cursor_pos.first,     cursor_pos.second + 1},
-         BL = {cursor_pos.first + 1, cursor_pos.second - 1},
-         B  = {cursor_pos.first + 1, cursor_pos.second},
-         BR = {cursor_pos.first + 1, cursor_pos.second + 1};*/
-
-    //::mvprintw(20, 100, "ch: %u\n", ch);
-    //::mvprintw(21, 100, "COLOR_RED: %d\n", COLOR_RED);
-    //::mvprintw(22, 100, "A_COLOR: %d\n", A_COLOR);
-    //::mvprintw(23, 100, "COLOR_PAIR(GIVEN): %d\n", COLOR_PAIR(GIVEN));
-    //::mvprintw(24, 100, "ch & A_COLOR: %d\n", ch & A_COLOR);
-    //::refresh();
+    
     if (do_nothing()) reset_cursor();
-    //else if ((ch & A_CHARTEXT) == '?') {}
     else {
         //TODO: Make these const later
         uint8_t y = display_matrix_offset[cursor_pos].first,
@@ -591,6 +495,7 @@ void Sudoku::place_value (const uint16_t VALUE)
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
+            //TODO: Make these const later?
             uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
                     row_number = mat.map_row(index),
                     column_number = mat.map_column(index);
@@ -634,7 +539,6 @@ void Sudoku::place_value (const uint16_t VALUE)
             #if DEBUG
                 enum print_by {row, column, box};
                 for (uint8_t i = row; i <= box; i++) {
-                    //::mvprintw(9, 40 + 20 * i, "Printing by ");
                     ::move(9, 40 + 20 * i);
                     if (i == box) {
                         ::printw("box");
@@ -646,9 +550,7 @@ void Sudoku::place_value (const uint16_t VALUE)
                         ::printw("row");
                     }
                     mat.mvprintw(10, 40 + 20 * i, i & column, i & box);
-                    refresh();  //flush output to screen
-                    //getch();    //wait for user input
-                    //clear();    //clear the screen
+                    refresh();
                 }
 
                 refresh();
@@ -683,18 +585,15 @@ void Sudoku::place_value (const uint16_t VALUE)
         }
         refresh();
     }
-    reset_cursor(); //have cursor maintain position after printing (maybe unnecessary now)
+    reset_cursor(); //NOTE: Have cursor maintain position after printing
 }
-
-
 
 /* NOTE:
  * Name: 
  * Purpose: 
  * Parameters:
  */
-void Sudoku::reset_cursor ()
-{
+void Sudoku::reset_cursor () {
     ::move(cursor_pos.first, cursor_pos.second);
 }
 
@@ -703,7 +602,7 @@ void Sudoku::reset_cursor ()
  * Purpose: 
  * Parameters:
  */
-bool Sudoku::evaluate() {
+bool Sudoku::evaluate () {
     return mat.evaluate();
 }
 
@@ -756,9 +655,7 @@ void Sudoku::save_game () {
  * Purpose: 
  * Parameters:
  */
-void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE)
-{
-    //Load and display the new or saved puzzle
+void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE) {
     printw(SAVED_PUZZLE);
     InGameMenu* in_game_menu;
     if (not USE_IN_GAME_MENU) {
@@ -777,14 +674,11 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
 
-    //const uint8_t KEY_ENTER = 10;   //NOTE: This is the Enter key on the main keyboard. The original
-    bool quit_game = false;         //      KEY_ENTER refers to the one on the number pad, but that 
-                                    //      one doesn't seem to work as expected anyway.
-    
+    bool quit_game = false;
     do {
         uint16_t input = getch();
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
-            quit_game = true;           //      to work. Not sure why.
+            quit_game = true;           //      to work as expected. Not sure why.
         }
         else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
             attron(COLOR_PAIR(MENU_SELECTION));
@@ -806,24 +700,10 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             save_game();
             reset_cursor();
         }
-        else if (input >= KEY_DOWN and input <= KEY_RIGHT) {
-            move(input);
-        }
-        else if (input >= ONE and input <= NINE) {
-            place_value(input);
-        }
-        else if (input == KEY_DC or input == KEY_BACKSPACE) {
-            place_value(input);
-        }
+        else if (input >= KEY_DOWN and input <= KEY_RIGHT)  move(input);
+        else if (input >= ONE and input <= NINE)            place_value(input);
+        else if (input == KEY_DC or input == KEY_BACKSPACE) place_value(input);
         else if (input == KEY_ENTER) {
-            #if false
-            uint8_t y = display_matrix_offset[cursor_pos].first,
-                    x = display_matrix_offset[cursor_pos].second;
-            ::mvprintw(20, 100, "    cursor_pos[%d][%d]: ", cursor_pos.first, cursor_pos.second);
-            ::mvprintw(21, 100, "display_matrix[%d][%d]: %d", y, x, display_matrix[y][x]);
-            refresh();
-            reset_cursor();
-            #endif
             if (evaluate()) {
                 //TODO: Delete the save file if resuming a game
                 string msg = "You win!";
@@ -843,7 +723,6 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
                 reset_cursor();
             }
         }
-        
     } while (!quit_game);
     
     if (USE_IN_GAME_MENU) delete in_game_menu;
