@@ -532,6 +532,8 @@ void Sudoku::clear_surrounding_cells () {
  *       In other words, the smarter way to go about this would be to just update the display
  *       matrix, and then have an update/refresh function that handles actually updating the display
  *       based on the display matrix. Whether that's worth doing at this point is debatable, though.
+ * 
+ * TODO: Change this to set_value to follow naming convention
  */
 void Sudoku::place_value (const uint16_t VALUE) {
     /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
@@ -551,21 +553,13 @@ void Sudoku::place_value (const uint16_t VALUE) {
     
     if (do_nothing()) reset_cursor();
     else {
-        //TODO: Make these const later
-        uint8_t y = display_matrix_offset[cursor_pos].first,
-                x = display_matrix_offset[cursor_pos].second;
+        const uint8_t Y = display_matrix_offset[cursor_pos].first,
+                      X = display_matrix_offset[cursor_pos].second;
                 
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-            //TODO: Make these const later?
-            uint8_t index = _rev_map_[display_matrix_offset[cursor_pos]],
-                    row_number = mat.map_row(index),
-                    column_number = mat.map_column(index);
-                    
-            Row &row = mat.get_row(row_number);
-            Column &column = mat.get_column(column_number);
-            Box &box = mat.get_box(mat.map_box(row_number, column_number));
+            const uint8_t INDEX = _rev_map_[display_matrix_offset[cursor_pos]];
             
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
@@ -573,10 +567,8 @@ void Sudoku::place_value (const uint16_t VALUE) {
                     mvprintw(cursor_pos.first, cursor_pos.second, "?");
                     attroff(COLOR_PAIR(UNKNOWN));
                     
-                    row.set_value(mat.get_row_index(index), '?');
-                    column.set_value(mat.get_column_index(index), '?');
-                    box.set_value(mat.get_box_index(index), '?');
-                    display_matrix[y][x] = '?';
+                    mat.set_value(INDEX, '?');
+                    display_matrix[Y][X] = '?';
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
             }
@@ -586,16 +578,13 @@ void Sudoku::place_value (const uint16_t VALUE) {
                 mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
                 attroff(COLOR_PAIR(GUESS));
                 
-                //TODO: Maybe put the next 3 lines in Grid.cpp
-                row.set_value(mat.get_row_index(index), VALUE);
-                column.set_value(mat.get_column_index(index), VALUE);
-                box.set_value(mat.get_box_index(index), VALUE);
-                display_matrix[y][x] = VALUE;
+                mat.set_value(INDEX, VALUE);
+                display_matrix[Y][X] = VALUE;
                 
                 #if DEBUG
-                    ::mvprintw(25, 40 + 20, "index: %d", index);
-                    ::mvprintw(26, 40 + 20, "row #: %d", row_number);
-                    ::mvprintw(27, 40 + 20, "col #: %d", column_number);
+                    ::mvprintw(25, 40 + 20, "index: %d", INDEX);
+                    ::mvprintw(26, 40 + 20, "row #: %d", mat.map_row(INDEX));
+                    ::mvprintw(27, 40 + 20, "col #: %d", mat.map_column(INDEX));
                 #endif
             }
 
@@ -612,7 +601,7 @@ void Sudoku::place_value (const uint16_t VALUE) {
                     else {
                         ::printw("row");
                     }
-                    mat.mvprintw(10, 40 + 20 * i, i & column, i & box);
+                    mat.mvprintw(cell {10, 40 + 20 * i}, i & column, i & box);
                     refresh();
                 }
 
@@ -622,7 +611,7 @@ void Sudoku::place_value (const uint16_t VALUE) {
         else {
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 ::printw(" ");
-                display_matrix[y][x] = ' ';
+                display_matrix[Y][X] = ' ';
             }
             else {
                 //TODO: Now that alternating colors seems to work, update the rest of the code appropriately to account for there being two candidate colors.
@@ -644,7 +633,7 @@ void Sudoku::place_value (const uint16_t VALUE) {
                 attroff(A_BOLD);
                 attroff(COLOR_PAIR(color_pair));
                 
-                display_matrix[y][x] = VALUE;
+                display_matrix[Y][X] = VALUE;
             }
         }
         refresh();
