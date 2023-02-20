@@ -36,7 +36,10 @@ struct SavedPuzzle {
     std::string filename;
 };
 
-//NOTE: Difficulty levels corresponding to the number of grid cells given.
+/* NOTE: Difficulty levels corresponding to the number of grid cells given. According to
+ *       https://www.101computing.net/sudoku-generator-algorithm/, the minimum amount of tiles that
+ *       need to be filled in in order to create a uniquely solvable puzzle is 17.
+ */
 enum class difficulty_level { EASY = 60, MEDIUM = 45, HARD = 30, EXPERT = 17 };
 
 #endif

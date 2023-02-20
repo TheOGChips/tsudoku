@@ -20,13 +20,7 @@ using namespace std;
  *                      user has selected to resume a saved game, this object will be read in
  *                      beforehand.
  */
-Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
-    //TODO: Move this note to the location where the difficulty setting is chosen
-    /* NOTE: According to https://www.101computing.net/sudoku-generator-algorithm/, the
-     *       minimum amount of tiles that need to be filled in in order to create a uniquely
-     *       solvable puzzle is 17 (this will later be HARD difficulty if diffuculty settings are
-     *       added later)
-     */
+Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {    
     create_map();
     set_color_pairs();  //NOTE: Establish color pairs for display matrix
     //TODO: Will need to account for signal handling
