@@ -19,7 +19,7 @@ using namespace std;
  *              variables.
  */
 Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
-    grid_map = this->create_map();
+    create_map();
     init_known_positions();
     set_starting_positions(GRID);
 }
@@ -32,7 +32,7 @@ Grid::Grid (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
  *      DIFF -> Enum value of difficulty level chosen by the user from the main menu.
  */
 Grid::Grid (const difficulty_level DIFF) {
-    grid_map = this->create_map();
+    create_map();
     init_known_positions();
     set_starting_positions(static_cast<uint8_t>(DIFF));
 }
@@ -611,14 +611,12 @@ uint8_t Grid::get_box_index (const uint8_t POS) {
  * Purpose: Creates a mapping of all 81 grid positions to a 9x9 matrix.
  * Parameters: None
  */
-map<uint8_t, cell> Grid::create_map () {
-    map<uint8_t, cell> m;
+void Grid::create_map () {
     for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
         for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
-            m[i * CONTAINER_SIZE + j] = cell(i, j);
+            grid_map[i * CONTAINER_SIZE + j] = cell(i, j);
         }
     }
-    return m;
 }
 
 /* NOTE:

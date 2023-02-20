@@ -34,7 +34,7 @@ class Grid {
         array<uint8_t, GRID_SIZE> generate_solved_puzzle (const time_t);
         void set_starting_positions (uint8_t);
         void set_starting_positions (const uint8_t[NUM_CONTAINERS][NUM_CONTAINERS]);
-        map<uint8_t, cell> create_map ();
+        void create_map ();
         bool solve (const uint8_t, const uint8_t, Row[NUM_CONTAINERS], Column[NUM_CONTAINERS],
                     Box[NUM_CONTAINERS]);
         uint8_t at (const uint8_t);
