@@ -278,7 +278,7 @@ bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINER
     bool soln;
     while (true) {  //NOTE: Doing it this way gets rid of a compiler warning
         if (available_pos.empty()) return false;                        //NOTE: STEP 3
-        
+        //TODO: See if set_value can also work in here
         const uint8_t ROW_NUMBER = map_row(available_pos.front()),
                       COLUMN_NUMBER = map_column(available_pos.front()),
                       BOX_NUMBER = BOX,
@@ -410,25 +410,8 @@ array<uint8_t, GRID_SIZE> Grid::generate_solved_puzzle (const time_t SEED) {
  */
 void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAINERS]) {
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
-        const uint8_t ROW_NUMBER = map_row(i),
-                      COLUMN_NUMBER = map_column(i),
-                      BOX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER),
-                      INDEX_ROW = get_row_index(i),
-                      INDEX_COLUMN = get_column_index(i),
-                      INDEX_BOX = get_box_index(i),
-                      VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
-                      
-        //NOTE: Check the row, column, and box for the value.
-        //NOTE: Why these require the ampersand, I'm not really sure.
-        Row &row = get_row(ROW_NUMBER);
-        Column &column = get_column(COLUMN_NUMBER);
-        Box &box = get_box(BOX_NUMBER);
-        
-        //NOTE: Add value from solved puzzle to empty puzzle
-        row.set_value(INDEX_ROW, VALUE);
-        column.set_value(INDEX_COLUMN, VALUE);
-        box.set_value(INDEX_BOX, VALUE);
-        
+        const uint8_t VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
+        set_value(i, VALUE);
         known_positions[i] = (VALUE == '?') ? false : true;
     }
 }
@@ -449,34 +432,9 @@ void Grid::set_starting_positions (const uint8_t NUM_POSITIONS) {
     shuffle(begin(positions), end(positions), mt19937(seed));
     
     for (uint8_t i = 0; i < NUM_POSITIONS; i++) {
-        uint8_t pos = positions[i],
-                value,
-                index_row,
-                index_column,
-                index_box;
-        
-        const uint8_t ROW_NUMBER = map_row(pos),
-                      COLUMN_NUMBER = map_column(pos),
-                      BOX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER);
-                      
-        //NOTE: Check the row, column, and box for the value.
-        //NOTE: Why these require the ampersand, I'm not really sure...
-        Row &row = get_row(ROW_NUMBER);
-        Column &column = get_column(COLUMN_NUMBER);
-        Box &box = get_box(BOX_NUMBER);
-
-        //NOTE: Get indeces for particular row, column, and box
-        index_row = get_row_index(pos);
-        index_column = get_column_index(pos);
-        index_box = get_box_index(pos);
-        
-        //NOTE: Add value from solved puzzle to empty puzzle
-        value = solved_puzzle[pos];
-        row.set_value(index_row, value);
-        column.set_value(index_column, value);
-        box.set_value(index_box, value);
-        
-        known_positions[pos] = true;
+        const uint8_t POS = positions[i];
+        set_value(POS, solved_puzzle[POS]);
+        known_positions[POS] = true;
 
         #if DEBUG
             clear();
@@ -604,6 +562,33 @@ uint8_t Grid::get_box_index (const uint8_t POS) {
     const uint8_t ROW = get_row_index(POS),
                   COLUMN = get_column_index (POS);
     return 3 * (COLUMN % 3) + ROW % 3;
+}
+
+/* NOTE:
+ * Name: set_value
+ * Purpose: Places a value into the correct position (row, column, and box) in the grid.
+ * Parameters:
+ *      POS -> The grid position 0-80 where the value will be placed.
+ *      VALUE -> The value to be placed in the grid.
+ */
+void Grid::set_value (const uint8_t POS, const uint8_t VALUE) {
+    const uint8_t ROW_NUMBER = map_row(POS),
+                  COLUMN_NUMBER = map_column(POS),
+                  BOX_NUMBER = map_box(ROW_NUMBER, COLUMN_NUMBER),
+                  INDEX_ROW = get_row_index(POS),
+                  INDEX_COLUMN = get_column_index(POS),
+                  INDEX_BOX = get_box_index(POS);
+                  
+    //NOTE: Check the row, column, and box for the value.
+    //NOTE: Why these require the ampersand, I'm not really sure...
+    Row &row = get_row(ROW_NUMBER);
+    Column &column = get_column(COLUMN_NUMBER);
+    Box &box = get_box(BOX_NUMBER);
+    
+    //NOTE: Add value from solved puzzle to empty puzzle
+    row.set_value(INDEX_ROW, VALUE);
+    column.set_value(INDEX_COLUMN, VALUE);
+    box.set_value(INDEX_BOX, VALUE);
 }
 
 /* NOTE:
