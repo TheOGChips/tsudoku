@@ -275,10 +275,15 @@ bool Grid::solve (const uint8_t BOX, const uint8_t VALUE, Row rows[NUM_CONTAINER
         }
     }
     
+    /* NOTE: set_value cannot be used here because the rows, columns, and boxes being used are not
+     *       the Grid's internal Containers. They belong to the solution matrix and are completely
+     *       separate. Interesting things happened when I tested that out before I realized why it
+     *       wouldn't work.
+     */
     bool soln;
     while (true) {  //NOTE: Doing it this way gets rid of a compiler warning
         if (available_pos.empty()) return false;                        //NOTE: STEP 3
-        //TODO: See if set_value can also work in here
+        
         const uint8_t ROW_NUMBER = map_row(available_pos.front()),
                       COLUMN_NUMBER = map_column(available_pos.front()),
                       BOX_NUMBER = BOX,
