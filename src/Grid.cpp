@@ -37,6 +37,7 @@ Grid::Grid (const difficulty_level DIFF) {
     set_starting_positions(static_cast<uint8_t>(DIFF));
 }
 
+#if DEBUG
 /* NOTE:
  * Name: printw
  * Purpose: Prints out current Grid contents at the current cursor location based on how they are
@@ -145,6 +146,7 @@ void Grid::mvprintw (const cell COORDS, const bool COLUMN_PRINTING, const bool B
         }
     }
 }
+#endif
 
 /* NOTE:
  * Name: get_box
