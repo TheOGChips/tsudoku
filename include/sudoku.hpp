@@ -51,6 +51,7 @@ class Sudoku {
         const cell ORIGIN = { ORIGINy, ORIGINx };
         cell cursor_pos;
         map<cell, cell> display_matrix_offset;
+        //TODO: neighbor_cells might be a better name for this
         enum border_positions { TL = 0, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS };
 
         void create_map ();
@@ -63,7 +64,7 @@ class Sudoku {
         void refresh ();
         uint16_t getch ();
         void clear ();
-        bool is_border (const uint8_t, const uint8_t);
+        bool is_box_border (const uint8_t, const uint8_t);
         array<cell, NUM_BORDER_POSITIONS> get_surrounding_cells ();
         bool do_nothing ();
         void clear_surrounding_cells ();

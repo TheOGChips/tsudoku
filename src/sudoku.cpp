@@ -362,7 +362,7 @@ void Sudoku::move (const uint16_t KEY) {
     switch (KEY) {
         case KEY_DOWN:
             if (cursor_pos.first < MAX_YBOUNDARY) {
-                if (is_border(cursor_pos.first + 1, cursor_pos.second)) {
+                if (is_box_border(cursor_pos.first + 1, cursor_pos.second)) {
                     ::move(cursor_pos.first + 2, cursor_pos.second);
                 }
                 else ::move(cursor_pos.first + 1, cursor_pos.second);
@@ -371,7 +371,7 @@ void Sudoku::move (const uint16_t KEY) {
             break;
         case KEY_UP:
             if (cursor_pos.first > ORIGIN.first) {
-                if (is_border(cursor_pos.first - 1, cursor_pos.second)) {
+                if (is_box_border(cursor_pos.first - 1, cursor_pos.second)) {
                     ::move(cursor_pos.first - 2, cursor_pos.second);
                 }
                 else ::move(cursor_pos.first - 1, cursor_pos.second);
@@ -380,7 +380,7 @@ void Sudoku::move (const uint16_t KEY) {
                 break;
         case KEY_LEFT:
             if (cursor_pos.second > ORIGIN.second) {
-                if (is_border(cursor_pos.first, cursor_pos.second - 1)) {
+                if (is_box_border(cursor_pos.first, cursor_pos.second - 1)) {
                     ::move(cursor_pos.first, cursor_pos.second - 2);
                 }
                 else ::move(cursor_pos.first, cursor_pos.second - 1);
@@ -389,7 +389,7 @@ void Sudoku::move (const uint16_t KEY) {
             break;
         case KEY_RIGHT:
             if (cursor_pos.second < MAX_XBOUNDARY) {
-                if (is_border(cursor_pos.first, cursor_pos.second + 1)) {
+                if (is_box_border(cursor_pos.first, cursor_pos.second + 1)) {
                     ::move(cursor_pos.first, cursor_pos.second + 2);
                 }
                 else ::move(cursor_pos.first, cursor_pos.second + 1);
@@ -436,7 +436,7 @@ void Sudoku::clear () {
 }
 
 /* NOTE:
- * Name: is_border
+ * Name: is_box_border
  * Purpose: Determines whether a cell contains a box border character. This is what enables the
  *          cursor to skip over such a cell when moving. Returns true if the character is either a
  *          '|' or '-'; false otherwise.
@@ -445,7 +445,7 @@ void Sudoku::clear () {
  *      XCOORD -> Column number of the cell to be checked.
  *      TODO: Actually using a cell object here might be a better idea
  */
-bool Sudoku::is_border (const uint8_t YCOORD, const uint8_t XCOORD) {
+bool Sudoku::is_box_border (const uint8_t YCOORD, const uint8_t XCOORD) {
     chtype ch = mvinch(YCOORD, XCOORD);
     return ((ch == '|') | (ch == '-'));
 }
