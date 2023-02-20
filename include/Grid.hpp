@@ -54,8 +54,8 @@ class Grid {
         uint8_t get_row_index (const uint8_t);
         uint8_t get_column_index (const uint8_t);
         uint8_t get_box_index (const uint8_t);
-        void mvprintw (const uint8_t, const uint8_t, const bool, const bool);   //put under DEBUG
-        void printw (const bool, const bool);   //put under DEBUG
+        void mvprintw (const cell, const bool, const bool);   //TODO: put under DEBUG
+        void printw (const bool, const bool);   //TODO: put under DEBUG
         const cell get_position (const uint8_t);
         uint8_t get_map_size () const;
         uint8_t operator [] (const uint8_t);

@@ -50,7 +50,7 @@ void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
     uint8_t y,
             x;
     getyx(stdscr, y, x);
-    mvprintw(y, x, COLUMN_PRINTING, BOX_PRINTING);
+    mvprintw(cell {y, x}, COLUMN_PRINTING, BOX_PRINTING);
 }
 
 /* NOTE:
@@ -59,14 +59,11 @@ void Grid::printw (const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
  *          stored as either Rows, Columns, or Boxes. This is a wrapper for NCurses's printw
  *          function.
  * Parameters:
- *      YCOORD -> Line where cursor is moved to before printing.
- *      XCOORD -> Column where cursor is moved to before printing.
- *      TODO: Actually using a cell object here might be a better idea
+ *      COORDS -> Cell (line, column) where cursor is moved to before printing.
  *      COLUMN_PRINTING -> Boolean informing whether to print using Columns.
  *      BOX_PRINTING -> Boolean informing whether to print using Boxes.
  */
-void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLUMN_PRINTING,
-                     const bool BOX_PRINTING) {
+void Grid::mvprintw (const cell COORDS, const bool COLUMN_PRINTING, const bool BOX_PRINTING) {
     /*  NOTE: (i,j) mapping of sudoku grid
      * 
      *        NUMBERED (ROW x COLUMN)
@@ -82,8 +79,8 @@ void Grid::mvprintw (const uint8_t YCOORD, const uint8_t XCOORD, const bool COLU
      *    63 64 65 | 73 74 75 | 83 84 85
      *    66 67 68 | 76 77 78 | 86 87 88
      */
-    uint8_t y = YCOORD,
-            x = XCOORD;
+    uint8_t y = COORDS.first,
+            x = COORDS.second;
 
     if (BOX_PRINTING) {   //NOTE: For printing from a box
         for (uint8_t i = 0; i < CONTAINER_SIZE; i += 3) {
