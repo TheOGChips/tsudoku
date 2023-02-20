@@ -513,7 +513,7 @@ void Sudoku::clear_surrounding_cells () {
 }
 
 /* NOTE:
- * Name: place_value
+ * Name: set_value
  * Purpose: Places or removes a value in the display matrix with the appropriate coloring if the
  *          cursor's current position is a valid cell for input. The appropriate Row, Column, and
  *          Box from the internal Grid member is updated with the value if the cursor's position is
@@ -532,10 +532,8 @@ void Sudoku::clear_surrounding_cells () {
  *       In other words, the smarter way to go about this would be to just update the display
  *       matrix, and then have an update/refresh function that handles actually updating the display
  *       based on the display matrix. Whether that's worth doing at this point is debatable, though.
- * 
- * TODO: Change this to set_value to follow naming convention
  */
-void Sudoku::place_value (const uint16_t VALUE) {
+void Sudoku::set_value (const uint16_t VALUE) {
     /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
      * 
      * if value is red (starting value)
@@ -777,8 +775,8 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             reset_cursor();
         }
         else if (input >= KEY_DOWN and input <= KEY_RIGHT)  move(input);
-        else if (input >= ONE and input <= NINE)            place_value(input);
-        else if (input == KEY_DC or input == KEY_BACKSPACE) place_value(input);
+        else if (input >= ONE and input <= NINE)            set_value(input);
+        else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {
             if (evaluate()) {
                 //TODO: Delete the save file if resuming a game
