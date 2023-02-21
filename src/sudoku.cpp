@@ -150,7 +150,6 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
                 display_matrix[i][j] = ' ';
             }
         }
-        //TODO: Retrieve difficulty level and send to Grid somehow
         DifficultyMenu diff_menu;
         diff_menu.menu();
         
@@ -257,7 +256,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     #endif
     
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
-        move(i, 0); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
+        move(cell {i, 0}); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
             map_display_matrix_offset(cell {i, j});
             
@@ -303,7 +302,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     if (not SAVED_PUZZLE) {
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
-            move(coords.first, coords.second);
+            move(coords);
             
             if (mat.is_known(i)) {
                 attron(COLOR_PAIR(GIVEN));
@@ -325,13 +324,11 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
  *          from Sudoku::printw. This is necessary so that the the display matrix offset can be
  *          mapped correctly. This has the same parameter prototype as NCurses's printw.
  * Parameters:
- *      YCOORD -> Pre-offset display line number.
- *      XCOORD -> Pre-offset display column number.
- *      TODO: Actually using a cell object here might be a better idea
+ *      COORDS -> Pre-offset display line and column numbers.
  */
-void Sudoku::move (const uint8_t YCOORD, const uint8_t XCOORD) {
-    const uint8_t TOTAL_OFFSETY = YCOORD + ORIGIN.first  + (YCOORD / CONTAINER_SIZE),
-                  TOTAL_OFFSETX = XCOORD + ORIGIN.second + (XCOORD / CONTAINER_SIZE);
+void Sudoku::move (const cell COORDS) {
+    const uint8_t TOTAL_OFFSETY = COORDS.first + ORIGIN.first  + (COORDS.first / CONTAINER_SIZE),
+                  TOTAL_OFFSETX = COORDS.second + ORIGIN.second + (COORDS.second / CONTAINER_SIZE);
 
     ::move(TOTAL_OFFSETY, TOTAL_OFFSETX);
     getyx(stdscr, cursor_pos.first, cursor_pos.second); //NOTE: Update cursor_pos after moving

@@ -59,7 +59,7 @@ class Sudoku {
         void set_color_pairs ();
         void init_display_matrix (const SavedPuzzle*);
         void printw (const SavedPuzzle*);
-        void move (const uint8_t, const uint8_t);
+        void move (const cell);
         void move (const uint16_t);
         void refresh ();
         uint16_t getch ();
