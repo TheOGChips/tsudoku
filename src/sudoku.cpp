@@ -55,20 +55,17 @@ void Sudoku::create_map () {
  *          screen. A call to this function is made for one cell at a time during the initial
  *          printing of the display matrix to the screen.
  * Parameters:
- *      YINDEX -> Display line number.
- *      XINDEX -> Display column number.
- *      TODO: Actually using a cell object here might be a better idea
+ *      DISPLAY_INDECES -> Cell object containing the display line and display column number.
  * 
  * NOTE: This looks like it doesn't work as expected, but the use of the overloaded Sudoku::move in
  *       printw takes care of applying the offset before this function is called.
  */
-void Sudoku::map_display_matrix_offset (const uint8_t YINDEX, const uint8_t XINDEX) {
+void Sudoku::map_display_matrix_offset (const cell DISPLAY_INDECES) {
     uint8_t y,
             x;
     getyx(stdscr, y, x);
-    cell display_indeces = {YINDEX, XINDEX},
-         coords = {y, x};
-    display_matrix_offset[coords] = display_indeces;
+    cell coords = {y, x};
+    display_matrix_offset[coords] = DISPLAY_INDECES;
 }
 
 /* NOTE:
@@ -262,7 +259,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(i, 0); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
-            map_display_matrix_offset(i, j);
+            map_display_matrix_offset(cell {i, j});
             
             uint8_t color_pair;
             if (SAVED_PUZZLE) {

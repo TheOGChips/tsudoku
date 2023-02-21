@@ -55,7 +55,7 @@ class Sudoku {
         enum border_positions { TL = 0, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS };
 
         void create_map ();
-        void map_display_matrix_offset (const uint8_t, const uint8_t);
+        void map_display_matrix_offset (const cell);
         void set_color_pairs ();
         void init_display_matrix (const SavedPuzzle*);
         void printw (const SavedPuzzle*);
