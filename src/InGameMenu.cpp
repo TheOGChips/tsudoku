@@ -139,8 +139,8 @@ void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
 }
 
 string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
-    const uint8_t NAME_SIZE = 16;
-    char name[NAME_SIZE];
+    const uint8_t NAME_SIZE = 18;   //NOTE: NAME_SIZE limited by window width requirements of no
+    char name[NAME_SIZE];           //      in-game menu mode
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
