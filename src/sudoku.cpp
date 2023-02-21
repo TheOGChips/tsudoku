@@ -23,7 +23,7 @@ using namespace std;
 Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {    
     create_map();
     set_color_pairs();  //NOTE: Establish color pairs for display matrix
-    //TODO: Will need to account for signal handling
+    //TODO: Will need to account for signal handling (will need to account across multiple files)
     init_display_matrix(SAVED_PUZZLE);
 }
 
@@ -258,6 +258,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(cell {i, 0}); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
+            //TODO: This should be moved around so that it's not done on every call to update the display. Maybe have a second printw function with no args that actually does the printing?
             map_display_matrix_offset(cell {i, j});
             
             uint8_t color_pair;
@@ -299,6 +300,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
         }
     }
     
+    //TODO: Look into this again to see if it's redundant (i.e. not needed)
     if (not SAVED_PUZZLE) {
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
@@ -397,6 +399,7 @@ void Sudoku::move (const uint16_t KEY) {
  * Parameters: None
  */
 void Sudoku::refresh () {
+    //TODO: Call to printw here to update display before refreshing
     ::refresh();
 }
 
@@ -771,16 +774,13 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         else if (input >= KEY_DOWN and input <= KEY_RIGHT)  move(input);
         else if (input >= ONE and input <= NINE)            set_value(input);
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
-        else if (input == KEY_ENTER) {
-            const uint8_t 
-                          CENTERING = 14;   //NOTE: # columns to shift result output "centered"
-                          
+        else if (input == KEY_ENTER) {                          
             curs_set(false);
-            //TODO: Add "Result: " string before displaying result (always stay printed?)
+            ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, ORIGIN.second,
+                       "Result: ");
             if (evaluate()) {
                 string msg = "You win!";
-                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, CENTERING, "%s",
-                           msg.c_str());
+                ::printw("%s", msg.c_str());
                 clrtoeol();
                 refresh();
                 increment_completed_games();
@@ -791,8 +791,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             }
             else {
                 string msg = "Puzzle incomplete!";
-                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, CENTERING, "%s",
-                           msg.c_str());
+                ::printw("%s", msg.c_str());
                 refresh();
                 this_thread::sleep_for(chrono::seconds(DELAY));
                 ::move(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, 0);
