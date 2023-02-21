@@ -738,6 +738,7 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work as expected. Not sure why.
         }
+        //TODO: Move where these 'hotkey' action menus are displayed
         else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - 1, 0, "m -> return to game");
@@ -761,23 +762,34 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         else if (input >= ONE and input <= NINE)            set_value(input);
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {
+            const uint8_t DELAY = 2,        //NOTE: # seconds to delay after printing out results
+                          LINE_OFFSET_TWEAK = 3, //NOTE: # lines to get result output correct
+                          CENTERING = 14;   //NOTE: # columns to shift result output "centered"
+                          
+            curs_set(false);
             if (evaluate()) {
                 string msg = "You win!";
-                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + 4, 14, "%s", msg.c_str());
+                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, CENTERING, "%s",
+                           msg.c_str());
                 clrtoeol();
                 refresh();
                 increment_completed_games();
                 quit_game = true;
-                this_thread::sleep_for(chrono::seconds(2));
+                this_thread::sleep_for(chrono::seconds(DELAY));
                 
                 if (SAVED_PUZZLE) filesystem::remove(SAVED_PUZZLE->filename);
             }
             else {
-                string msg = "Puzzle incomplete!";  //TODO: Remove this result display after a delay
-                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + 4, 14, "%s", msg.c_str());
+                string msg = "Puzzle incomplete!";
+                ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, CENTERING, "%s",
+                           msg.c_str());
                 refresh();
+                this_thread::sleep_for(chrono::seconds(DELAY));
+                ::move(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, 0);
+                clrtoeol();
                 reset_cursor();
             }
+            curs_set(true);
         }
     } while (!quit_game);
     
