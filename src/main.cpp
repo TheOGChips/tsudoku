@@ -1,7 +1,7 @@
 #include <ncurses.h>    //NOTE: NCurses is included first in all the files here so that the KEY_ENTER
 #include "MainMenu.hpp" //      redefinition in values.hpp persists across files the way I wanted.
 #include "SavedGameMenu.hpp"
-#include "sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
+#include "Sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
                         //      this file; however, there don't appear to be any for some reason.
 #include <filesystem>   //filesystem::create_directory, filesystem::exists
 #include <fstream>      //std::ofstream, std::ifstream

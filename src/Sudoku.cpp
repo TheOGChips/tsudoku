@@ -1,5 +1,5 @@
 #include <ncurses.h>
-#include "sudoku.hpp"
+#include "Sudoku.hpp"
 #include "colors.hpp"
 #include <cctype>
 #include <thread>
