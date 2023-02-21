@@ -45,7 +45,7 @@ using namespace std;
 class Sudoku {
     private:
         uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
-        Grid mat;   //TODO: Change this name to grid
+        Grid grid;
         map<uint8_t, cell> _map_;   //TODO: Change this to grid2display_map
         map<cell, uint8_t> _rev_map_; //TODO: Change this to display2grid_map
         const cell ORIGIN = { ORIGINy, ORIGINx };

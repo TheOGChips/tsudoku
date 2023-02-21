@@ -153,7 +153,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
         DifficultyMenu diff_menu;
         diff_menu.menu();
         
-        mat = Grid(diff_menu.get_difficulty_level());
+        this->grid = Grid(diff_menu.get_difficulty_level());
         /* NOTE: This call to create_map() actually works as originally intended, but the
          *       constructor call is currently used because of the catch-22 that occurs when
          *       resuming a game.
@@ -161,7 +161,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
         //create_map();
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
-            display_matrix[coords.first][coords.second] = mat[i];
+            display_matrix[coords.first][coords.second] = this->grid[i];
         }
     }
     else {
@@ -191,18 +191,19 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
             refresh();
             getch();
         #endif
-        mat = Grid(grid);
+        this->grid = Grid(grid);
         /* NOTE: This call to create_map() currently fails if run here. There's a sort of catch-22
-         *       where (to work as intended) the grid passed to mat needs _map_ to be filled, but
-         *       _map_ also needs mat to be filled.
+         *       where (to work as intended) the grid passed to grid needs _map_ to be filled, but
+         *       _map_ also needs grid to be filled.
          */
         //create_map();
     }
     
     #if DEBUG
         ::printw("Printing mapping...\n");
-        for (uint8_t i = 0; i < mat.get_map_size(); i++) {
-            ::printw("m[%u]: (%u, %u)", i, mat.get_position(i).first, mat.get_position(i).second);
+        for (uint8_t i = 0; i < this->grid.get_map_size(); i++) {
+            ::printw("m[%u]: (%u, %u)", i, this->grid.get_position(i).first,
+                     this->grid.get_position(i).second);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
@@ -233,7 +234,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
             else {
                 ::printw("row...\n");
             }
-            mat.printw(i & column, i & box);
+            this->grid.printw(i & column, i & box);
             refresh();
             getch();
             clear();
@@ -258,7 +259,6 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(cell {i, 0}); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
         for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
-            //TODO: This should be moved around so that it's not done on every call to update the display. Maybe have a second printw function with no args that actually does the printing?
             map_display_matrix_offset(cell {i, j});
             
             uint8_t color_pair;
@@ -300,13 +300,12 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
         }
     }
     
-    //TODO: Look into this again to see if it's redundant (i.e. not needed)
     if (not SAVED_PUZZLE) {
         for (uint8_t i = 0; i < _map_.size(); i++) {
             cell coords = _map_[i];
             move(coords);
             
-            if (mat.is_known(i)) {
+            if (grid.is_known(i)) {
                 attron(COLOR_PAIR(GIVEN));
                 ::printw("%c", display_matrix[coords.first][coords.second]);
                 attroff(COLOR_PAIR(GIVEN));
@@ -399,7 +398,6 @@ void Sudoku::move (const uint16_t KEY) {
  * Parameters: None
  */
 void Sudoku::refresh () {
-    //TODO: Call to printw here to update display before refreshing
     ::refresh();
 }
 
@@ -511,7 +509,7 @@ void Sudoku::clear_surrounding_cells () {
  *               Column, and Box of this game's Grid member variable. If the value corresponds to
  *               that of the Delete or Backspace keys, this function performs a removal instead.
  * 
- * TODO: I've noticed that probably a more preferred way this should work would be to just update
+ * NOTE: I've noticed that probably a more preferred way this should work would be to just update
  *       the display matrix and then call a generic update/refresh function that updates the display
  *       instead of having individual printw lines here. This way does only update the specific
  *       cells and is potentially more efficient (the simplest way to implement the proposed method
@@ -519,7 +517,8 @@ void Sudoku::clear_surrounding_cells () {
  *       implementation also doesn't take advantage of having the display matrix also being updated.
  *       In other words, the smarter way to go about this would be to just update the display
  *       matrix, and then have an update/refresh function that handles actually updating the display
- *       based on the display matrix. Whether that's worth doing at this point is debatable, though.
+ *       based on the display matrix. However, at this point I don't think it's worth doing after
+ *       seeing some of the minute things that would need to be adjusted just to accommodate that.
  */
 void Sudoku::set_value (const uint16_t VALUE) {
     /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
@@ -553,7 +552,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                     mvprintw(cursor_pos.first, cursor_pos.second, "?");
                     attroff(COLOR_PAIR(UNKNOWN));
                     
-                    mat.set_value(INDEX, '?');
+                    grid.set_value(INDEX, '?');
                     display_matrix[Y][X] = '?';
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
@@ -564,13 +563,13 @@ void Sudoku::set_value (const uint16_t VALUE) {
                 mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
                 attroff(COLOR_PAIR(GUESS));
                 
-                mat.set_value(INDEX, VALUE);
+                grid.set_value(INDEX, VALUE);
                 display_matrix[Y][X] = VALUE;
                 
                 #if DEBUG
                     ::mvprintw(25, 40 + 20, "index: %d", INDEX);
-                    ::mvprintw(26, 40 + 20, "row #: %d", mat.map_row(INDEX));
-                    ::mvprintw(27, 40 + 20, "col #: %d", mat.map_column(INDEX));
+                    ::mvprintw(26, 40 + 20, "row #: %d", grid.map_row(INDEX));
+                    ::mvprintw(27, 40 + 20, "col #: %d", grid.map_column(INDEX));
                 #endif
             }
 
@@ -587,7 +586,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                     else {
                         ::printw("row");
                     }
-                    mat.mvprintw(cell {10, 40 + 20 * i}, i & column, i & box);
+                    grid.mvprintw(cell {10, 40 + 20 * i}, i & column, i & box);
                     refresh();
                 }
 
@@ -607,7 +606,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                     if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or
                         (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
                         color_pair = (_rev_map_[display_matrix_offset[border[i]]] % 2) ?
-                                     CANDIDATES_B : CANDIDATES_Y;
+                                      CANDIDATES_B : CANDIDATES_Y;
                     }
                 }
                 reset_cursor();
@@ -645,7 +644,7 @@ void Sudoku::reset_cursor () {
  * Parameters: None
  */
 bool Sudoku::evaluate () {
-    return mat.evaluate();
+    return grid.evaluate();
 }
 
 /* NOTE:
