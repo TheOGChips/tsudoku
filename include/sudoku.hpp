@@ -39,7 +39,7 @@ using namespace std;
  *                               positions displayed in the terminal window. This makes the math
  *                               behind making position-related changes easier. display_matrix[0][0]
  *                               is mapped to the ORIGIN and so forth.
- *      border_positions -> Enumeration of shorthand constants used when retrieving a cell's 8
+ *      neighbor_cells -> Enumeration of shorthand constants used when retrieving a cell's 8
  *                          surrounding (i.e. border) cells along with a constant for the number of
  *                          border positions.
  */
@@ -52,8 +52,7 @@ class Sudoku {
         const cell ORIGIN = { ORIGINy, ORIGINx };
         cell cursor_pos;
         map<cell, cell> display_matrix_offset;
-        //TODO: neighbor_cells might be a better name for this
-        enum border_positions { TL = 0, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS };
+        enum neighbor_cells { TL = 0, T, TR, L, R, BL, B, BR, NUM_BORDER_POSITIONS };
 
         void create_map ();
         void map_display_matrix_offset (const cell);
