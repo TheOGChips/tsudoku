@@ -64,7 +64,7 @@ class Sudoku {
         void refresh ();
         uint16_t getch ();
         void clear ();
-        bool is_box_border (const uint8_t, const uint8_t);
+        bool is_box_border (const cell);
         array<cell, NUM_BORDER_POSITIONS> get_surrounding_cells ();
         bool do_nothing ();
         void clear_surrounding_cells ();
