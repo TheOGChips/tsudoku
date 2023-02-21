@@ -92,9 +92,9 @@ void Sudoku::set_color_pairs () {
     }
     else {  //NOTE: Monochrome mode
         init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(GIVEN, COLOR_WHITE, COLOR_BLACK);
-        init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);  //TODO: Reverse the coloring for either
-        init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);  //      the candidate or guess cells.
+        init_pair(GIVEN, COLOR_BLACK, COLOR_WHITE); //NOTE: Reversed to better stand out
+        init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
+        init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
         init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
     }
 }
