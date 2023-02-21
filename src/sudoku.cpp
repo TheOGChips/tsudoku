@@ -40,7 +40,7 @@ void Sudoku::create_map () {
 
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
         grid2display_map[i] = cell(row, column);
-        _rev_map_[cell(row, column)] = i;
+        display2grid_map[cell(row, column)] = i;
         column += 3;
         if (column / DISPLAY_MATRIX_COLUMNS) {
             column %= DISPLAY_MATRIX_COLUMNS;
@@ -212,9 +212,9 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
-        for (uint8_t i = 0; i < _rev_map_.size(); i++) {
+        for (uint8_t i = 0; i < display2grid_map.size(); i++) {
             ::printw("rm[(%u, %u)]:\t%u", grid2display_map[i].first, grid2display_map[i].second,
-                     _rev_map_[grid2display_map[i]]);
+                     display2grid_map[grid2display_map[i]]);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         refresh();
@@ -545,7 +545,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
         reset_cursor();
         chtype ch = inch();
         if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-            const uint8_t INDEX = _rev_map_[display_matrix_offset[cursor_pos]];
+            const uint8_t INDEX = display2grid_map[display_matrix_offset[cursor_pos]];
             
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
@@ -606,7 +606,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                     chtype ch = mvinch(border[i].first, border[i].second);
                     if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN) or
                         (ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-                        color_pair = (_rev_map_[display_matrix_offset[border[i]]] % 2) ?
+                        color_pair = (display2grid_map[display_matrix_offset[border[i]]] % 2) ?
                                       CANDIDATES_B : CANDIDATES_Y;
                     }
                 }

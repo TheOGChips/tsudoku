@@ -21,7 +21,7 @@ using namespace std;
  *      grid -> Grid object representing just the 81 cells of a sudoku board.
  *      grid2display_map -> Mapping of 81 positions of a grid to their (y, x) coordinates in the
  *                          display matrix.
- *      _rev_map_ -> Reverse mapping of _map_.
+ *      display2grid_map -> Reverse mapping of _map_.
  *      ORIGIN -> Starting cell of the display matrix's (0, 0) position on the actual terminal
  *                window. This is effectively the row and column offset from the top left cell of the
  *                terminal and also controls the size of the buffers from the edges of the terminal
@@ -48,7 +48,7 @@ class Sudoku {
         uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         Grid grid;
         map<uint8_t, cell> grid2display_map;
-        map<cell, uint8_t> _rev_map_; //TODO: Change this to display2grid_map
+        map<cell, uint8_t> display2grid_map;
         const cell ORIGIN = { ORIGINy, ORIGINx };
         cell cursor_pos;
         map<cell, cell> display_matrix_offset;
