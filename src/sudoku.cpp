@@ -491,10 +491,9 @@ void Sudoku::clear_surrounding_cells () {
     array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
     for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
         mvprintw(border[i].first, border[i].second, " ");
-        //TODO: Make these const later
-        uint8_t y = display_matrix_offset[border[i]].first,
-                x = display_matrix_offset[border[i]].second;
-        display_matrix[y][x] = ' ';
+        const uint8_t Y = display_matrix_offset[border[i]].first,
+                      X = display_matrix_offset[border[i]].second;
+        display_matrix[Y][X] = ' ';
     }
 }
 
