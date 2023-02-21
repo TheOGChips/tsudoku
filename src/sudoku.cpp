@@ -39,7 +39,7 @@ void Sudoku::create_map () {
             column = 1;
 
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
-        _map_[i] = cell(row, column);
+        grid2display_map[i] = cell(row, column);
         _rev_map_[cell(row, column)] = i;
         column += 3;
         if (column / DISPLAY_MATRIX_COLUMNS) {
@@ -159,8 +159,8 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
          *       resuming a game.
          */
         //create_map();
-        for (uint8_t i = 0; i < _map_.size(); i++) {
-            cell coords = _map_[i];
+        for (uint8_t i = 0; i < grid2display_map.size(); i++) {
+            cell coords = grid2display_map[i];
             display_matrix[coords.first][coords.second] = this->grid[i];
         }
     }
@@ -174,7 +174,7 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
         uint8_t grid[NUM_CONTAINERS][NUM_CONTAINERS] = {};
         for (uint8_t i = 0; i < NUM_CONTAINERS; i++) {
             for (uint8_t j = 0; j < NUM_CONTAINERS; j++) {
-                cell coords = _map_[i*CONTAINER_SIZE + j];
+                cell coords = grid2display_map[i*CONTAINER_SIZE + j];
                 grid[i][j] = SAVED_PUZZLE->puzzle[coords.first][coords.second];
             }
         }
@@ -193,8 +193,8 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
         #endif
         this->grid = Grid(grid);
         /* NOTE: This call to create_map() currently fails if run here. There's a sort of catch-22
-         *       where (to work as intended) the grid passed to grid needs _map_ to be filled, but
-         *       _map_ also needs grid to be filled.
+         *       where (to work as intended) the grid passed to grid needs grid2display_map to be
+         *       filled, but grid2display_map also needs grid to be filled.
          */
         //create_map();
     }
@@ -207,13 +207,14 @@ void Sudoku::init_display_matrix(const SavedPuzzle* SAVED_PUZZLE) {
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
-        for (uint8_t i = 0; i < _map_.size(); i++) {
-            ::printw("m[%u]: (%u, %u)", i, _map_[i].first, _map_[i].second);
+        for (uint8_t i = 0; i < grid2display_map.size(); i++) {
+            ::printw("m[%u]: (%u, %u)", i, grid2display_map[i].first, grid2display_map[i].second);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         ::printw("\n\n");
         for (uint8_t i = 0; i < _rev_map_.size(); i++) {
-            ::printw("rm[(%u, %u)]:\t%u", _map_[i].first, _map_[i].second, _rev_map_[_map_[i]]);
+            ::printw("rm[(%u, %u)]:\t%u", grid2display_map[i].first, grid2display_map[i].second,
+                     _rev_map_[grid2display_map[i]]);
             (i+1) % NUM_CONTAINERS ? ::printw("\t") : ::printw("\n");
         }
         refresh();
@@ -301,8 +302,8 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     }
     
     if (not SAVED_PUZZLE) {
-        for (uint8_t i = 0; i < _map_.size(); i++) {
-            cell coords = _map_[i];
+        for (uint8_t i = 0; i < grid2display_map.size(); i++) {
+            cell coords = grid2display_map[i];
             move(coords);
             
             if (grid.is_known(i)) {
