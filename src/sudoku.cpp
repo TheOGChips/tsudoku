@@ -678,8 +678,7 @@ void Sudoku::increment_completed_games () {
  * Parameters: None
  */
 void Sudoku::save_game () {
-    //TODO: Fix the display here
-    const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 4;
+    const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 3;
     
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
@@ -696,6 +695,7 @@ void Sudoku::save_game () {
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
     mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
+    //TODO: Consider clearing this output as well after a delay
 }
 
 /* NOTE:
