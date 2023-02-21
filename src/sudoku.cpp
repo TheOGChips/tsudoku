@@ -677,7 +677,7 @@ void Sudoku::increment_completed_games () {
  *          when the in-game menu is disabled.
  * Parameters: None
  */
-void Sudoku::save_game () {
+void Sudoku::save_game (const uint8_t DELAY) {
     const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 3;
     
     ::move(DISPLAY_LINE, 1);
@@ -694,8 +694,15 @@ void Sudoku::save_game () {
     const string NAME = InGameMenu::save_game(display_matrix);
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
+    curs_set(false);    //NOTE: Turn off cursor while displaying
     mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
-    //TODO: Consider clearing this output as well after a delay
+    refresh();
+    
+    //NOTE: Clear output after a delay
+    this_thread::sleep_for(chrono::seconds(DELAY));
+    ::move(DISPLAY_LINE, 0);
+    clrtoeol();
+    curs_set(true); //NOTE: Turn cursor back on before returning to the game
 }
 
 /* NOTE:
@@ -717,7 +724,9 @@ void Sudoku::save_game () {
 void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE) {
     printw(SAVED_PUZZLE);
     InGameMenu* in_game_menu;
-    const uint8_t LINE_OFFSET_TWEAK = 3;    //NOTE: # lines to get display output correct
+    const uint8_t LINE_OFFSET_TWEAK = 3,    //NOTE: # lines to get display output correct
+                  DELAY = 2;                //NOTE: # seconds to delay after printing out results
+                  
     if (not USE_IN_GAME_MENU) {
         in_game_menu = nullptr;
         attron(COLOR_PAIR(MENU_SELECTION));
@@ -756,14 +765,14 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             reset_cursor();
         }
         else if (tolower(input) == 's' and not USE_IN_GAME_MENU) {
-            save_game();
+            save_game(DELAY);
             reset_cursor();
         }
         else if (input >= KEY_DOWN and input <= KEY_RIGHT)  move(input);
         else if (input >= ONE and input <= NINE)            set_value(input);
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {
-            const uint8_t DELAY = 2,        //NOTE: # seconds to delay after printing out results
+            const uint8_t 
                           CENTERING = 14;   //NOTE: # columns to shift result output "centered"
                           
             curs_set(false);

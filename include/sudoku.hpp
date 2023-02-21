@@ -72,7 +72,7 @@ class Sudoku {
         void reset_cursor ();
         bool evaluate ();
         void increment_completed_games ();
-        void save_game ();
+        void save_game (const uint8_t);
         
     public:
         Sudoku (const SavedPuzzle*);
