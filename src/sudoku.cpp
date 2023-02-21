@@ -597,7 +597,6 @@ void Sudoku::set_value (const uint16_t VALUE) {
                 display_matrix[Y][X] = ' ';
             }
             else {
-                //TODO: Now that alternating colors seems to work, update the rest of the code appropriately to account for there being two candidate colors.
                 array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
                 uint8_t color_pair;
                 for (uint8_t i = TL; i < NUM_BORDER_POSITIONS; i++) {
@@ -754,7 +753,6 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             
             reset_cursor();
         }
-        //TODO: Add option for 's' when no in-game menu
         else if (tolower(input) == 's' and not USE_IN_GAME_MENU) {
             save_game();
             reset_cursor();
@@ -764,7 +762,6 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {
             if (evaluate()) {
-                //TODO: Delete the save file if resuming a game
                 string msg = "You win!";
                 ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + 4, 14, "%s", msg.c_str());
                 clrtoeol();
