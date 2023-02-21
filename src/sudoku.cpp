@@ -678,6 +678,7 @@ void Sudoku::increment_completed_games () {
  * Parameters: None
  */
 void Sudoku::save_game () {
+    //TODO: Fix the display here
     const uint8_t DISPLAY_LINE = ORIGIN.first + DISPLAY_MATRIX_ROWS + 4;
     
     ::move(DISPLAY_LINE, 1);
@@ -716,16 +717,17 @@ void Sudoku::save_game () {
 void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE) {
     printw(SAVED_PUZZLE);
     InGameMenu* in_game_menu;
+    const uint8_t LINE_OFFSET_TWEAK = 3;    //NOTE: # lines to get display output correct
     if (not USE_IN_GAME_MENU) {
         in_game_menu = nullptr;
         attron(COLOR_PAIR(MENU_SELECTION));
-        ::mvprintw(getmaxy(stdscr) - 1, 0, "s -> save game");
+        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "s -> save game");
         attroff(COLOR_PAIR(MENU_SELECTION));
     }
     else {
         in_game_menu = new InGameMenu(display_matrix);
         attron(COLOR_PAIR(MENU_SELECTION));
-        ::mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
+        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
         attroff(COLOR_PAIR(MENU_SELECTION));
     }
     ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
@@ -738,17 +740,16 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work as expected. Not sure why.
         }
-        //TODO: Move where these 'hotkey' action menus are displayed
         else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
             attron(COLOR_PAIR(MENU_SELECTION));
-            mvprintw(getmaxy(stdscr) - 1, 0, "m -> return to game");
+            mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> return to game");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
             in_game_menu->menu();
             
             attron(COLOR_PAIR(MENU_SELECTION));
-            mvprintw(getmaxy(stdscr) - 1, 0, "m -> in-game menu");
+            mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
@@ -763,10 +764,10 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {
             const uint8_t DELAY = 2,        //NOTE: # seconds to delay after printing out results
-                          LINE_OFFSET_TWEAK = 3, //NOTE: # lines to get result output correct
                           CENTERING = 14;   //NOTE: # columns to shift result output "centered"
                           
             curs_set(false);
+            //TODO: Add "Result: " string before displaying result (always stay printed?)
             if (evaluate()) {
                 string msg = "You win!";
                 ::mvprintw(ORIGIN.first + DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK, CENTERING, "%s",
