@@ -12,14 +12,17 @@ using namespace std;
  */
 difficulty_level operator ++ (difficulty_level& diff, int) {
     switch (diff) {
-        case difficulty_level::EASY: diff = difficulty_level::MEDIUM;
-                                     break;
+        case difficulty_level::EASY:
+            diff = difficulty_level::MEDIUM;
+            break;
                                      
-        case difficulty_level::MEDIUM: diff = difficulty_level::HARD;
-                                       break;
+        case difficulty_level::MEDIUM:
+            diff = difficulty_level::HARD;
+            break;
                                        
-        case difficulty_level::HARD: diff = difficulty_level::EXPERT;
-                                     break;
+        case difficulty_level::HARD:
+            diff = difficulty_level::EXPERT;
+            break;
                                      
         default: diff = difficulty_level::EXPERT;
     }
@@ -34,14 +37,17 @@ difficulty_level operator ++ (difficulty_level& diff, int) {
  */
 difficulty_level operator -- (difficulty_level& diff, int) {
     switch (diff) {
-        case difficulty_level::EXPERT: diff = difficulty_level::HARD;
-                                     break;
+        case difficulty_level::EXPERT:
+            diff = difficulty_level::HARD;
+            break;
                                      
-        case difficulty_level::HARD: diff = difficulty_level::MEDIUM;
-                                       break;
+        case difficulty_level::HARD:
+            diff = difficulty_level::MEDIUM;
+            break;
                                        
-        case difficulty_level::MEDIUM: diff = difficulty_level::EASY;
-                                     break;
+        case difficulty_level::MEDIUM:
+            diff = difficulty_level::EASY;
+            break;
                                      
         default: diff = difficulty_level::EASY;
     }
@@ -62,7 +68,7 @@ difficulty_level operator -- (difficulty_level& diff, int) {
 void DifficultyMenu::display_menu (const cell EDGE, const options) {
     const uint8_t NUM_DIFFS = 4;
     const string TITLE = "CHOOSE DIFFICULTY SETTING",
-                 DIFFS[NUM_DIFFS] = { "Easy", "Medium", "Hard", "Expert"};
+                 DIFFS[NUM_DIFFS] = { "Easy", "Medium", "Hard", "Expert" };
     
     map<uint8_t, difficulty_level> diff_map;
     diff_map[0] = difficulty_level::EASY;
@@ -83,10 +89,10 @@ void DifficultyMenu::display_menu (const cell EDGE, const options) {
  * Name: set_difficulty_level
  * Purpose: Records the difficulty level the user has chosen to start a new game.
  * Parameters:
- *      diff -> The chosen difficulty level.
+ *      DIFF -> The chosen difficulty level.
  */
-void DifficultyMenu::set_difficulty_level (const difficulty_level diff) {
-    this->diff = diff;
+void DifficultyMenu::set_difficulty_level (const difficulty_level DIFF) {
+    diff = DIFF;
 }
 
 /* NOTE:
@@ -103,11 +109,13 @@ options DifficultyMenu::menu () {
         display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
         input = getch();
         switch (input) {
-            case KEY_DOWN: diff++;
-                           break;
+            case KEY_DOWN:
+                diff++;
+                break;
                            
-            case KEY_UP: diff--;
-                         break;
+            case KEY_UP:
+                diff--;
+                break;
                          
             default:;
         }
