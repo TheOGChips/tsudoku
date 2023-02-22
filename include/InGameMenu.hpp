@@ -25,11 +25,11 @@ class InGameMenu : public Menu {
         uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];
         
         void display_menu (const cell, const options) override;
-        void clear (const uint8_t, const uint8_t);
-        void display_rules (const uint8_t, const uint8_t);
-        void display_manual (const uint8_t, const uint8_t);
-        void screen_reader (const uint8_t, const uint8_t, std::string, uint8_t&);
-        void save_game (const uint8_t, const uint8_t);
+        void clear (const cell);
+        void display_rules (const cell);
+        void display_manual (const cell);
+        void screen_reader (const cell, std::string, uint8_t&);
+        void save_game (const cell);
         
     public:
         InGameMenu (uint8_t[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS]);

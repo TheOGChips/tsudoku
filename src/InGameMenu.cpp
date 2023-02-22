@@ -26,7 +26,6 @@ options operator -- (options& opt, int) {
     return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;
 }
 
-//TODO: This might need to be dynamically allocated instead
 /* NOTE:
  * Name: Class Constructor
  * Purpose: Initializes the display matrix, so the in-game menu can track any changes made during
@@ -76,12 +75,10 @@ void InGameMenu::display_menu (const cell EDGE, const options OPT) {
  * Parameters:
  *      Y_EDGE -> Line to start clearing from.
  *      X_EDGE -> Column to start clearing from.
- * 
- * TODO: Use a cell here instead?
  */
-void InGameMenu::clear (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
-    for (uint8_t y = Y_EDGE + IN_GAME_MENU_TITLE_SPACING + NUM_OPTS + 2; y < getmaxy(stdscr); y++) {
-        move(y, X_EDGE);
+void InGameMenu::clear (const cell EDGE) {
+    for (uint8_t y = EDGE.first + IN_GAME_MENU_TITLE_SPACING + NUM_OPTS + 2; y < getmaxy(stdscr); y++) {
+        move(y, EDGE.second);
         clrtoeol();
     }
 }
@@ -92,10 +89,8 @@ void InGameMenu::clear (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
  * Parameters:
  *      Y_EDGE -> Line to start the display at.
  *      X_EDGE -> Column to start the display at.
- * 
- * TODO: Use a cell here instead?
  */
-void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
+void InGameMenu::display_rules (const cell EDGE) {
     const string TITLE = "RULES FOR PLAYING SUDOKU",
                  RULES_INTRO = string("Sudoku is a puzzle game using the numbers 1-9. The ") +
                                "puzzle board is a 9x9 grid that can be broken up evenly in 3 " +
@@ -110,10 +105,10 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
     string rules_text[NUM_RULES] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
     uint8_t display_offset = NUM_OPTS + 2; //NOTE: Offset to allow the display to start below the list of menu options
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_RULES; i++) {
         display_offset++;
-        screen_reader(Y_EDGE, X_EDGE, rules_text[i], display_offset);
+        screen_reader(EDGE, rules_text[i], display_offset);
     }
 }
 
@@ -123,10 +118,8 @@ void InGameMenu::display_rules (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
  * Parameters:
  *      Y_EDGE -> Line to start the display at.
  *      X_EDGE -> Column to start the display at.
- * 
- * TODO: Use a cell here instead?
  */
-void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
+void InGameMenu::display_manual (const cell EDGE) {
     const string TITLE = "TSUDOKU GAME MANUAL",
                  MANUAL_INTRO = string("Red numbers are givens provided for you when the puzzle ") +
                                 "has been generated. The number of givens present corresponds to " +
@@ -160,10 +153,10 @@ void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
                                        MANUAL_NUM, MANUAL_ENTER };
     uint8_t display_offset = NUM_OPTS + 2;  //NOTE: Offset to allow the display to start below the list of menu options
     
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s", TITLE.c_str());
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_MANUAL; i++) {
         display_offset++;
-        screen_reader(Y_EDGE, X_EDGE, manual_text[i], display_offset);
+        screen_reader(EDGE, manual_text[i], display_offset);
     }
 }
 
@@ -179,10 +172,8 @@ void InGameMenu::display_manual (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
  *      str -> Input string to be printed in the in-game menu's display area.
  *      display_offset -> Line offset to allow displaying correctly below the in-game menu title and
  *                        options.
- * 
- * TODO: Use a cell here instead?
  */
-void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, string str,
+void InGameMenu::screen_reader (const cell EDGE, string str,
                                 uint8_t& display_offset) {
     string display_str;
     while (not str.empty()) {
@@ -192,7 +183,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
         if (space_pos == string::npos) {
             display_str += str;
             str.clear();
-            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s",
+            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s",
                      display_str.c_str());
         }
         
@@ -206,7 +197,7 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
          *       increment the display offset.
          */
         else {  
-            mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "%s",
+            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s",
                      display_str.c_str());
             display_str.clear();
         }
@@ -221,15 +212,13 @@ void InGameMenu::screen_reader (const uint8_t Y_EDGE, const uint8_t X_EDGE, stri
  * Parameters:
  *      Y_EDGE -> Line to start the display at. The prompt for the save file name will appear here.
  *      X_EDGE -> Column to start the display at. The prompt for the save file name will start here.
- * 
- * TODO: Use a cell here instead?
  */
-void InGameMenu::save_game (const uint8_t Y_EDGE, const uint8_t X_EDGE) {
+void InGameMenu::save_game (const cell EDGE) {
     uint8_t display_offset = NUM_OPTS + 2;
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + display_offset++, X_EDGE, "Enter save file name: ");
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "Enter save file name: ");
     
     curs_set(true);
-    mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + ++display_offset, X_EDGE, "%s saved!",
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + ++display_offset, EDGE.second, "%s saved!",
              save_game(display_matrix).c_str());
     curs_set(false);
 }
@@ -297,28 +286,28 @@ options InGameMenu::menu () {
         display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
         input = getch();
         switch (input) {
-            case KEY_DOWN: opt++;  //TODO: These could actually be changed to be post-increment/
-                           break;  //      decrement judging by how they're used here.
+            case KEY_DOWN: opt++;
+                           break;
                            
             case KEY_UP: opt--;
                          break;
                             
             case KEY_ENTER: 
                 switch (opt) {
-                    case options::RULES: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                         display_rules(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                    case options::RULES: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                                         display_rules(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
                                          break;
                                              
-                    case options::MANUAL: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
-                                          display_manual(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                    case options::MANUAL: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                                          display_manual(cell{TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
                                           break;
                                               
-                    case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                    case options::SAVE_GAME: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
                                              //NOTE: Turn off highlighted option while entering in
                                              //      save name
                                              display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE},
                                                           options::NONE);
-                                             save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
+                                             save_game(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
                                              break;
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
