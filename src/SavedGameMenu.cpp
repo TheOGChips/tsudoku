@@ -42,10 +42,7 @@ void SavedGameMenu::generate_saved_games_list () {
     typedef directory_iterator dir_iter;
     
     for (dir_iter iter(DIR); iter != end(dir_iter()); iter++) {
-        //TODO: Change this to check for ".csv" instead
-        if (iter->path().extension() != ".txt") {
-            saved_games.push_back(iter->path().stem().string());
-        }
+        if (iter->path().extension() == ".csv") saved_games.push_back(iter->path().stem().string());
     }
     saved_games.sort();
 }
