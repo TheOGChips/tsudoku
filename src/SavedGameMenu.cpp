@@ -70,9 +70,8 @@ bool SavedGameMenu::select_saved_game () {
             if (input == KEY_DOWN and *selection != saved_games.back()) selection++;
             else if (input == KEY_UP and *selection != saved_games.front()) selection--;
         } while (input != KEY_ENTER);
-        //TODO: Move adding the extension to read_saved_game and get_saved_game
-        *selection += ".csv";
-        mvprintw(TOP_PADDING + saved_games.size() + 2, LEFT_PADDING, "You selected %s", selection->c_str());
+        mvprintw(TOP_PADDING + saved_games.size() + 2, LEFT_PADDING,
+                 "You selected %s", selection->c_str());
     }
     mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
     refresh();
@@ -88,7 +87,7 @@ bool SavedGameMenu::select_saved_game () {
  * Parameters: None
  */
 void SavedGameMenu::read_saved_game () {
-    ifstream infile (DIR + "/" + *selection);
+    ifstream infile (DIR + "/" + *selection + ".csv");
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         string row;
         getline(infile, row);
@@ -139,7 +138,7 @@ SavedPuzzle SavedGameMenu::get_saved_game () {
             saved_puzzle.color_codes[i][j] = saved_color_codes[i][j];
         }
     }
-    saved_puzzle.filename = DIR + "/" + *selection;
+    saved_puzzle.filename = DIR + "/" + *selection + ".csv";
     return saved_puzzle;
 }
 
