@@ -39,8 +39,7 @@ int main (int argc, char** argv) {
         case 2:
             if (not strcmp(argv[1], "--no-in-game-menu") or
                 not strcmp(argv[1], "-n")) use_in_game_menu = false;
-            //TODO: Remove the "-?" option
-            else if (not strcmp(argv[1], "--help") or not strcmp(argv[1], "-?")) {
+            else if (not strcmp(argv[1], "--help")) {
                 print_help();
                 return 0;
             }
@@ -105,7 +104,7 @@ void print_help () {
     printf("\nUsage: $ ./tsudoku OPTION\n\n");
     printf("OPTIONS\n\n");
     printf("    -n, --no-in-game-menu\tRun tsudoku without the in-game menu\n");
-    printf("    -?, --help\t\t\tDisplay this help menu\n\n");
+    printf("    --help\t\t\tDisplay this help menu\n\n");
 }
 
 /* NOTE:

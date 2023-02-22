@@ -16,6 +16,7 @@ CONTAINER = Container
 GRID = Grid
 OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(DIFFICULTY_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
 COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/misc.hpp
+# TODO: Fix this later
 TGT = t$(SUDOKU)
 
 .PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean
@@ -62,7 +63,6 @@ run_no_menu:	$(TGT)
 
 run_help:	$(TGT)
 		-./$< --help
-		-./$< -?
 
 run_invalid:	$(TGT)
 		-./$< --bad-flag
