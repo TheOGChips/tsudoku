@@ -3,8 +3,6 @@
 
 #include "Menu.hpp"
 
-//enum class options { NEW_GAME, RESUME_GAME, SHOW_STATS };   //TODO: Add EXIT option
-
 /* NOTE:
  * Class: MainMenu
  * Purpose: Menu-derived class that displays and controls the main menu the user sees before and
@@ -40,12 +38,6 @@ class MainMenu : public Menu {
         ~MainMenu ();   //NOTE: Default destructor. Does nothing.
         options menu () override;
         options menu (const bool);
-        //friend options operator ++ (options&);
-        //friend options operator -- (options&);
 };
-
-//TODO: See if you can get rid of having these declarations here.
-options operator ++ (options&);
-options operator -- (options&);
 
 #endif

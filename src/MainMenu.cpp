@@ -7,6 +7,56 @@
 using namespace std;
 
 /* NOTE:
+ * Name: Operator ++ (pre-increment, overloaded)
+ * Purpose: Shorthand convenience for changing main menu options.
+ * Parameters:
+ *      opt -> The previously selected main menu option to update.
+ */
+options operator ++ (options& opt) {
+    switch (opt) {
+        case options::NEW_GAME:
+            opt = options::RESUME_GAME;
+            break;
+                                     
+        case options::RESUME_GAME:
+            opt = options::SHOW_STATS;
+            break;
+                                       
+        case options::SHOW_STATS:
+            opt = options::EXIT;
+            break;
+                                     
+        default: opt = options::EXIT;
+    }
+    return opt;
+}
+
+/* NOTE:
+ * Name: Operator -- (pre-decrement, overloaded)
+ * Purpose: Shorthand convenience for changing main menu options.
+ * Parameters:
+ *      opt -> The previously selected main menu option to update.
+ */
+options operator -- (options& opt) {
+    switch (opt) {
+        case options::EXIT:
+            opt = options::SHOW_STATS;
+            break;
+                                     
+        case options::SHOW_STATS:
+            opt = options::RESUME_GAME;
+            break;
+                                       
+        case options::RESUME_GAME:
+            opt = options::NEW_GAME;
+            break;
+                                     
+        default: opt = options::NEW_GAME;
+    }
+    return opt;
+}
+
+/* NOTE:
  * Name: Class Constructor
  * Purpose: Initializes the NCurses environment and global NCurses settings.
  * Parameters: None
@@ -190,57 +240,5 @@ options MainMenu::menu () {
     
     ::clear();
     curs_set(true); //NOTE: Turn the cursor back on before leaving the main menu
-    return opt;
-}
-
-/* NOTE:
- * Name: Operator ++ (pre-increment, overloaded)
- * Purpose: Shorthand convenience for changing main menu options.
- * Parameters:
- *      opt -> The previously selected main menu option to update.
- */
-options operator ++ (options& opt) {
-    //return opt = (opt == options::NEW_GAME) ? options::RESUME_GAME : options::SHOW_STATS;
-    switch (opt) {
-        case options::NEW_GAME:
-            opt = options::RESUME_GAME;
-            break;
-                                     
-        case options::RESUME_GAME:
-            opt = options::SHOW_STATS;
-            break;
-                                       
-        case options::SHOW_STATS:
-            opt = options::EXIT;
-            break;
-                                     
-        default: opt = options::EXIT;
-    }
-    return opt;
-}
-
-/* NOTE:
- * Name: Operator -- (pre-decrement, overloaded)
- * Purpose: Shorthand convenience for changing main menu options.
- * Parameters:
- *      opt -> The previously selected main menu option to update.
- */
-options operator -- (options& opt) {
-    //return opt = (opt == options::SHOW_STATS) ? options::RESUME_GAME : options::NEW_GAME;
-    switch (opt) {
-        case options::EXIT:
-            opt = options::SHOW_STATS;
-            break;
-                                     
-        case options::SHOW_STATS:
-            opt = options::RESUME_GAME;
-            break;
-                                       
-        case options::RESUME_GAME:
-            opt = options::NEW_GAME;
-            break;
-                                     
-        default: opt = options::NEW_GAME;
-    }
     return opt;
 }
