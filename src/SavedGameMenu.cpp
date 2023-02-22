@@ -103,13 +103,13 @@ void SavedGameMenu::read_saved_game () {
     infile.close();
 }
 
+#if DEBUG
 /* NOTE:
  * Name: print_saved_game
  * Purpose: Prints the matrices of saved game values and color codes side by side. This is only
  *          available when the program has been compiled with debug mode enabled.
  * Parameters: None
  */
-//TODO: Enclose this under DEBUG
 void SavedGameMenu::print_saved_game () {
     clear();
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
@@ -121,6 +121,7 @@ void SavedGameMenu::print_saved_game () {
     refresh();
     getch();
 }
+#endif
 
 /* NOTE:
  * Name: get_saved_game
@@ -150,8 +151,10 @@ SavedPuzzle SavedGameMenu::get_saved_game () {
 options SavedGameMenu::menu () {
     generate_saved_games_list();
     if (select_saved_game()) {
-        read_saved_game();  //TODO: Read in saved game based on selection
-        //print_saved_game();   //TODO: Enclose under DEBUG
+        read_saved_game();
+        #if DEBUG
+            print_saved_game();
+        #endif
         return options::SAVE_READY;
     }
     else return options::NO_SAVES;
