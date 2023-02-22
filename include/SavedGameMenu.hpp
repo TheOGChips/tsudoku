@@ -5,10 +5,22 @@
 #include <filesystem>
 #include <list>
 
-//enum class options { NONE };
-
-//NOTE: The address of a SavedPuzzle object and it's mat member matrix will be the same. This is here to make passing the matrix around easier.
-
+/* NOTE:
+ * Class: SavedGameMenu
+ * Purpose: Menu-derived class that displays the a list of saved games the user can choose from to
+ *          resume.
+ * Private variables:
+ *      list_iter -> Alias to a string list iterator.
+ *      saved_games -> The list of saved games to be displayed to the screen. Each will appear as an
+ *                     option the user can choose from.
+ *      selection -> The currently highlighted game from the displayed list. If the user presses
+ *                   Enter, this becomes the game loaded.
+ *      saved_game -> The matrix used to read a saved game into. This later becomes the display
+ *                    matrix.
+ *      saved_color_codes -> The matrix used to read saved game display matrix color codes into. This
+ *                           is used to display the saved game with the same coloring as the session
+ *                           from when it was saved.
+ */
 class SavedGameMenu : public Menu {
     private:
         typedef std::list<std::string>::iterator list_iter;
@@ -24,10 +36,10 @@ class SavedGameMenu : public Menu {
         void print_saved_game ();
         
     public:
-        SavedGameMenu () {} //TODO: Not having this defined in SavedGameMenu.cpp caused a weird crash before. I suspected it might have been some odd linking issue, and compiling from scratch seems to have fixed it. Delete this comment later if no other problems occur.
-        ~SavedGameMenu () {}
+        SavedGameMenu () {}     //NOTE: Default constructor. Does nothing.
+        ~SavedGameMenu () {}    //NOTE: Default destructor. Does nothing.
         options menu () override;
-        SavedPuzzle get_saved_game();
+        SavedPuzzle get_saved_game ();
 };
 
 #endif
