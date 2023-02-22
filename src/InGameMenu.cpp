@@ -11,6 +11,7 @@ using namespace std;
  * Purpose: Shorthand convenience for changing in-game menu options.
  * Parameters:
  *      opt -> The previously highlighted in-game menu option to update.
+ * TODO: Add note about unused int parameter
  */
 options operator ++ (options& opt, int) {
     return opt = (opt == options::RULES) ? options::MANUAL : options::SAVE_GAME;
@@ -21,6 +22,7 @@ options operator ++ (options& opt, int) {
  * Purpose: Shorthand convenience for changing in-game menu options.
  * Parameters:
  *      opt -> The previously highlighted in-game option to update.
+ * TODO: Add note about unused int parameter
  */
 options operator -- (options& opt, int) {
     return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;
@@ -53,8 +55,8 @@ void InGameMenu::display_menu (const cell EDGE, const options OPT) {
     const uint8_t NUM_OPTS = 3;
     const string TITLE = "IN-GAME MENU",
                  OPTS[NUM_OPTS] = { "View the rules of sudoku",
-                                   "See game manual", 
-                                   "Save current game"};
+                                    "See game manual", 
+                                    "Save current game" };
     map<uint8_t, options> opt_map;
     opt_map[0] = options::RULES;
     opt_map[1] = options::MANUAL;
@@ -63,7 +65,8 @@ void InGameMenu::display_menu (const cell EDGE, const options OPT) {
     mvprintw(EDGE.first, EDGE.second, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
         if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + i + 1, EDGE.second, "%s", OPTS[i].c_str());
+        mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + i + 1, EDGE.second,
+                 "%s", OPTS[i].c_str());
         if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -73,11 +76,11 @@ void InGameMenu::display_menu (const cell EDGE, const options OPT) {
  * Name: clear (NCurses library function overload)
  * Purpose: Clears the in-game menu display area.
  * Parameters:
- *      Y_EDGE -> Line to start clearing from.
- *      X_EDGE -> Column to start clearing from.
+ *      EDGE -> Line and column to start clearing from.
  */
 void InGameMenu::clear (const cell EDGE) {
-    for (uint8_t y = EDGE.first + IN_GAME_MENU_TITLE_SPACING + NUM_OPTS + 2; y < getmaxy(stdscr); y++) {
+    for (uint8_t y = EDGE.first + IN_GAME_MENU_TITLE_SPACING + NUM_OPTS + 2; y < getmaxy(stdscr);
+         y++) {
         move(y, EDGE.second);
         clrtoeol();
     }
@@ -87,8 +90,7 @@ void InGameMenu::clear (const cell EDGE) {
  * Name: display_rules
  * Purpose: Displays the rules of sudoku.
  * Parameters:
- *      Y_EDGE -> Line to start the display at.
- *      X_EDGE -> Column to start the display at.
+ *      EDGE -> Line and column to start the display at.
  */
 void InGameMenu::display_rules (const cell EDGE) {
     const string TITLE = "RULES FOR PLAYING SUDOKU",
@@ -103,9 +105,11 @@ void InGameMenu::display_rules (const cell EDGE) {
                  
     const uint8_t NUM_RULES = 4;
     string rules_text[NUM_RULES] = { RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_SUBMATRIX };
-    uint8_t display_offset = NUM_OPTS + 2; //NOTE: Offset to allow the display to start below the list of menu options
+    uint8_t display_offset = NUM_OPTS + 2;  //NOTE: Offset to allow the display to start below the
+                                            //      list of menu options
     
-    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s", TITLE.c_str());
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second,
+             "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_RULES; i++) {
         display_offset++;
         screen_reader(EDGE, rules_text[i], display_offset);
@@ -116,8 +120,7 @@ void InGameMenu::display_rules (const cell EDGE) {
  * Name: display_manual
  * Purpose: Displays the tsudoku game manual.
  * Parameters:
- *      Y_EDGE -> Line to start the display at.
- *      X_EDGE -> Column to start the display at.
+ *      EDGE -> Line and column to start the display at.
  */
 void InGameMenu::display_manual (const cell EDGE) {
     const string TITLE = "TSUDOKU GAME MANUAL",
@@ -151,9 +154,11 @@ void InGameMenu::display_manual (const cell EDGE) {
     const uint8_t NUM_MANUAL = 6;
     string manual_text[NUM_MANUAL] = { MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS,
                                        MANUAL_NUM, MANUAL_ENTER };
-    uint8_t display_offset = NUM_OPTS + 2;  //NOTE: Offset to allow the display to start below the list of menu options
+    uint8_t display_offset = NUM_OPTS + 2;  //NOTE: Offset to allow the display to start below the
+                                            //      list of menu options
     
-    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s", TITLE.c_str());
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second,
+             "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_MANUAL; i++) {
         display_offset++;
         screen_reader(EDGE, manual_text[i], display_offset);
@@ -167,14 +172,12 @@ void InGameMenu::display_manual (const cell EDGE) {
  *          printing on a new line (i.e. if adding another word would overlap with the window border
  *          and ruin the sudoku board display).
  * Parameters:
- *      Y_EDGE -> Line to start the display at.
- *      X_EDGE -> Column to start the display at.
+ *      EDGE -> Line and column to start the display at.
  *      str -> Input string to be printed in the in-game menu's display area.
  *      display_offset -> Line offset to allow displaying correctly below the in-game menu title and
  *                        options.
  */
-void InGameMenu::screen_reader (const cell EDGE, string str,
-                                uint8_t& display_offset) {
+void InGameMenu::screen_reader (const cell EDGE, string str, uint8_t& display_offset) {
     string display_str;
     while (not str.empty()) {
         size_t space_pos = str.find_first_of(' ');  //NOTE: Index of the next space character in str
@@ -183,8 +186,8 @@ void InGameMenu::screen_reader (const cell EDGE, string str,
         if (space_pos == string::npos) {
             display_str += str;
             str.clear();
-            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s",
-                     display_str.c_str());
+            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second,
+                     "%s", display_str.c_str());
         }
         
         //NOTE: If there is enough space to display the next word, add it to the display string
@@ -197,8 +200,8 @@ void InGameMenu::screen_reader (const cell EDGE, string str,
          *       increment the display offset.
          */
         else {  
-            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "%s",
-                     display_str.c_str());
+            mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second,
+                     "%s", display_str.c_str());
             display_str.clear();
         }
     }
@@ -210,16 +213,17 @@ void InGameMenu::screen_reader (const cell EDGE, string str,
  * Purpose: Prompts the user for the name to save the game under before saving the game. Displays a
  *          success message after having saved.
  * Parameters:
- *      Y_EDGE -> Line to start the display at. The prompt for the save file name will appear here.
- *      X_EDGE -> Column to start the display at. The prompt for the save file name will start here.
+ *      EDGE -> Line and column to start the display at. The prompt for the save file name will
+ *              start here.
  */
 void InGameMenu::save_game (const cell EDGE) {
     uint8_t display_offset = NUM_OPTS + 2;
-    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second, "Enter save file name: ");
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + display_offset++, EDGE.second,
+             "Enter save file name: ");
     
     curs_set(true);
-    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + ++display_offset, EDGE.second, "%s saved!",
-             save_game(display_matrix).c_str());
+    mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + ++display_offset, EDGE.second,
+             "%s saved!", save_game(display_matrix).c_str());
     curs_set(false);
 }
 
@@ -246,20 +250,25 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
             outfile << static_cast<uint16_t>(display_matrix[i][j]);
             chtype ch = mvinch(i + ORIGINy + i / CONTAINER_SIZE, j + ORIGINx + j / CONTAINER_SIZE);
             switch (ch & A_COLOR) {
-                case COLOR_PAIR(UNKNOWN): outfile << color_code[UNKNOWN];
-                                          break;
+                case COLOR_PAIR(UNKNOWN):
+                    outfile << color_code[UNKNOWN];
+                    break;
                                           
-                case COLOR_PAIR(GIVEN): outfile << color_code[GIVEN];
-                                        break;
+                case COLOR_PAIR(GIVEN):
+                    outfile << color_code[GIVEN];
+                    break;
                                         
-                case COLOR_PAIR(CANDIDATES_Y): outfile << color_code[CANDIDATES_Y];
-                                               break;
+                case COLOR_PAIR(CANDIDATES_Y):
+                    outfile << color_code[CANDIDATES_Y];
+                    break;
                                                
-                case COLOR_PAIR(CANDIDATES_B): outfile << color_code[CANDIDATES_B];
-                                               break;
+                case COLOR_PAIR(CANDIDATES_B):
+                    outfile << color_code[CANDIDATES_B];
+                    break;
                                              
-                case COLOR_PAIR(GUESS): outfile << color_code[GUESS];
-                                        break;
+                case COLOR_PAIR(GUESS):
+                    outfile << color_code[GUESS];
+                    break;
                                         
                 default: outfile << color_code[0];
             }
@@ -286,29 +295,32 @@ options InGameMenu::menu () {
         display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
         input = getch();
         switch (input) {
-            case KEY_DOWN: opt++;
-                           break;
+            case KEY_DOWN:
+                opt++;
+                break;
                            
-            case KEY_UP: opt--;
-                         break;
+            case KEY_UP:
+                opt--;
+                break;
                             
             case KEY_ENTER: 
                 switch (opt) {
-                    case options::RULES: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                         display_rules(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                         break;
+                    case options::RULES:
+                        clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        display_rules(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        break;
                                              
-                    case options::MANUAL: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                          display_manual(cell{TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                          break;
+                    case options::MANUAL:
+                        clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        display_manual(cell{TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        break;
                                               
-                    case options::SAVE_GAME: clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                             //NOTE: Turn off highlighted option while entering in
-                                             //      save name
-                                             display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE},
-                                                          options::NONE);
-                                             save_game(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
-                                             break;
+                    case options::SAVE_GAME:
+                        clear(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        //NOTE: Turn off highlighted option while entering in save name
+                        display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, options::NONE);
+                        save_game(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE});
+                        break;
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
                 }
