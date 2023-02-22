@@ -60,8 +60,11 @@ bool SavedGameMenu::select_saved_game () {
     selection = saved_games.begin();
     
     curs_set(false);    //NOTE: Turn off cursor while in the menu.
-    //TODO: Alter the control here to automatically load a saved game after the user selects it.
-    if (saved_games.empty()) mvprintw(TOP_PADDING, LEFT_PADDING, "You have no saved games.");
+    if (saved_games.empty()) {
+        mvprintw(TOP_PADDING, LEFT_PADDING, "You have no saved games.");
+        mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
+        while (getch() != KEY_ENTER);
+    }
     else {
         do {
             display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
@@ -70,12 +73,8 @@ bool SavedGameMenu::select_saved_game () {
             if (input == KEY_DOWN and *selection != saved_games.back()) selection++;
             else if (input == KEY_UP and *selection != saved_games.front()) selection--;
         } while (input != KEY_ENTER);
-        mvprintw(TOP_PADDING + saved_games.size() + 2, LEFT_PADDING,
-                 "You selected %s", selection->c_str());
     }
-    mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
     refresh();
-    while (getch() != KEY_ENTER);
     curs_set(true);     //NOTE: Turn cursor back on before leaving the menu.
         
     return not saved_games.empty();
