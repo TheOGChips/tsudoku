@@ -4,6 +4,12 @@
 
 using namespace std;
 
+/* NOTE:
+ * Name: Operator ++ (post-increment, overloaded)
+ * Purpose: Shorthand convenience for changing difficulty options.
+ * Parameters:
+ *      opt -> The previously highlighted difficulty option to update.
+ */
 difficulty_level operator ++ (difficulty_level& diff, int) {
     switch (diff) {
         case difficulty_level::EASY: diff = difficulty_level::MEDIUM;
@@ -20,6 +26,12 @@ difficulty_level operator ++ (difficulty_level& diff, int) {
     return diff;
 }
 
+/* NOTE:
+ * Name: Operator -- (post-decrement, overloaded)
+ * Purpose: Shorthand convenience for changing difficulty options.
+ * Parameters:
+ *      opt -> The previously highlighted difficulty option to update.
+ */
 difficulty_level operator -- (difficulty_level& diff, int) {
     switch (diff) {
         case difficulty_level::EXPERT: diff = difficulty_level::HARD;
@@ -36,6 +48,17 @@ difficulty_level operator -- (difficulty_level& diff, int) {
     return diff;
 }
 
+/* NOTE:
+ * Name: display_menu (pure virtual override)
+ * Purpose: Displays the difficulty menu. The currently selected option is always highlighted. The
+ *          difficulty menu is re-rendered each time the user uses the Up/Down keys to highlight a
+ *          different option.
+ * Parameters:
+ *      EDGE -> Starting cell the difficulty menu will display at. The menu title should display at
+ *              the origin.
+ *      (unused options enum) -> Unused variable with a named reference. Required because of the
+ *                               function prototype inherited from Menu.
+ */
 void DifficultyMenu::display_menu (const cell EDGE, const options) {
     const uint8_t NUM_DIFFS = 4;
     const string TITLE = "CHOOSE DIFFICULTY SETTING",
@@ -56,10 +79,21 @@ void DifficultyMenu::display_menu (const cell EDGE, const options) {
     refresh();
 }
 
+/* NOTE:
+ * Name: set_difficulty_level
+ * Purpose: Records the difficulty level the user has chosen to start a new game.
+ * Parameters:
+ *      diff -> The chosen difficulty level.
+ */
 void DifficultyMenu::set_difficulty_level (const difficulty_level diff) {
     this->diff = diff;
 }
 
+/* NOTE:
+ * Name: menu (overload)
+ * Purpose: Controls the menu display and difficulty level recording.
+ * Parameters: None
+ */
 options DifficultyMenu::menu () {
     curs_set(false);
     diff = difficulty_level::EASY;
@@ -83,6 +117,11 @@ options DifficultyMenu::menu () {
     return options::NONE;
 }
 
+/* NOTE:
+ * Name: get_difficulty_level
+ * Purpose: Returns the difficulty level the user has chosen to start the new game.
+ * Parameters: None
+ */
 difficulty_level DifficultyMenu::get_difficulty_level () {
     return diff;
 }
