@@ -8,112 +8,138 @@
 #include <sstream>      //std::stringstream
 #include <cstring>      //strcmp
 
+//NOTE: This file keeps a persistent record of how many games the player has successfully finished
 const std::string COMPLETED = DIR + "/completed_puzzles.txt";
-enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };
-
+enum class err_msg { INVALID_ARG, TOO_MANY_ARGS };  //NOTE: Possible types of errors that can be
+                                                    //      generated
 void create_dir ();
 void display_completed_puzzles ();
 void print_help ();
 void print_err_msg (err_msg);
 
-int main (int argc, char** argv) //TODO: The majority of this code will need to be in a loop
-{
+/* NOTE:
+ * Name: main
+ * Purpose: The main function from the which the program starts. Tsudoku only accepts one option at
+ *          run time.
+ * Parameters:
+ *      argc -> The total number of items entered on the command line. "tsudoku" will always be
+ *              index 0 and any option, if provided, will start at index 1.
+ *      argv -> The list of items entered on the command line. Possible tsudoku options are:
+ *                  1. "--no-in-game-menu" or "-n" to disable the in-game menu
+ *                  2. "--help" to display the help information
+ */
+int main (int argc, char** argv) {
+    //NOTE: Detemine whether the in-game menu should be enabled and if there is any input error
     bool use_in_game_menu;
     switch (argc) {
-        case 1: use_in_game_menu = true;
-                break;
+        case 1:
+            use_in_game_menu = true;
+            break;
                 
-        case 2: if (not strcmp(argv[1], "--no-in-game-menu") or
-                    not strcmp(argv[1], "-n")) use_in_game_menu = false;
-                //TODO: Add a --help/-? option
-                else if (not strcmp(argv[1], "--help") or
-                         not strcmp(argv[1], "-?")) {
-                    print_help();
-                    return 0;
-                }
-                //TODO: Add a --info option
-                else {
-                    print_err_msg(err_msg::INVALID_ARG);
-                    return 1;
-                }
-                break;
+        case 2:
+            if (not strcmp(argv[1], "--no-in-game-menu") or
+                not strcmp(argv[1], "-n")) use_in_game_menu = false;
+            //TODO: Remove the "-?" option
+            else if (not strcmp(argv[1], "--help") or not strcmp(argv[1], "-?")) {
+                print_help();
+                return 0;
+            }
+            else {
+                print_err_msg(err_msg::INVALID_ARG);
+                return 1;
+            }
+            break;
                 
-        default: print_err_msg(err_msg::TOO_MANY_ARGS);
-                 return 1;
+        default:
+            print_err_msg(err_msg::TOO_MANY_ARGS);
+            return 1;
     }
     
-    //printf("argv[1]: %s\n", argv[1]);
-    //return 0;
-    create_dir();
+    create_dir();   //NOTE: Create the tsudoku environment directory if it doesn't already exist
     
     MainMenu main_menu;
     options opt;
-    
     do {
-        opt = main_menu.menu(use_in_game_menu);
+        opt = main_menu.menu(use_in_game_menu); //NOTE: Start the main menu and respond accordingly
         
         switch (opt) {
-            case options::NEW_GAME:  {
-                                            Sudoku puzzle(/*true, */nullptr);    //TODO: Consider making this a
-                                                                    //      static function, depending
-                                                                    //      on how resuming games works
-                                            puzzle.start_game(use_in_game_menu, nullptr);
-                                            break;
-                                        }
+            case options::NEW_GAME: {   //NOTE: Start a new game
+                Sudoku puzzle(nullptr);
+                puzzle.start_game(use_in_game_menu, nullptr);
+                break;
+            }
                         
-            case options::RESUME_GAME:  { SavedGameMenu saved_game_menu;
-                                        if (saved_game_menu.menu() == options::SAVE_READY) {
-                                            SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
-                                            Sudoku puzzle(/*true, */&saved_puzzle);
-                                            puzzle.start_game(use_in_game_menu, &saved_puzzle);
-                                        }
-                                        break;  //TODO
-                                        }
-                                    //instantiate Sudoku object
-                                    //puzzle.start_game(use_in_game_menu);
+            case options::RESUME_GAME: {    //NOTE: Resume a previously saved game
+                SavedGameMenu saved_game_menu;
+                if (saved_game_menu.menu() == options::SAVE_READY) {
+                    SavedPuzzle saved_puzzle = saved_game_menu.get_saved_game();
+                    Sudoku puzzle(/*true, */&saved_puzzle);
+                    puzzle.start_game(use_in_game_menu, &saved_puzzle);
+                }
+                break;
+            }
             
-            case options::SHOW_STATS: display_completed_puzzles();
-                                        break;
+            case options::SHOW_STATS:   //NOTE: Show how many games the player has finished
+                display_completed_puzzles();
+                break;
                             
             default:;
         }
-    } while (opt != options::EXIT);
+    } while (opt != options::EXIT); //NOTE: Exit the program
     
     clear();
-    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));  //TODO: This can be deleted later
+    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));  //TODO: Enclose this under DEBUG
     printw("sizeof(Sudoku): %.7f kB", sizeof(Sudoku) / 1024.0);
     refresh();
     getch();
     return 0;
 }
 
+/* NOTE:
+ * Name: print_help
+ * Purpose: Prints out how to run tsudoku when the player enters the --help option on the command
+ *          line.
+ * Parameters: None
+ */
 void print_help () {
     printf("\nUsage: $ ./tsudoku OPTION\n\n");
     printf("OPTIONS\n\n");
-    printf("    -n, --no-in-game-menu");
-    printf("\tRun tsudoku without the in-game menu\n");
-    printf("    -?, --help");
-    printf("\t\t\tDisplay this help menu\n\n");
+    printf("    -n, --no-in-game-menu\tRun tsudoku without the in-game menu\n");
+    printf("    -?, --help\t\t\tDisplay this help menu\n\n");
 }
 
+/* NOTE:
+ * Name: print_err_msg
+ * Purpose: Prints out an error message depending on the type of error the player committed.
+ * Parameters:
+ *      err -> The type of error the player committed. Possible options are:
+ *                  1. invalid command line option (INVALID_ARG)
+ *                  2. too many command line options (TOO_MANY_ARGS)
+ */
 void print_err_msg (err_msg err) {
     string str;
     switch (err) {
-        case err_msg::INVALID_ARG: str = string("Invalid argument. Use the '--help' option to ") +
-                                         "see a list of valid options.";
-                                   break;
-                          
-        case err_msg::TOO_MANY_ARGS: str = string("Too many arguments. Use the '--help' option ") +
-                                           "for a short how-to.";
-                                     break;
-                            
+        case err_msg::INVALID_ARG:
+            str = "Invalid argument. Use the '--help' option to see a list of valid options.";
+            break;
+            
+        case err_msg::TOO_MANY_ARGS:
+            str = "Too many arguments. Use the '--help' option for a short how-to.";
+            break;
+            
         default:;
     }
     printf("Error: %s\n", str.c_str());
 }
 
+/* NOTE:
+ * Name: create_dir
+ * Purpose: Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if
+ *          it doesn't already exist.
+ * Parameters: None
+ */
 void create_dir () {
-    using namespace std::filesystem;
+    using namespace std::filesystem;    //NOTE: Use C++17's filesystem library
     create_directory(DIR.c_str());
     
     if (not exists(COMPLETED.c_str())) {
@@ -124,6 +150,12 @@ void create_dir () {
     }
 }
 
+/* NOTE:
+ * Name: display_completed_puzzles
+ * Purpose: Reads in the current number of games the player has successfully completed and then
+ *          displays that information to the screen in the terminal window.
+ * Parameters: None
+ */
 void display_completed_puzzles () {
     uint64_t num_completed;
     ifstream infile;
@@ -139,20 +171,11 @@ void display_completed_puzzles () {
             x_max;
     getmaxyx(stdscr, y_max, x_max);
     
-    curs_set(false);
+    curs_set(false);    //NOTE: Turn cursor off while displaying information
     clear();
     mvprintw(y_max/2, x_max/2 - sstr.str().size()/2, "%s", sstr.str().c_str());
     mvprintw(y_max/2 + 2, x_max/2 - str.size()/2, "%s", str.c_str());
     refresh();
     while (getch() != KEY_ENTER);
-    curs_set(true);
+    curs_set(true);     //NOTE: Turn cursor back on before returning to the calling function
 }
-
-//TODO: Make a struct that will be returned with the saved puzzle contents inside it. This will be
-//      easier than trying to return the array itself.
-/*SavedPuzzle import_puzzle () {
-    SavedPuzzle saved_puzzle;
-    //ifstream infile("game1.csv");
-    
-    return saved_puzzle;
-}*/
