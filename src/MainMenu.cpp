@@ -185,8 +185,6 @@ options MainMenu::menu () {
      */
     if (first_pass) {
         while (y_max < WINDOW_YMIN or x_max < WINDOW_XMIN) {
-            uint8_t x_curr,
-                    y_curr;
             ::clear();
             string msg1 = "The current window is too small",
                    msg4 = "Resize the terminal window and press Enter twice to continue";
