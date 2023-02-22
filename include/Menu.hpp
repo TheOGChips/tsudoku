@@ -38,7 +38,7 @@ class Menu {
         uint8_t VERTICAL_DIVIDER = 4,
                 IN_GAME_MENU_DISPLAY_SPACING = 80;
         
-        virtual void display_menu (const uint8_t, const uint8_t, const options) = PURE_VIRTUAL;
+        virtual void display_menu (const cell, const options) = PURE_VIRTUAL;
         
     public:
         Menu () {}  //NOTE: Default constructor. Does nothing.

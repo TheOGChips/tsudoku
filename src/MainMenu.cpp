@@ -62,7 +62,7 @@ options operator -- (options& opt) {
  * Parameters: None
  */
 MainMenu::MainMenu () {
-    initscr();  //TODO: Account for already having been called somehow
+    initscr();
     cbreak();   //TODO: Will need to account for signal handling
     noecho();
     keypad(stdscr, true);
@@ -88,15 +88,14 @@ MainMenu::~MainMenu () {
  *          menu is re-rendered each time the user uses the Up/Down keys to highlight a different
  *          option.
  * Parameters:
- *      TODO: Switch to using a cell object instead of Y, X
- *      Y -> Starting display line for main menu.
- *      X -> Starting display column for main menu.
+ *      MAX -> Bottom right corner cell of the terminal window. Signifies the max number of lines
+ *             and columns in the window.
  *      OPT -> The currently selected main menu option.
  */
-void MainMenu::display_menu (const uint8_t Y, const uint8_t X, const options OPT) {
+void MainMenu::display_menu (const cell MAX, const options OPT) {
     const string TITLE = "MAIN MENU";
-    const uint8_t Y_CENTER = Y / 2,
-                  X_CENTER = X/2 - TITLE.size()/2,
+    const uint8_t Y_CENTER = MAX.first/2,
+                  X_CENTER = MAX.second/2 - TITLE.size()/2,
                   NUM_OPTS = 4;
     const string OPTS[NUM_OPTS] = { "New Game", "Resume Game", "Show # Finished Games", "Exit" };
     map<uint8_t, options> opt_map;
@@ -217,7 +216,7 @@ options MainMenu::menu () {
     
     //NOTE: Display the main menu starting with the "New Game" option highlighted
     options opt = options::NEW_GAME;
-    display_menu(y_max, x_max, opt);
+    display_menu(cell {y_max, x_max}, opt);
     
     //NOTE: Cycle through the menu until the user selects an option
     uint16_t input;
@@ -226,12 +225,12 @@ options MainMenu::menu () {
         switch (input) {
             case KEY_DOWN:
                 ++opt;
-                display_menu(y_max, x_max, opt);
+                display_menu(cell {y_max, x_max}, opt);
                 break;
                             
             case KEY_UP:
                 --opt;
-                display_menu(y_max, x_max, opt);
+                display_menu(cell {y_max, x_max}, opt);
                 break;
                 
             default:;

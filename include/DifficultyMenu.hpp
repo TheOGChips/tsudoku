@@ -8,7 +8,7 @@ class DifficultyMenu : public Menu {
     private:
         difficulty_level diff;
         
-        void display_menu (const uint8_t, const uint8_t, const options);
+        void display_menu (const cell, const options);
         void set_difficulty_level (const difficulty_level);
         
     public:

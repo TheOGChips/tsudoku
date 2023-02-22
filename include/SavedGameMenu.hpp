@@ -17,7 +17,7 @@ class SavedGameMenu : public Menu {
         uint8_t saved_game[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         char saved_color_codes[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         
-        void display_menu (const uint8_t, const uint8_t, const options) override;
+        void display_menu (const cell, const options) override;
         void generate_saved_games_list ();
         bool select_saved_game ();
         void read_saved_game ();

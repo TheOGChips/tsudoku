@@ -5,13 +5,13 @@
 
 using namespace std;
 
-void SavedGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const options) {
-    uint8_t display_line = Y_EDGE;
+void SavedGameMenu::display_menu (const cell EDGE, const options) {
+    uint8_t display_line = EDGE.first;
     clear();
-    mvprintw(display_line++, X_EDGE, "Saved Games:");
+    mvprintw(display_line++, EDGE.second, "Saved Games:");
     for (list_iter iter = saved_games.begin(); iter != saved_games.end(); iter++) {
         if (*selection == *iter) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(++display_line, X_EDGE, "%s", iter->c_str());
+        mvprintw(++display_line, EDGE.second, "%s", iter->c_str());
         if (*selection == *iter) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -38,7 +38,7 @@ bool SavedGameMenu::select_saved_game () {
     if (saved_games.empty()) mvprintw(TOP_PADDING, LEFT_PADDING, "You have no saved games.");
     else {
         do {
-            display_menu(TOP_PADDING, LEFT_PADDING, options::NONE);
+            display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
             
             input = getch();
             if (input == KEY_DOWN and *selection != saved_games.back()) selection++;

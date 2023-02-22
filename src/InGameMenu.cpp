@@ -13,7 +13,7 @@ InGameMenu::InGameMenu (uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATR
     }
 }
 
-void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const options OPT) {
+void InGameMenu::display_menu (const cell EDGE, const options OPT) {
     const uint8_t NUM_OPTS = 3;
     const string TITLE = "IN-GAME MENU",
                  OPTS[NUM_OPTS] = { "View the rules of sudoku",
@@ -24,10 +24,10 @@ void InGameMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const
     opt_map[1] = options::MANUAL;
     opt_map[2] = options::SAVE_GAME;
            
-    mvprintw(Y_EDGE, X_EDGE, "%s", TITLE.c_str());
+    mvprintw(EDGE.first, EDGE.second, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_OPTS; i++) {
         if (OPT == opt_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_EDGE + IN_GAME_MENU_TITLE_SPACING + i + 1, X_EDGE, "%s", OPTS[i].c_str());
+        mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + i + 1, EDGE.second, "%s", OPTS[i].c_str());
         if (OPT == opt_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -185,7 +185,7 @@ options InGameMenu::menu () {
     uint16_t input;
     do {
         refresh();
-        display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, opt);
+        display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
         input = getch();
         switch (input) {
             case KEY_DOWN: opt++;  //TODO: These could actually be changed to be post-increment/
@@ -207,7 +207,7 @@ options InGameMenu::menu () {
                     case options::SAVE_GAME: clear(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
                                              //NOTE: Turn off highlighted option while entering in
                                              //      save name
-                                             display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE,
+                                             display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE},
                                                           options::NONE);
                                              save_game(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE);
                                              break;
@@ -218,7 +218,7 @@ options InGameMenu::menu () {
         }
     } while (tolower(input) != 'm');
     opt = options::NONE;
-    display_menu(TOP_PADDING, IN_GAME_MENU_LEFT_EDGE, opt);
+    display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
     curs_set(true);
     
     return opt;

@@ -36,7 +36,7 @@ difficulty_level operator -- (difficulty_level& diff, int) {
     return diff;
 }
 
-void DifficultyMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, const options) {
+void DifficultyMenu::display_menu (const cell EDGE, const options) {
     const uint8_t NUM_DIFFS = 4;
     const string TITLE = "CHOOSE DIFFICULTY SETTING",
                  DIFFS[NUM_DIFFS] = { "Easy", "Medium", "Hard", "Expert"};
@@ -47,10 +47,10 @@ void DifficultyMenu::display_menu (const uint8_t Y_EDGE, const uint8_t X_EDGE, c
     diff_map[2] = difficulty_level::HARD;
     diff_map[3] = difficulty_level::EXPERT;
            
-    mvprintw(Y_EDGE, X_EDGE, "%s", TITLE.c_str());
+    mvprintw(EDGE.first, EDGE.second, "%s", TITLE.c_str());
     for (uint8_t i = 0; i < NUM_DIFFS; i++) {
         if (diff == diff_map[i]) attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(Y_EDGE + i + 2, X_EDGE, "%s", DIFFS[i].c_str());
+        mvprintw(EDGE.first + i + 2, EDGE.second, "%s", DIFFS[i].c_str());
         if (diff == diff_map[i]) attroff(COLOR_PAIR(MENU_SELECTION));
     }
     refresh();
@@ -66,7 +66,7 @@ options DifficultyMenu::menu () {
     uint16_t input;
     do {
         refresh();
-        display_menu(TOP_PADDING, LEFT_PADDING, options::NONE);
+        display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
         input = getch();
         switch (input) {
             case KEY_DOWN: diff++;

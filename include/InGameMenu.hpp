@@ -12,7 +12,7 @@ class InGameMenu : public Menu {
                       NUM_OPTS = 3;
         uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];    //NOTE: This must be a pointer so that the display matrix will properly update when saving a game in the in-game menu.
         
-        void display_menu (const uint8_t, const uint8_t, const options) override;
+        void display_menu (const cell, const options) override;
         void clear (const uint8_t, const uint8_t);
         void display_rules (const uint8_t, const uint8_t);
         void display_manual (const uint8_t, const uint8_t);
