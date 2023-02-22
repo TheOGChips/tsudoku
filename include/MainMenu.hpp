@@ -34,8 +34,8 @@ class MainMenu : public Menu {
         void set_WINDOW_XMIN ();
         
     public:        
-        MainMenu ();    //NOTE: Default constructor. Does nothing.
-        ~MainMenu ();   //NOTE: Default destructor. Does nothing.
+        MainMenu ();
+        ~MainMenu ();
         options menu () override;
         options menu (const bool);
 };
