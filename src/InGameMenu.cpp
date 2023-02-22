@@ -6,6 +6,26 @@
 
 using namespace std;
 
+/* NOTE:
+ * Name: Operator ++ (post-increment, overloaded)
+ * Purpose: Shorthand convenience for changing in-game menu options.
+ * Parameters:
+ *      opt -> The previously highlighted in-game menu option to update.
+ */
+options operator ++ (options& opt, int) {
+    return opt = (opt == options::RULES) ? options::MANUAL : options::SAVE_GAME;
+}
+
+/* NOTE:
+ * Name: Operator -- (post-decrement, overloaded)
+ * Purpose: Shorthand convenience for changing in-game menu options.
+ * Parameters:
+ *      opt -> The previously highlighted in-game option to update.
+ */
+options operator -- (options& opt, int) {
+    return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;
+}
+
 //TODO: This might need to be dynamically allocated instead
 /* NOTE:
  * Name: Class Constructor
@@ -311,24 +331,4 @@ options InGameMenu::menu () {
     curs_set(true); //NOTE: Turn the cursor back on before returning to the game
     
     return opt;
-}
-
-/* NOTE:
- * Name: Operator ++ (post-increment, overloaded)
- * Purpose: Shorthand convenience for changing in-game menu options.
- * Parameters:
- *      opt -> The previously highlighted in-game menu option to update.
- */
-options operator ++ (options& opt, int) {
-    return opt = (opt == options::RULES) ? options::MANUAL : options::SAVE_GAME;
-}
-
-/* NOTE:
- * Name: Operator -- (post-decrement, overloaded)
- * Purpose: Shorthand convenience for changing in-game menu options.
- * Parameters:
- *      opt -> The previously highlighted in-game option to update.
- */
-options operator -- (options& opt, int) {
-    return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;
 }

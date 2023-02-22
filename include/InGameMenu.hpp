@@ -38,8 +38,4 @@ class InGameMenu : public Menu {
         static std::string save_game (uint8_t*[DISPLAY_MATRIX_COLUMNS]);
 };
 
-//TODO: Remove these and adjust the source file accordingly
-options operator ++ (options&, int);
-options operator -- (options&, int);
-
 #endif
