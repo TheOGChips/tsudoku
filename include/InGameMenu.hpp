@@ -33,7 +33,7 @@ class InGameMenu : public Menu {
         
     public:
         InGameMenu (uint8_t[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS]);
-        ~InGameMenu () {}
+        ~InGameMenu () {}   //NOTE: Default destructor. Does nothing.
         options menu () override;
         static std::string save_game (uint8_t*[DISPLAY_MATRIX_COLUMNS]);
 };
