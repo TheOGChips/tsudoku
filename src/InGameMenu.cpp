@@ -11,7 +11,7 @@ using namespace std;
  * Purpose: Shorthand convenience for changing in-game menu options.
  * Parameters:
  *      opt -> The previously highlighted in-game menu option to update.
- * TODO: Add note about unused int parameter
+ *      (unused int) -> Tells the compiler to overload the post-increment operator.
  */
 options operator ++ (options& opt, int) {
     return opt = (opt == options::RULES) ? options::MANUAL : options::SAVE_GAME;
@@ -22,7 +22,7 @@ options operator ++ (options& opt, int) {
  * Purpose: Shorthand convenience for changing in-game menu options.
  * Parameters:
  *      opt -> The previously highlighted in-game option to update.
- * TODO: Add note about unused int parameter
+ *      (unused int) -> Tells the compiler to overload the post-decrement operator.
  */
 options operator -- (options& opt, int) {
     return opt = (opt == options::SAVE_GAME) ? options::MANUAL : options::RULES;

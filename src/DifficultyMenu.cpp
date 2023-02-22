@@ -9,6 +9,7 @@ using namespace std;
  * Purpose: Shorthand convenience for changing difficulty options.
  * Parameters:
  *      opt -> The previously highlighted difficulty option to update.
+ *      (unused int) -> Tells the compiler to overload the post-increment operator.
  */
 difficulty_level operator ++ (difficulty_level& diff, int) {
     switch (diff) {
@@ -34,6 +35,7 @@ difficulty_level operator ++ (difficulty_level& diff, int) {
  * Purpose: Shorthand convenience for changing difficulty options.
  * Parameters:
  *      opt -> The previously highlighted difficulty option to update.
+ *      (unused int) -> Tells the compiler to overload the post-decrement operator.
  */
 difficulty_level operator -- (difficulty_level& diff, int) {
     switch (diff) {
