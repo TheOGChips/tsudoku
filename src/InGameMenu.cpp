@@ -238,9 +238,11 @@ void InGameMenu::save_game (const cell EDGE) {
 string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
     const uint8_t NAME_SIZE = 18;   //NOTE: NAME_SIZE limited by window width requirements of no
     char name[NAME_SIZE];           //      in-game menu mode
+    nodelay(stdscr, false);
     echo();
     getnstr(name, NAME_SIZE - 1);
     noecho();
+    nodelay(stdscr, true);
     
     const string FILENAME = DIR + "/" + name + ".csv";
     ofstream outfile;

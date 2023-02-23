@@ -46,6 +46,7 @@ using namespace std;
 class Sudoku {
     private:
         uint8_t display_matrix[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
+        uint8_t color_codes[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS] = {};
         Grid grid;
         map<uint8_t, cell> grid2display_map;
         map<cell, uint8_t> display2grid_map;
@@ -59,6 +60,7 @@ class Sudoku {
         void set_color_pairs ();
         void init_display_matrix (const SavedPuzzle*);
         void printw (const SavedPuzzle*);
+        void printw ();
         void move (const cell);
         void move (const uint16_t);
         void refresh ();
@@ -73,6 +75,7 @@ class Sudoku {
         bool evaluate ();
         void increment_completed_games ();
         void save_game (const uint8_t);
+        void display_hotkey (const bool, const uint8_t);
         
     public:
         Sudoku (const SavedPuzzle*);

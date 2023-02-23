@@ -286,6 +286,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
                     default: color_pair = 0;    //NOTE: case 'n'
                 }
                 
+                color_codes[i][j] = color_pair;
                 attron(COLOR_PAIR(color_pair));
             }
             ::printw("%c", display_matrix[i][j]);
@@ -308,15 +309,38 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
             move(coords);
             
             if (grid.is_known(i)) {
+                color_codes[coords.first][coords.second] = GIVEN;
                 attron(COLOR_PAIR(GIVEN));
                 ::printw("%c", display_matrix[coords.first][coords.second]);
                 attroff(COLOR_PAIR(GIVEN));
             }
             else {
+                color_codes[coords.first][coords.second] = UNKNOWN;
                 attron(COLOR_PAIR(UNKNOWN));
                 ::printw("%c", display_matrix[coords.first][coords.second]);
                 attroff(COLOR_PAIR(UNKNOWN));
             }
+        }
+    }
+}
+
+/**/
+void Sudoku::printw () {
+    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+        move(cell {i, 0}); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
+        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
+            if (color_codes[i][j] == CANDIDATES_Y or
+                color_codes[i][j] == CANDIDATES_B) attron(A_BOLD);
+            attron(COLOR_PAIR(color_codes[i][j]));
+            ::printw("%c", display_matrix[i][j]);
+            attroff(COLOR_PAIR(color_codes[i][j]));
+            attroff(A_BOLD);
+            
+            if (j == 8 or j == 17) ::printw("|");
+        }
+        if (i == 8 or i == 17) {
+            ::move(i + ORIGIN.first + (i / CONTAINER_SIZE) + 1, ORIGIN.second);
+            ::printw("---------|---------|---------");
         }
     }
 }
@@ -556,6 +580,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                     
                     grid.set_value(INDEX, '?');
                     display_matrix[Y][X] = '?';
+                    color_codes[Y][X] = UNKNOWN;
                 }
                 //else if ((ch & A_COLOR) == COLOR_PAIR(UNKNOWN)) {}    //Do nothing
             }
@@ -567,6 +592,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                 
                 grid.set_value(INDEX, VALUE);
                 display_matrix[Y][X] = VALUE;
+                color_codes[Y][X] = GUESS;
                 
                 #if DEBUG
                     ::mvprintw(25, 40 + 20, "index: %d", INDEX);
@@ -599,6 +625,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 ::printw(" ");
                 display_matrix[Y][X] = ' ';
+                color_codes[Y][X] = 0;
             }
             else {
                 array<cell, NUM_BORDER_POSITIONS> border = get_surrounding_cells();
@@ -620,6 +647,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
                 attroff(COLOR_PAIR(color_pair));
                 
                 display_matrix[Y][X] = VALUE;
+                color_codes[Y][X] = color_pair;
             }
         }
         refresh();
@@ -710,6 +738,31 @@ void Sudoku::save_game (const uint8_t DELAY) {
 }
 
 /* NOTE:
+ * Name: display_hotkey
+ * Purpose: Displays the hotkey command available in the bottom left corner depending on whether the
+ *          in-game menu is enabled.
+ * Parameters:
+ *      USE_IN_GAME_MENU -> Boolean controlling whether or not the in-game menu is enabled. This is
+ *                          determined based on whether or not the user runs this program with the
+ *                          "--no-in-game-menu" or "-n" command line options. This also controls
+ *                          which hotkey is available.
+ *      LINE_OFFSET_TWEAK -> Line offset from max line number used to display hotkey command in an
+ *                           ideal location.
+ */
+void Sudoku::display_hotkey (const bool USE_IN_GAME_MENU, const uint8_t LINE_OFFSET_TWEAK) {
+    if (not USE_IN_GAME_MENU) {
+        attron(COLOR_PAIR(MENU_SELECTION));
+        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "s -> save game");
+        attroff(COLOR_PAIR(MENU_SELECTION));
+    }
+    else {
+        attron(COLOR_PAIR(MENU_SELECTION));
+        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
+        attroff(COLOR_PAIR(MENU_SELECTION));
+    }
+}
+
+/* NOTE:
  * Name: start_game
  * Purpose: Starts and runs a game of sudoku until the user either wins or decides to quit.
  *          Dispatches calls to the in-game menu (when enabled), to directly save the game (when the
@@ -730,23 +783,16 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
     const uint8_t LINE_OFFSET_TWEAK = 3,    //NOTE: # lines to get display output correct
                   DELAY = 2;                //NOTE: # seconds to delay after printing out results
                   
-    if (not USE_IN_GAME_MENU) {
-        attron(COLOR_PAIR(MENU_SELECTION));
-        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "s -> save game");
-        attroff(COLOR_PAIR(MENU_SELECTION));
-    }
-    else {
-        attron(COLOR_PAIR(MENU_SELECTION));
-        ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
-        attroff(COLOR_PAIR(MENU_SELECTION));
-    }
-    ::move(ORIGIN.first, ORIGIN.second);    //starting position of the user
+    display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
+    ::move(ORIGIN.first, ORIGIN.second);    //NOTE: starting position of the user
     cursor_pos = make_pair(ORIGIN.first, ORIGIN.second);
     refresh();
 
     bool quit_game = false;
+    //nodelay(stdscr, true);
+    timeout(250);
     do {
-        uint16_t input = getch();
+        int16_t input = getch();
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work as expected. Not sure why.
         }
@@ -801,7 +847,17 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             }
             curs_set(true);
         }
+        else {
+            if (invalid_window_size_handler()) {
+                cell curr_pos = cursor_pos;
+                printw();
+                cursor_pos = curr_pos;
+                display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
+                reset_cursor();
+            }
+        }
     } while (!quit_game);
+    nodelay(stdscr, false);
 }
 
 /* NOTE:

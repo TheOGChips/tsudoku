@@ -6,6 +6,8 @@ using namespace std;
 
 cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
 
+//TODO: This file also probably needs a SIGINT handler
+
 /* NOTE:
  * Name: invalid_window_size_handler
  * Purpose: Enforce window size on initial startup if terminal window is not already compliant. The
@@ -14,14 +16,16 @@ cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
  *          decided to make a feature. For some reason, it's required to hit twice only in this
  *          section. Since it doesn't affect anything else, I just left it alone.
  * Parameters: None
+ * 
+ * TODO: Fix up the text that displays after a player fixes the terminal window size
  */
-void invalid_window_size_handler () {
+bool invalid_window_size_handler () {
     uint8_t x_max,
             y_max;
     getmaxyx(stdscr, y_max, x_max);
     if (y_max != WINDOW_REQ.first or x_max != WINDOW_REQ.second) {
         do {
-            ::clear();
+            clear();
             string msg1 = "The current window is too small",
                    msg4 = "Resize the terminal window and press Enter twice to continue";
             stringstream msg2,
@@ -36,7 +40,7 @@ void invalid_window_size_handler () {
             getmaxyx(stdscr, y_max, x_max);
             while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be
         } while (y_max != WINDOW_REQ.first or x_max != WINDOW_REQ.second); //      pressed twice here
-        ::clear();
+        clear();
         
         string msg1 = "The window is now an appropriate size",
                msg2 = "Press Enter to continue";
@@ -44,5 +48,8 @@ void invalid_window_size_handler () {
         mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
         refresh();
         while (getch() != KEY_ENTER);
+        clear();
+        return true;
     }
+    else return false;
 }

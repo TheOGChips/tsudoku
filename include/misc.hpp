@@ -44,6 +44,6 @@ enum class difficulty_level { EASY = 60, MEDIUM = 45, HARD = 30, EXPERT = 17 };
 
 //NOTE: These are both defined in misc.cpp
 extern cell WINDOW_REQ;
-void invalid_window_size_handler ();
+bool invalid_window_size_handler ();
 
 #endif
