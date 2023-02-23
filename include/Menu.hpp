@@ -1,8 +1,6 @@
 #ifndef MENU_HPP
 #define MENU_HPP
 
-#include <cstdint>
-#include <string>
 #include "misc.hpp"
 
 /* NOTE: Options used by the various Menu-derived classes. There is probably a slightly better way to
@@ -41,9 +39,10 @@ class Menu {
         virtual void display_menu (const cell, const options) = PURE_VIRTUAL;
         
     public:
-        Menu () {}  //NOTE: Default constructor. Does nothing.
+        Menu ();
         ~Menu () {} //NOTE: Default destructor. Does nothing.
         virtual options menu () = PURE_VIRTUAL;
+        static void SIGINT_handler (int32_t);
 };
 
 #endif

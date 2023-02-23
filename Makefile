@@ -14,8 +14,9 @@ DIFFICULTY_MENU = DifficultyMenu
 SUDOKU = Sudoku
 CONTAINER = Container
 GRID = Grid
-OBJ = $(LIB)/$(MAIN).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(DIFFICULTY_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
-COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/misc.hpp
+MISC = misc
+OBJ = $(LIB)/$(MISC).o $(LIB)/$(MAIN).o $(LIB)/$(MENU).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(DIFFICULTY_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
+COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/$(MISC).hpp
 # TODO: Fix this later
 TGT = t$(SUDOKU)
 
@@ -26,7 +27,13 @@ all:	$(OBJ)
 	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT) -lncurses
 
+$(LIB)/$(MISC).o:	$(SRC)/$(MISC).cpp $(COMMON_HDRS)
+			$(COMPILE) $<
+
 $(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp $(COMMON_HDRS)
+			$(COMPILE) $<
+
+$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
 #TODO: Clean this up some

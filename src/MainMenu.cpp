@@ -63,7 +63,7 @@ options operator -- (options& opt) {
  */
 MainMenu::MainMenu () {
     initscr();
-    cbreak();   //TODO: Will need to account for signal handling
+    cbreak();
     noecho();
     keypad(stdscr, true);
     
