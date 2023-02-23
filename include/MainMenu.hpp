@@ -14,24 +14,17 @@
  *                       terminal display.
  *      RESULT_MSG_SPACE -> Minimum number of lines required to properly display the puzzle's
  *                          evaluation result.
- *      WINDOW_YMIN -> Minimum terminal window lines enforced on startup. If the window does not meet
- *                     this requirement, it will halt until the user resizes their terminal window.
- *      WINDOW_XMIN -> Minimum terminal window columns enforced on startup. This value is dependent
- *                     on whether the in-game menu is enable. If the window does not meet this
- *                     requirement, it will halt until the user resizes their terminal window.
  */
 class MainMenu : public Menu {
     private:
         const uint8_t BOTTOM_PADDING = TOP_PADDING,
                       RIGHT_PADDING = LEFT_PADDING,
-                      RESULT_MSG_SPACE = 3,
-                      WINDOW_YMIN = TOP_PADDING + PUZZLE_SPACE + RESULT_MSG_SPACE + BOTTOM_PADDING;
-        uint8_t WINDOW_XMIN;
+                      RESULT_MSG_SPACE = 3;
         
         void display_menu (const cell, const options) override;
         void set_VERTICAL_DIVIDER (const uint8_t);
         void set_IN_GAME_MENU_DISPLAY_SPACING (const uint8_t);
-        void set_WINDOW_XMIN ();
+        void set_WINDOW_REQ ();
         
     public:        
         MainMenu ();

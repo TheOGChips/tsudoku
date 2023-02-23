@@ -1,7 +1,6 @@
 #include <ncurses.h>
 #include "MainMenu.hpp"
 #include "colors.hpp"
-#include <sstream>
 #include <map>
 
 using namespace std;
@@ -61,7 +60,7 @@ options operator -- (options& opt) {
  * Purpose: Initializes the NCurses environment and global NCurses settings.
  * Parameters: None
  */
-MainMenu::MainMenu () {
+MainMenu::MainMenu () {    
     initscr();
     cbreak();
     noecho();
@@ -137,13 +136,15 @@ void MainMenu::set_IN_GAME_MENU_DISPLAY_SPACING (const uint8_t VAL) {
 
 /* NOTE:
  * Name: set_WINDOW_XMIN
- * Purpose: Sets the minimum number of columns the terminal window must be in order to play. This
- *          size is dependent on whether the in-game menu is enabled.
+ * Purpose: Sets the number of lines and columns the terminal window must be in order to
+ *          play. This size is dependent on whether the in-game menu is enabled.
  * Parameters: None
  */
-void MainMenu::set_WINDOW_XMIN () {
-    WINDOW_XMIN = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER + IN_GAME_MENU_DISPLAY_SPACING +
-                  RIGHT_PADDING;
+void MainMenu::set_WINDOW_REQ () {
+    //NOTE: WINDOW_REQ is defined in misc.hpp and misc.cpp
+    WINDOW_REQ.first = TOP_PADDING + PUZZLE_SPACE + RESULT_MSG_SPACE + BOTTOM_PADDING;
+    WINDOW_REQ.second = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER +
+                        IN_GAME_MENU_DISPLAY_SPACING + RIGHT_PADDING;
 }
 
 /* NOTE:
@@ -158,7 +159,7 @@ options MainMenu::menu (const bool USE_IN_GAME_MENU) {
         set_VERTICAL_DIVIDER(0);
         set_IN_GAME_MENU_DISPLAY_SPACING(0);
     }
-    set_WINDOW_XMIN();
+    set_WINDOW_REQ();
     
     return menu();
 }
@@ -182,32 +183,11 @@ options MainMenu::menu () {
      *       the Enter key twice. The reason the Enter key must be hit twice is actually a bug I
      *       decided to make a feature. For some reason, it's required to hit twice only in this
      *       section. Since it doesn't affect anything else, I just left it alone.
+     * 
+     * TODO: Move this note into misc.cpp
      */
-    if (first_pass) {
-        while (y_max < WINDOW_YMIN or x_max < WINDOW_XMIN) {
-            ::clear();
-            string msg1 = "The current window is too small",
-                   msg4 = "Resize the terminal window and press Enter twice to continue";
-            stringstream msg2,
-                         msg3;
-            msg2 << "Required dimensions: " << WINDOW_XMIN+0 << " x " << WINDOW_YMIN+0;
-            msg3 << "Current dimensions: " << x_max+0 << " x " << y_max+0;
-            mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       "%s", msg1.c_str());
-            mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, "%s", msg2.str().c_str());
-            mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, "%s", msg3.str().c_str());
-            mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       "%s", msg4.c_str());
-            refresh();
-            getmaxyx(stdscr, y_max, x_max);
-            while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be
-        }                                   //      pressed twice here
-        ::clear();
-        
-        string msg1 = "The window is now an appropriate size",
-            msg2 = "Press Enter to continue";
-        mvprintw(y_max/2,     x_max/2 - msg1.size()/2, "%s", msg1.c_str());
-        mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
-        refresh();
-        while (getch() != KEY_ENTER);
+    if (first_pass) {   //TODO: Get rid of this first_pass check here
+        invalid_window_size_handler();
         first_pass = false;
     }
     ::clear();
