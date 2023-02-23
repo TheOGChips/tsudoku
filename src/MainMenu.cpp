@@ -174,22 +174,11 @@ options MainMenu::menu (const bool USE_IN_GAME_MENU) {
 options MainMenu::menu () {
     uint8_t x_max,
             y_max;
-    static bool first_pass = true;
+    //static bool first_pass = true;
     getmaxyx(stdscr, y_max, x_max);
     curs_set(false);    //NOTE: Turn the cursor off while in the main menu.
 
-    /* NOTE: Enforce window size on initial startup if terminal window is not already compliant. The
-     *       user will be updated as to whether the window is the correct size or not after pressing
-     *       the Enter key twice. The reason the Enter key must be hit twice is actually a bug I
-     *       decided to make a feature. For some reason, it's required to hit twice only in this
-     *       section. Since it doesn't affect anything else, I just left it alone.
-     * 
-     * TODO: Move this note into misc.cpp
-     */
-    if (first_pass) {   //TODO: Get rid of this first_pass check here
-        invalid_window_size_handler();
-        first_pass = false;
-    }
+    invalid_window_size_handler();  //NOTE: Enforce window size
     ::clear();
     
     //NOTE: Display the main menu starting with the "New Game" option highlighted
