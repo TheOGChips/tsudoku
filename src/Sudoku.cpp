@@ -726,18 +726,15 @@ void Sudoku::save_game (const uint8_t DELAY) {
  */
 void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_PUZZLE) {
     printw(SAVED_PUZZLE);
-    InGameMenu* in_game_menu;
     const uint8_t LINE_OFFSET_TWEAK = 3,    //NOTE: # lines to get display output correct
                   DELAY = 2;                //NOTE: # seconds to delay after printing out results
                   
     if (not USE_IN_GAME_MENU) {
-        in_game_menu = nullptr;
         attron(COLOR_PAIR(MENU_SELECTION));
         ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "s -> save game");
         attroff(COLOR_PAIR(MENU_SELECTION));
     }
     else {
-        in_game_menu = new InGameMenu(display_matrix);
         attron(COLOR_PAIR(MENU_SELECTION));
         ::mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
         attroff(COLOR_PAIR(MENU_SELECTION));
@@ -753,12 +750,15 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             quit_game = true;           //      to work as expected. Not sure why.
         }
         else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
+            // NOTE: Allows re-using the same in-game menu object on each loop iteration
+            static InGameMenu in_game_menu(display_matrix); 
+            
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> return to game");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
-            in_game_menu->menu();
+            in_game_menu.menu();
             
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
@@ -801,6 +801,4 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             curs_set(true);
         }
     } while (!quit_game);
-    
-    if (USE_IN_GAME_MENU) delete in_game_menu;
 }
