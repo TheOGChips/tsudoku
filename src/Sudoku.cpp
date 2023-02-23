@@ -324,8 +324,12 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     }
 }
 
-//TODO: Add note for printw
-/**/
+/* NOTE:
+ * Name: printw (NCurses library function overload)
+ * Purpose: Prints the entire sudoku puzzle (the display matrix) to the screen whenever there has
+ *          been an update by the player (i.e. removal or insertion of a value).
+ * Parameters: None
+ */
 void Sudoku::printw () {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
         move(cell {i, 0}); //NOTE: Call to Sudoku::move wrapper function (applies display offset)
@@ -536,11 +540,13 @@ void Sudoku::clear_surrounding_cells () {
  *               Column, and Box of this game's Grid member variable. If the value corresponds to
  *               that of the Delete or Backspace keys, this function performs a removal instead.
  * 
- * NOTE: This now uses the new overload of Sudoku::printw, but there's some issue with how the color
- *       pairs for candidate cells are determined when I try to do a similar simplification in the
- *       original Sudoku::printw (the one with parameters). The display2grid_map always produces a
- *       0, which means all the candidate cells become yellow. TODO: Figure out why this might be
- *       and fix it if possible.
+ * NOTE: This now uses the new overload of Sudoku::printw (although the original lines have been
+ *       left as comments for posterity), but there's some issue with how the color pairs for
+ *       candidate cells are determined when I try to do a similar simplification in the original
+ *       Sudoku::printw (the one with parameters). The display2grid_map always produces a 0, which
+ *       means all the candidate cells become yellow. I've made several attempts to see if I could
+ *       figure out why this might be, but I don't think it's worth taking the time to "fix" when it
+ *       already works perfectly fine.
  */
 void Sudoku::set_value (const uint16_t VALUE) {
     /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
