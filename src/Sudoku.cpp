@@ -8,6 +8,7 @@
 #include "InGameMenu.hpp"
 #include <filesystem>
 #include "DifficultyMenu.hpp"
+#include <csignal>
 
 using namespace std;
 
@@ -20,10 +21,10 @@ using namespace std;
  *                      user has selected to resume a saved game, this object will be read in
  *                      beforehand.
  */
-Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {    
+Sudoku::Sudoku (const SavedPuzzle* SAVED_PUZZLE) {
+    signal(SIGINT, SIGINT_handler);
     create_map();
     set_color_pairs();  //NOTE: Establish color pairs for display matrix
-    //TODO: Will need to account for signal handling (will need to account across multiple files)
     init_display_matrix(SAVED_PUZZLE);
 }
 
@@ -801,4 +802,21 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             curs_set(true);
         }
     } while (!quit_game);
+}
+
+/* NOTE:
+ * Name: SIGINT_handler
+ * Purpose: Resets the terminal settings to their previous state from before the NCurses environment
+ *          was initialized.
+ * Parameters:
+ *      (unused 32-bit integer) -> The signal being caught by this handler, in this case SIGINT.
+ *                                 Since it's value is never used, it does not need a name for
+ *                                 reference.
+ */
+void Sudoku::SIGINT_handler (int32_t) {
+    curs_set(true);
+    echo();
+    nocbreak();
+    endwin();
+    exit(EXIT_SUCCESS);
 }

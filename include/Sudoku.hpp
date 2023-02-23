@@ -79,6 +79,7 @@ class Sudoku {
         ~Sudoku () {}
 
         void start_game (const bool, const SavedPuzzle*);
+        static void SIGINT_handler (int32_t);
 };
 
 #endif
