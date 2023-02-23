@@ -16,7 +16,7 @@ void invalid_window_size_handler () {
             y_max;
     getmaxyx(stdscr, y_max, x_max);
     
-    while (y_max < WINDOW_REQ.first or x_max < WINDOW_REQ.second) {
+    while (y_max != WINDOW_REQ.first or x_max != WINDOW_REQ.second) {
         ::clear();
         string msg1 = "The current window is too small",
                msg4 = "Resize the terminal window and press Enter twice to continue";
