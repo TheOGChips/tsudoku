@@ -324,6 +324,7 @@ void Sudoku::printw (const SavedPuzzle* SAVED_PUZZLE) {
     }
 }
 
+//TODO: Add note for printw
 /**/
 void Sudoku::printw () {
     for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
@@ -535,16 +536,11 @@ void Sudoku::clear_surrounding_cells () {
  *               Column, and Box of this game's Grid member variable. If the value corresponds to
  *               that of the Delete or Backspace keys, this function performs a removal instead.
  * 
- * NOTE: I've noticed that probably a more preferred way this should work would be to just update
- *       the display matrix and then call a generic update/refresh function that updates the display
- *       instead of having individual printw lines here. This way does only update the specific
- *       cells and is potentially more efficient (the simplest way to implement the proposed method
- *       would be to simply reprint the entire display matrix every time), but the current
- *       implementation also doesn't take advantage of having the display matrix also being updated.
- *       In other words, the smarter way to go about this would be to just update the display
- *       matrix, and then have an update/refresh function that handles actually updating the display
- *       based on the display matrix. However, at this point I don't think it's worth doing after
- *       seeing some of the minute things that would need to be adjusted just to accommodate that.
+ * NOTE: This now uses the new overload of Sudoku::printw, but there's some issue with how the color
+ *       pairs for candidate cells are determined when I try to do a similar simplification in the
+ *       original Sudoku::printw (the one with parameters). The display2grid_map always produces a
+ *       0, which means all the candidate cells become yellow. TODO: Figure out why this might be
+ *       and fix it if possible.
  */
 void Sudoku::set_value (const uint16_t VALUE) {
     /* NOTE: Algorithm for determining where and/or how to place a value entered by the user
@@ -574,9 +570,9 @@ void Sudoku::set_value (const uint16_t VALUE) {
             
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
                 if ((ch & A_COLOR) == COLOR_PAIR(GUESS)) {
-                    attron(COLOR_PAIR(UNKNOWN));
+                    /*attron(COLOR_PAIR(UNKNOWN));
                     mvprintw(cursor_pos.first, cursor_pos.second, "?");
-                    attroff(COLOR_PAIR(UNKNOWN));
+                    attroff(COLOR_PAIR(UNKNOWN));*/
                     
                     grid.set_value(INDEX, '?');
                     display_matrix[Y][X] = '?';
@@ -586,9 +582,9 @@ void Sudoku::set_value (const uint16_t VALUE) {
             }
             else {
                 clear_surrounding_cells();
-                attron(COLOR_PAIR(GUESS));
+                /*attron(COLOR_PAIR(GUESS));
                 mvprintw(cursor_pos.first, cursor_pos.second, "%c", VALUE);
-                attroff(COLOR_PAIR(GUESS));
+                attroff(COLOR_PAIR(GUESS));*/
                 
                 grid.set_value(INDEX, VALUE);
                 display_matrix[Y][X] = VALUE;
@@ -623,7 +619,7 @@ void Sudoku::set_value (const uint16_t VALUE) {
         }
         else {
             if (VALUE == KEY_DC or VALUE == KEY_BACKSPACE) {
-                ::printw(" ");
+                //::printw(" ");
                 display_matrix[Y][X] = ' ';
                 color_codes[Y][X] = 0;
             }
@@ -640,11 +636,11 @@ void Sudoku::set_value (const uint16_t VALUE) {
                 }
                 reset_cursor();
                 
-                attron(COLOR_PAIR(color_pair));
+                /*attron(COLOR_PAIR(color_pair));
                 attron(A_BOLD);
                 ::printw("%c", VALUE);
                 attroff(A_BOLD);
-                attroff(COLOR_PAIR(color_pair));
+                attroff(COLOR_PAIR(color_pair));*/
                 
                 display_matrix[Y][X] = VALUE;
                 color_codes[Y][X] = color_pair;
@@ -652,6 +648,10 @@ void Sudoku::set_value (const uint16_t VALUE) {
         }
         refresh();
     }
+    
+    cell curr_pos = cursor_pos;
+    printw();
+    cursor_pos = curr_pos;
     reset_cursor(); //NOTE: Have cursor maintain position after printing
 }
 
