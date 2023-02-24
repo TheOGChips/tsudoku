@@ -19,6 +19,7 @@ OBJ = $(LIB)/$(MISC).o $(LIB)/$(MAIN).o $(LIB)/$(MENU).o $(LIB)/$(MAIN_MENU).o $
 COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/$(MISC).hpp
 # TODO: Fix this later
 TGT = t$(SUDOKU)
+SYMLINK_PATH = $(HOME)/.local/bin/
 
 .PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean
 
@@ -26,6 +27,7 @@ all:	$(OBJ)
 	mkdir -p $(LIB)
 	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT) -lncurses
+	-@ln -s $(PWD)/$(TGT) $(SYMLINK_PATH)
 
 $(LIB)/$(MISC).o:	$(SRC)/$(MISC).cpp $(COMMON_HDRS)
 			$(COMPILE) $<
@@ -66,19 +68,20 @@ run:	$(TGT)
 
 run_no_menu:	$(TGT)
 		@#./$< --no-in-game-menu
-		./$< -n
+		$< -n
 
 run_help:	$(TGT)
-		-./$< --help
+		$< --help
 
 run_invalid:	$(TGT)
-		-./$< --bad-flag
+		-$< --bad-flag
 
 run_too_many:	$(TGT)
-		-./$< --flag1 --flag2
+		-$< --flag1 --flag2
 
 clean:	$(TGT)
 	rm $< $(LIB)/*.o
 	rmdir $(LIB)
 	
 uninstall:	clean
+		@rm $(SYMLINK_PATH)/$(TGT)
