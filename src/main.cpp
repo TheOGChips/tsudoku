@@ -16,6 +16,7 @@ void create_dir ();
 void display_completed_puzzles ();
 void print_help ();
 void print_err_msg (err_msg);
+void delete_saved_games ();
 
 /* NOTE:
  * Name: main
@@ -41,6 +42,11 @@ int main (int argc, char** argv) {
                 not strcmp(argv[1], "-n")) use_in_game_menu = false;
             else if (not strcmp(argv[1], "--help")) {
                 print_help();
+                return 0;
+            }
+            else if (not strcmp(argv[1], "--delete-saved-games") or
+                     not strcmp(argv[1], "-d")) {
+                delete_saved_games();
                 return 0;
             }
             else {
@@ -177,4 +183,27 @@ void display_completed_puzzles () {
     refresh();
     while (getch() != KEY_ENTER);
     curs_set(true);     //NOTE: Turn cursor back on before returning to the calling function
+}
+
+/* NOTE:
+ * Name: delete_saved_games
+ * Purpose: Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
+ * Parameters: None
+ */
+void delete_saved_games () {
+    using namespace std::filesystem;
+    typedef directory_iterator dir_iter;
+    
+    /* NOTE: The standard says it's not specified whether a directory_iterator is updated or not
+     *       when a file is deleted, so this seems like a safer/more portable way to delete all
+     *       CSV files.
+     */
+    dir_iter iter(DIR);
+    while (iter != end(dir_iter())) {
+        path filepath = iter->path();
+        iter++;
+        if (filepath.extension() == ".csv") {
+            remove(filepath);
+        }
+    }
 }
