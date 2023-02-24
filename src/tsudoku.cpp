@@ -13,10 +13,11 @@ using namespace std;
  * Parameters: None
  */
 void print_help () {
-    printf("\nUsage: $ ./tsudoku OPTION\n\n");
+    printf("\nUsage: $ tsudoku OPTION\n\n");
     printf("OPTIONS\n\n");
-    printf("    -n, --no-in-game-menu\tRun tsudoku without the in-game menu\n");
+    printf("    -n, --no-in-game-menu\tRun tsudoku without the in-game menu\n\n");
     printf("    --help\t\t\tDisplay this help menu\n\n");
+    printf("    -d, --delete-saved-games\tDelete all saved games\n\n");
 }
 
 /* NOTE:
