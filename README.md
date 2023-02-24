@@ -19,6 +19,13 @@ NOTE: These are likely already installed depending on your operating system. If 
 >\- g++ (tsudoku compiles using the C++17 standard)  
 >\- ncurses
 
+## Prerequisites Installation
+
+If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager.
+
+>`$ sudo apt install g++`  
+>`$ sudo apt install libncurses-dev`
+
 ## Usage
 
 ### With in-game menu enabled:
