@@ -187,6 +187,7 @@ options MainMenu::menu () {
     
     //NOTE: Cycle through the menu until the user selects an option
     uint16_t input;
+    timeout(250);
     do {
         input = getch();
         switch (input) {
@@ -200,11 +201,14 @@ options MainMenu::menu () {
                 display_menu(cell {y_max, x_max}, opt);
                 break;
                 
-            default:;
+            default:
+                invalid_window_size_handler();
+                display_menu(cell {y_max, x_max}, opt);
         }
     } while (input != KEY_ENTER);
     
     ::clear();
+    nodelay(stdscr, false);
     curs_set(true); //NOTE: Turn the cursor back on before leaving the main menu
     return opt;
 }
