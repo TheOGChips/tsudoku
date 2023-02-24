@@ -19,7 +19,7 @@ COMMON_HDRS = $(INCLUDE_PATH)/colors.hpp $(INCLUDE_PATH)/$(MISC).hpp
 TGT = t$(SUDOKU)
 SYMLINK_PATH = $(HOME)/.local/bin
 
-.PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean uninstall
+.PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean uninstall purge
 
 all:	$(OBJ)
 	mkdir -p $(LIB)
@@ -61,3 +61,6 @@ clean:	$(TGT)
 	
 uninstall:	clean
 		@rm $(SYMLINK_PATH)/$(TGT)
+
+purge:	uninstall
+	rm -rf $(HOME)/.tsudoku
