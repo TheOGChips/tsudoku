@@ -1,6 +1,9 @@
-#include <ncurses.h>    //NOTE: NCurses is included first in all the files here so that the 
+/* NOTE: NCurses is included first in all files where its needed so that the KEY_ENTER
+ *       redefinition in values.hpp persists across files the way I wanted.
+ */
+#include <ncurses.h>
 #include "tsudoku.hpp"
-#include "MainMenu.hpp" //      KEY_ENTER redefinition in values.hpp persists across files the way I wanted.
+#include "MainMenu.hpp" //      
 #include "SavedGameMenu.hpp"
 #include "Sudoku.hpp"   //NOTE: This inclusion here should cause issues with the getch() calls in
                         //      this file; however, there don't appear to be any for some reason.
@@ -16,6 +19,7 @@
  *      argv -> The list of items entered on the command line. Possible tsudoku options are:
  *                  1. "--no-in-game-menu" or "-n" to disable the in-game menu
  *                  2. "--help" to display the help information
+ *                  3. "--delete-saved-games" or "-d" to delete all saved games
  */
 int main (int argc, char** argv) {
     //NOTE: Detemine whether the in-game menu should be enabled and if there is any input error
