@@ -66,13 +66,16 @@ bool SavedGameMenu::select_saved_game () {
         while (getch() != KEY_ENTER);
     }
     else {
+        timeout(250);
         do {
             display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
             
             input = getch();
             if (input == KEY_DOWN and *selection != saved_games.back()) selection++;
             else if (input == KEY_UP and *selection != saved_games.front()) selection--;
+            else invalid_window_size_handler();
         } while (input != KEY_ENTER);
+        nodelay(stdscr, false);
     }
     refresh();
     curs_set(true);     //NOTE: Turn cursor back on before leaving the menu.
