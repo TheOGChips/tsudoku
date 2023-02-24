@@ -12,11 +12,12 @@
     - MacOS
     - WSL (Windows Subsystem for Linux)
 
-## Requirements:
+## Prerequisites:
 
-    g++ (tsudoku compiles using the C++17 standard)
-    ncurses
-    NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see "Requirements Installation" section).
+<p>NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see "Requirements Installation" section).</p>
+
+    - g++ (tsudoku compiles using the C++17 standard)
+    - ncurses
               
 ## To run (from the directory tsudoku is in):
     Normal mode:     $ ./tsudoku
