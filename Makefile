@@ -17,8 +17,8 @@ VPATH = $(LIB)
 SRC = src
 MENU = Menu
 MISC = misc
-OBJ = $(MISC).o main.o $(MENU).o MainMenu.o SavedGameMenu.o DifficultyMenu.o InGameMenu.o Sudoku.o \
-      Grid.o Container.o
+OBJ = tsudoku.o $(MISC).o main.o $(MENU).o MainMenu.o SavedGameMenu.o DifficultyMenu.o InGameMenu.o \
+      Sudoku.o Grid.o Container.o
 COMMON_HDRS = $(INCLUDE_PATH)/colors.hpp $(INCLUDE_PATH)/$(MISC).hpp
 
 # NOTE: The final executable name
