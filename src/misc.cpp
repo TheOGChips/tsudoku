@@ -6,8 +6,6 @@ using namespace std;
 
 cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
 
-//TODO: This file also probably needs a SIGINT handler
-
 /* NOTE:
  * Name: invalid_window_size_handler
  * Purpose: Enforce window size on initial startup if terminal window is not already compliant. The
@@ -35,7 +33,16 @@ bool invalid_window_size_handler () {
             mvprintw(y_max/2,     x_max/2 - msg1.size()/2,       "%s", msg1.c_str());
             mvprintw(y_max/2 + 2, x_max/2 - msg2.str().size()/2, "%s", msg2.str().c_str());
             mvprintw(y_max/2 + 3, x_max/2 - msg3.str().size()/2, "%s", msg3.str().c_str());
-            mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,       "%s", msg4.c_str());
+            
+            if (msg4.size() > x_max) {
+                 const uint8_t PARTITION = 30;
+                 mvprintw(y_max/2 + 5, x_max/2 - msg4.substr(0, PARTITION).size()/2,
+                          "%s", msg4.substr(0, PARTITION).c_str());
+                 mvprintw(y_max/2 + 6, x_max/2 - msg4.substr(PARTITION).size()/2,
+                          "%s", msg4.substr(PARTITION).c_str());
+            }
+            else mvprintw(y_max/2 + 5, x_max/2 - msg4.size()/2,  "%s", msg4.c_str());
+            
             refresh();
             getmaxyx(stdscr, y_max, x_max);
             while (getch() != KEY_ENTER);   //NOTE: For some reason, the Enter key needs to be
