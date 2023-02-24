@@ -733,7 +733,8 @@ void Sudoku::save_game (const uint8_t DELAY) {
     ::move(DISPLAY_LINE, 1);
     clrtoeol();
     curs_set(false);    //NOTE: Turn off cursor while displaying
-    mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
+    if (not NAME.empty()) mvprintw(DISPLAY_LINE, ORIGIN.second, "%s saved!", NAME.c_str());
+    else mvprintw(DISPLAY_LINE, ORIGIN.second, "Error: File not saved!");
     refresh();
     
     //NOTE: Clear output after a delay

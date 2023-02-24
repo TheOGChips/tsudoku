@@ -222,6 +222,9 @@ void InGameMenu::save_game (const cell EDGE) {
              "Enter save file name: ");
     
     curs_set(true);
+    /* NOTE: This message will not be seen if there is a window resize, so no error handling
+     *       required.
+     */
     mvprintw(EDGE.first + IN_GAME_MENU_TITLE_SPACING + ++display_offset, EDGE.second,
              "%s saved!", save_game(display_matrix).c_str());
     curs_set(false);
@@ -231,7 +234,13 @@ void InGameMenu::save_game (const cell EDGE) {
  * Name: save_game (static overload)
  * Purpose: Performs the actual saving of the current game to a CSV file in $HOME/.tsudoku. Each
  *          cell is saved as its integer representation follow by a letter representing the
- *          foreground color of the character.
+ *          foreground color of the character. Resizing the window acts as if the player had hit
+ *          Enter (i.e. had finished typing the name to save the file as). If the player is not able
+ *          to enter any characters for the filename before a resizing event, then the file is not
+ *          saved (any partially-typed name is saved, however). This also has the beneficial side of
+ *          preventing users from actively or accidentally otherwise saving a file with no name
+ *          (i.e. ".csv"). Any file save success message for any of these cases is handled by the
+ *          calling function.
  * Parameters:
  *      display_matrix -> The display matrix as seen in the terminal window.
  */
@@ -240,49 +249,62 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
     char name[NAME_SIZE];           //      in-game menu mode
     nodelay(stdscr, false);
     echo();
-    getnstr(name, NAME_SIZE - 1);   //TODO: When resizing, this will save the game as ".csv"
+    getnstr(name, NAME_SIZE - 1);
     noecho();
     nodelay(stdscr, true);
     
-    const string FILENAME = DIR + "/" + name + ".csv";
-    ofstream outfile;
-    outfile.open(FILENAME.c_str());
-    for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
-        for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
-            outfile << static_cast<uint16_t>(display_matrix[i][j]);
-            chtype ch = mvinch(i + ORIGINy + i / CONTAINER_SIZE, j + ORIGINx + j / CONTAINER_SIZE);
-            switch (ch & A_COLOR) {
-                case COLOR_PAIR(UNKNOWN):
-                    outfile << color_code[UNKNOWN];
-                    break;
-                                          
-                case COLOR_PAIR(GIVEN):
-                    outfile << color_code[GIVEN];
-                    break;
-                                        
-                case COLOR_PAIR(CANDIDATES_Y):
-                    outfile << color_code[CANDIDATES_Y];
-                    break;
-                                               
-                case COLOR_PAIR(CANDIDATES_B):
-                    outfile << color_code[CANDIDATES_B];
-                    break;
-                                             
-                case COLOR_PAIR(GUESS):
-                    outfile << color_code[GUESS];
-                    break;
-                                        
-                default: outfile << color_code[0];
+    //NOTE: Only save the file if the player was able to enter any text first. The success message
+    //      will be handled by the calling function.
+    if (not string(name).empty()) {
+        const string FILENAME = DIR + "/" + name + ".csv";
+        ofstream outfile;
+        outfile.open(FILENAME.c_str());
+        for (uint8_t i = 0; i < DISPLAY_MATRIX_ROWS; i++) {
+            for (uint8_t j = 0; j < DISPLAY_MATRIX_COLUMNS; j++) {
+                outfile << static_cast<uint16_t>(display_matrix[i][j]);
+                chtype ch = mvinch(i + ORIGINy + i / CONTAINER_SIZE,
+                                   j + ORIGINx + j / CONTAINER_SIZE);
+                switch (ch & A_COLOR) {
+                    case COLOR_PAIR(UNKNOWN):
+                        outfile << color_code[UNKNOWN];
+                        break;
+                                            
+                    case COLOR_PAIR(GIVEN):
+                        outfile << color_code[GIVEN];
+                        break;
+                                            
+                    case COLOR_PAIR(CANDIDATES_Y):
+                        outfile << color_code[CANDIDATES_Y];
+                        break;
+                                                
+                    case COLOR_PAIR(CANDIDATES_B):
+                        outfile << color_code[CANDIDATES_B];
+                        break;
+                                                
+                    case COLOR_PAIR(GUESS):
+                        outfile << color_code[GUESS];
+                        break;
+                                            
+                    default: outfile << color_code[0];
+                }
+                if (j < DISPLAY_MATRIX_COLUMNS - 1) outfile << ",";
             }
-            if (j < DISPLAY_MATRIX_COLUMNS - 1) outfile << ",";
+            outfile << endl;
         }
-        outfile << endl;
+        outfile.close();
     }
-    outfile.close();
     
     return string(name);
 }
 
+/* NOTE:
+ * Name: set_window_resized
+ * Purpose: Sets whether the window has been resized during gameplay. True indicates the window was
+ *          resized.
+ * Parameters: 
+ *      WINDOW_RESIZED -> Boolean indicating whether the window was resized. Sets the member
+ *                        window_resized to its value.
+ */
 void InGameMenu::set_window_resized (const bool WINDOW_RESIZED) {
     window_resized = WINDOW_RESIZED;
 }
@@ -346,6 +368,12 @@ options InGameMenu::menu () {
     return opt;
 }
 
+/* NOTE:
+ * Name: get_window_resized
+ * Purpose: Lets the caller know whether the window was resized while in the in-game menu. True
+ *          indicates the window was resized.
+ * Parameters: None
+ */
 bool InGameMenu::get_window_resized () const {
     return window_resized;
 }
