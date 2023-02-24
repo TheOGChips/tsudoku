@@ -60,13 +60,17 @@ bool SavedGameMenu::select_saved_game () {
     selection = saved_games.begin();
     
     curs_set(false);    //NOTE: Turn off cursor while in the menu.
+    timeout(250);
     if (saved_games.empty()) {
-        mvprintw(TOP_PADDING, LEFT_PADDING, "You have no saved games.");
-        mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
-        while (getch() != KEY_ENTER);
+        do {
+            input = getch();
+            //NOTE: Somehow this displays without me needing to call refresh
+            mvprintw(TOP_PADDING, LEFT_PADDING, "You have no saved games.");
+            mvprintw(TOP_PADDING + saved_games.size() + 3, LEFT_PADDING, "Press ENTER to continue...");
+            invalid_window_size_handler();
+        } while (input != KEY_ENTER);
     }
     else {
-        timeout(250);
         do {
             display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
             
@@ -77,9 +81,9 @@ bool SavedGameMenu::select_saved_game () {
                      *selection != saved_games.front()) selection--;
             else invalid_window_size_handler();
         } while (input != KEY_ENTER);
-        nodelay(stdscr, false);
     }
     refresh();
+    nodelay(stdscr, false);
     curs_set(true);     //NOTE: Turn cursor back on before leaving the menu.
         
     return not saved_games.empty();
