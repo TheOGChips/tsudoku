@@ -106,6 +106,7 @@ options DifficultyMenu::menu () {
     curs_set(false);
     diff = difficulty_level::EASY;
     uint16_t input;
+    timeout(250);
     do {
         refresh();
         display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
@@ -119,9 +120,10 @@ options DifficultyMenu::menu () {
                 diff--;
                 break;
                          
-            default:;
+            default: invalid_window_size_handler();
         }
     } while (input != KEY_ENTER);
+    nodelay(stdscr, false);
     curs_set(true);
     
     return options::NONE;
