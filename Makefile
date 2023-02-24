@@ -1,64 +1,40 @@
 COMPILER = clang++
-INCLUDE_FLAGS = -I $(INCLUDE)/ -std=c++17
+
+INCLUDE_PATH = include
+INCLUDE_FLAGS = -I $(INCLUDE_PATH)/ -std=c++17
 COMPILE = $(COMPILER) -c $(INCLUDE_FLAGS)
+
 LIB = lib
-INCLUDE = include
-LINK = $(COMPILER) $(LIB)/*.o -o
+LINK_FLAGS = -lncurses
+LINK = $(COMPILER) $(LINK_FLAGS) $(LIB)/*.o -o
+
 SRC = src
-MAIN = main
 MENU = Menu
-MAIN_MENU = MainMenu
-INGAME_MENU = InGameMenu
-SAVED_GAME_MENU = SavedGameMenu
-DIFFICULTY_MENU = DifficultyMenu
 SUDOKU = Sudoku
-CONTAINER = Container
-GRID = Grid
 MISC = misc
-OBJ = $(LIB)/$(MISC).o $(LIB)/$(MAIN).o $(LIB)/$(MENU).o $(LIB)/$(MAIN_MENU).o $(LIB)/$(SAVED_GAME_MENU).o $(LIB)/$(DIFFICULTY_MENU).o $(LIB)/$(INGAME_MENU).o $(LIB)/$(SUDOKU).o $(LIB)/$(GRID).o $(LIB)/$(CONTAINER).o
-COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/$(MISC).hpp
+OBJ = $(MISC).o main.o $(MENU).o MainMenu.o SavedGameMenu.o DifficultyMenu.o InGameMenu.o \
+      $(SUDOKU).o Grid.o Container.o
+COMMON_HDRS = $(INCLUDE_PATH)/colors.hpp $(INCLUDE_PATH)/$(MISC).hpp
 # TODO: Fix this later
 TGT = t$(SUDOKU)
-SYMLINK_PATH = $(HOME)/.local/bin/
+SYMLINK_PATH = $(HOME)/.local/bin
 
 .PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean uninstall
 
 all:	$(OBJ)
 	mkdir -p $(LIB)
 	-mv $(?F) $(LIB)/
-	$(LINK) $(TGT) -lncurses
+	$(LINK) $(TGT)
 	-@ln -s $(PWD)/$(TGT) $(SYMLINK_PATH)
 
-$(LIB)/$(MISC).o:	$(SRC)/$(MISC).cpp $(COMMON_HDRS)
-			$(COMPILE) $<
+%.o:	$(SRC)/%.cpp $(COMMON_HDRS)
+	$(COMPILE) $<
 
-$(LIB)/$(MAIN).o:	$(SRC)/$(MAIN).cpp $(COMMON_HDRS)
-			$(COMPILE) $<
+$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE_PATH)/$(MENU).hpp $(COMMON_HDRS)
+	$(COMPILE) $<
 
-$(LIB)/$(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
-			$(COMPILE) $<
-
-#TODO: Clean this up some
-$(LIB)/$(MAIN_MENU).o:	$(SRC)/$(MAIN_MENU).cpp $(INCLUDE)/$(MAIN_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
-			$(COMPILE) $<
-
-$(LIB)/$(INGAME_MENU).o:	$(SRC)/$(INGAME_MENU).cpp $(INCLUDE)/$(INGAME_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
-				$(COMPILE) $<
-
-$(LIB)/$(SAVED_GAME_MENU).o:	$(SRC)/$(SAVED_GAME_MENU).cpp $(INCLUDE)/$(SAVED_GAME_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
-				$(COMPILE) $(SRC)/$(SAVED_GAME_MENU).cpp
-
-$(LIB)/$(DIFFICULTY_MENU).o:	$(SRC)/$(DIFFICULTY_MENU).cpp $(INCLUDE)/$(DIFFICULTY_MENU).hpp $(INCLUDE)/$(MENU).hpp $(COMMON_HDRS)
-				$(COMPILE) $(SRC)/$(DIFFICULTY_MENU).cpp
-
-$(LIB)/$(SUDOKU).o:	$(SRC)/$(SUDOKU).cpp $(COMMON_HDRS)
-			$(COMPILE) $<
-
-$(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp $(INCLUDE)/$(GRID).hpp $(COMMON_HDRS)
-			$(COMPILE) $<
-
-$(LIB)/$(CONTAINER).o:	$(SRC)/$(CONTAINER).cpp $(INCLUDE)/$(CONTAINER).hpp $(COMMON_HDRS)
-			$(COMPILE) $<
+%Menu.o:	$(SRC)/%Menu.cpp $(INCLUDE_PATH)/%Menu.hpp $(INCLUDE_PATH)/$(MENU).hpp $(COMMON_HDRS)
+	$(COMPILE) $<
 
 run_all: run run_no_menu run_help run_invalid run_too_many uninstall
 
