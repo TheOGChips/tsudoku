@@ -50,8 +50,8 @@ bool invalid_window_size_handler () {
     else {
         do {
             clear();
-            string msg1 = "The current window is too small",
-                   msg4 = "Resize the terminal window and press Enter twice to continue";
+            string msg1 = "The current window is incorrect.",
+                   msg4 = "Resize the terminal window and press Enter twice to continue.";
             stringstream msg2,
                          msg3;
             msg2 << "Required dimensions: " << WINDOW_REQ.second+0 << " x "
