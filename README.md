@@ -2,42 +2,44 @@
 
 ## Description
 
-<p>tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.</p>
+tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
 
 ## Supported systems
 
-<p>The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported.</p>
+The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported.
 
-    - Debian Linux
-    - MacOS
-    - WSL (Windows Subsystem for Linux)
+>\- Debian Linux  
+>\- MacOS  
+>\- WSL (Windows Subsystem for Linux)
 
 ## Prerequisites
 
-<p>NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see "Requirements Installation" section).</p>
+NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
 
-    - g++ (tsudoku compiles using the C++17 standard)
-    - ncurses
-              
+>\- g++ (tsudoku compiles using the C++17 standard)  
+>\- ncurses
+
 ## Usage
 
 ### With in-game menu enabled:
 
-    $ tsudoku
+>`$ tsudoku`
 
 ### With in-game menu disabled:
 
-    $ tsudoku -n
-    $ tsudoku --no-in-game-menu
+>`$ tsudoku -n`  
+>or  
+>`$ tsudoku --no-in-game-menu`
                  
 ### Display usage information:
 
-    $ tsudoku --help
+>`$ tsudoku --help`
     
 ### Remove all saved games
 
-    $ tsudoku -d
-    $ tsudoku --delete-saved-games
+>`$ tsudoku -d`  
+>or  
+>`$ tsudoku --delete-saved-games`
 
 ## Status update: 6 February 2023
 
