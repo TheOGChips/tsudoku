@@ -21,7 +21,7 @@ COMMON_HDRS = $(INCLUDE)/colors.hpp $(INCLUDE)/$(MISC).hpp
 TGT = t$(SUDOKU)
 SYMLINK_PATH = $(HOME)/.local/bin/
 
-.PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean
+.PHONY: all run_all run run_no_menu run_help run_invalid run_too_many clean uninstall
 
 all:	$(OBJ)
 	mkdir -p $(LIB)
