@@ -58,7 +58,7 @@ $(LIB)/$(GRID).o:	$(SRC)/$(GRID).cpp $(INCLUDE)/$(GRID).hpp $(COMMON_HDRS)
 $(LIB)/$(CONTAINER).o:	$(SRC)/$(CONTAINER).cpp $(INCLUDE)/$(CONTAINER).hpp $(COMMON_HDRS)
 			$(COMPILE) $<
 
-run_all: run run_no_menu run_help run_invalid run_too_many
+run_all: run run_no_menu run_help run_invalid run_too_many uninstall
 
 run:	$(TGT)
 	./$<
@@ -80,3 +80,5 @@ run_too_many:	$(TGT)
 clean:	$(TGT)
 	rm $< $(LIB)/*.o
 	rmdir $(LIB)
+	
+uninstall:	clean
