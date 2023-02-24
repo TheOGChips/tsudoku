@@ -43,7 +43,6 @@ class Menu {
         ~Menu () {} //NOTE: Default destructor. Does nothing.
         virtual options menu () = PURE_VIRTUAL;
         static void SIGINT_handler (int32_t);
-        //TODO: The Menu classes still need a way to handle screen resizing (at least the InGameMenu)
 };
 
 #endif
