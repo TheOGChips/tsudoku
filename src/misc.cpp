@@ -3,10 +3,28 @@
 #include <sstream>
 #include <thread>
 #include <chrono>
+#include <csignal>
 
 using namespace std;
 
 cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
+
+/* NOTE:
+ * Name: SIGINT_handler
+ * Purpose: Resets the terminal settings to their previous state from before the NCurses environment
+ *          was initialized.
+ * Parameters:
+ *      (unused 32-bit integer) -> The signal being caught by this handler, in this case SIGINT.
+ *                                 Since it's value is never used, it does not need a name for
+ *                                 reference.
+ */
+void SIGINT_handler (int32_t) {
+    curs_set(true);
+    echo();
+    nocbreak();
+    endwin();
+    exit(EXIT_SUCCESS);
+}
 
 /* NOTE:
  * Name: invalid_window_size_handler
@@ -20,6 +38,8 @@ cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
  * Parameters: None
  */
 bool invalid_window_size_handler () {
+    signal(SIGINT, SIGINT_handler);
+    
     uint8_t y_max,
             x_max;
     getmaxyx(stdscr, y_max, x_max);
