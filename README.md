@@ -26,6 +26,22 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ sudo apt install g++`  
 >`$ sudo apt install libncurses-dev`
 
+## Installation
+
+### From source
+
+#### Step 1: Clone the project from Github.
+
+- Git over HTTPS
+>`$ git clone https://github.com/TheOGChips/tsudoku.git && cd tsudoku`
+
+- Git over SSH
+>`$ git clone git@github.com:TheOGChips/tsudoku.git && cd tsudoku`
+
+- Direct download from the main branch
+>`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
+>`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`
+
 ## Usage
 
 ### With in-game menu enabled:
