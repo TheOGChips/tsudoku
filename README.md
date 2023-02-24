@@ -12,19 +12,32 @@
     - MacOS
     - WSL (Windows Subsystem for Linux)
 
-## Prerequisites:
+## Prerequisites
 
 <p>NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see "Requirements Installation" section).</p>
 
     - g++ (tsudoku compiles using the C++17 standard)
     - ncurses
               
-## To run (from the directory tsudoku is in):
-    Normal mode:     $ ./tsudoku
-    No in-game menu: $ ./tsudoku -n
-                     $ ./tsudoku --no-in-game-menu
-    Display help:    $ ./tsudoku --help
-                     $ ./tsudoku -?
+## Usage
+
+### With in-game menu enabled:
+
+    $ tsudoku
+
+### With in-game menu disabled:
+
+    $ tsudoku -n
+    $ tsudoku --no-in-game-menu
+                 
+### Display usage information:
+
+    $ tsudoku --help
+    
+### Remove all saved games
+
+    $ tsudoku -d
+    $ tsudoku --delete-saved-games
 
 ## Status update: 6 February 2023
 
