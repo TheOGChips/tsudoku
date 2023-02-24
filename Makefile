@@ -11,6 +11,7 @@ COMPILE = $(COMPILER) -c $(INCLUDE_FLAGS)
 LIB = lib
 LINK_FLAGS = -lncurses
 LINK = $(COMPILER) $(LINK_FLAGS) $(LIB)/*.o -o
+VPATH = $(LIB)
 
 # NOTE: Helpful common filepaths and filenames
 SRC = src
@@ -33,16 +34,17 @@ all:	$(OBJ)
 	mkdir -p $(LIB)
 	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT)
+	# TODO: Make SYMLINK_PATH first
 	-@ln -s $(PWD)/$(TGT) $(SYMLINK_PATH)
 
 %.o:	$(SRC)/%.cpp $(COMMON_HDRS)
-	$(COMPILE) $<
+		$(COMPILE) $<
 
 $(MENU).o:	$(SRC)/$(MENU).cpp $(INCLUDE_PATH)/$(MENU).hpp $(COMMON_HDRS)
-	$(COMPILE) $<
+		$(COMPILE) $<
 
 %Menu.o:	$(SRC)/%Menu.cpp $(INCLUDE_PATH)/%Menu.hpp $(INCLUDE_PATH)/$(MENU).hpp $(COMMON_HDRS)
-	$(COMPILE) $<
+		$(COMPILE) $<
 
 # NOTE: Run all tests (except purge)
 run_all: run run_no_menu run_help run_invalid run_too_many uninstall
