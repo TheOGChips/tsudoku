@@ -34,7 +34,7 @@ all:	$(OBJ)
 	mkdir -p $(LIB)
 	-mv $(?F) $(LIB)/
 	$(LINK) $(TGT)
-	# TODO: Make SYMLINK_PATH first
+	@mkdir -p $(SYMLINK_PATH)
 	-@ln -s $(PWD)/$(TGT) $(SYMLINK_PATH)
 
 %.o:	$(SRC)/%.cpp $(COMMON_HDRS)
