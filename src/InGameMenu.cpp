@@ -147,7 +147,7 @@ void InGameMenu::display_manual (const cell EDGE) {
                                 "undone.",
                  MANUAL_M = "m/M -> Enter/Exit the in-game manual",
                  MANUAL_Q = "q/Q -> Quit the game without saving",
-                 MANUAL_DIR_KEYS = "Up, Down, Left, Right -> Navigate the sudoku board",
+                 MANUAL_DIR_KEYS = "Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board",
                  MANUAL_NUM = "1-9 -> Places number in cell highlighted by cursor",
                  MANUAL_ENTER = "Enter -> Evaluate the puzzle. Analysis will appear below puzzle.";
                  
