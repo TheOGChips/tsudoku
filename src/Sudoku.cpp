@@ -380,6 +380,7 @@ void Sudoku::move (const uint16_t KEY) {
                          MAX_XBOUNDARY = ORIGIN.second + DISPLAY_MATRIX_COLUMNS + 1;
 
     switch (KEY) {
+        case 's':
         case KEY_DOWN:
             if (cursor_pos.first < MAX_YBOUNDARY) {
                 if (is_box_border(cell {cursor_pos.first + 1, cursor_pos.second})) {
@@ -389,6 +390,8 @@ void Sudoku::move (const uint16_t KEY) {
                 getyx(stdscr, cursor_pos.first, cursor_pos.second);
             }
             break;
+            
+        case 'w':
         case KEY_UP:
             if (cursor_pos.first > ORIGIN.first) {
                 if (is_box_border(cell {cursor_pos.first - 1, cursor_pos.second})) {
@@ -396,8 +399,10 @@ void Sudoku::move (const uint16_t KEY) {
                 }
                 else ::move(cursor_pos.first - 1, cursor_pos.second);
                     getyx(stdscr, cursor_pos.first, cursor_pos.second);
-                }
-                break;
+            }
+            break;
+                
+        case 'a':
         case KEY_LEFT:
             if (cursor_pos.second > ORIGIN.second) {
                 if (is_box_border(cell {cursor_pos.first, cursor_pos.second - 1})) {
@@ -407,6 +412,8 @@ void Sudoku::move (const uint16_t KEY) {
                 getyx(stdscr, cursor_pos.first, cursor_pos.second);
             }
             break;
+            
+        case 'd':
         case KEY_RIGHT:
             if (cursor_pos.second < MAX_XBOUNDARY) {
                 if (is_box_border(cell {cursor_pos.first, cursor_pos.second + 1})) {
@@ -831,7 +838,10 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
             save_game(DELAY);
             reset_cursor();
         }
-        else if (input >= KEY_DOWN and input <= KEY_RIGHT)  move(input);
+        else if ((input >= KEY_DOWN and input <= KEY_RIGHT) or
+                 input == 'a' or input == 's' or input == 'd' or input == 'w') {
+                     move(input);
+        }
         else if (input >= ONE and input <= NINE)            set_value(input);
         else if (input == KEY_DC or input == KEY_BACKSPACE) set_value(input);
         else if (input == KEY_ENTER) {                          

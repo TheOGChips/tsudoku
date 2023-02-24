@@ -112,10 +112,12 @@ options DifficultyMenu::menu () {
         display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
         input = getch();
         switch (input) {
+            case 's':
             case KEY_DOWN:
                 diff++;
                 break;
-                           
+                
+            case 'w':
             case KEY_UP:
                 diff--;
                 break;

@@ -71,8 +71,10 @@ bool SavedGameMenu::select_saved_game () {
             display_menu(cell {TOP_PADDING, LEFT_PADDING}, options::NONE);
             
             input = getch();
-            if (input == KEY_DOWN and *selection != saved_games.back()) selection++;
-            else if (input == KEY_UP and *selection != saved_games.front()) selection--;
+            if ((input == KEY_DOWN or input == 's') and
+                *selection != saved_games.back()) selection++;
+            else if ((input == KEY_UP or input == 'w') and
+                     *selection != saved_games.front()) selection--;
             else invalid_window_size_handler();
         } while (input != KEY_ENTER);
         nodelay(stdscr, false);

@@ -325,14 +325,16 @@ options InGameMenu::menu () {
         display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
         input = getch();
         switch (input) {
+            case 's':
             case KEY_DOWN:
                 opt++;
                 break;
-                           
+                
+            case 'w':
             case KEY_UP:
                 opt--;
                 break;
-                            
+                
             case KEY_ENTER: 
                 switch (opt) {
                     case options::RULES:

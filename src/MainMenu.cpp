@@ -192,10 +192,12 @@ options MainMenu::menu () {
         display_menu(cell {y_max, x_max}, opt);
         input = getch();
         switch (input) {
+            case 's':
             case KEY_DOWN:
                 ++opt;
                 break;
-                            
+                
+            case 'w':
             case KEY_UP:
                 --opt;
                 break;
