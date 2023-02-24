@@ -23,6 +23,7 @@ class InGameMenu : public Menu {
                       IN_GAME_MENU_LEFT_EDGE = LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER,
                       NUM_OPTS = 3;
         uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS];
+        bool window_resized;
         
         void display_menu (const cell, const options) override;
         void clear (const cell);
@@ -30,12 +31,14 @@ class InGameMenu : public Menu {
         void display_manual (const cell);
         void screen_reader (const cell, std::string, uint8_t&);
         void save_game (const cell);
+        void set_window_resized (const bool);
         
     public:
         InGameMenu (uint8_t[DISPLAY_MATRIX_ROWS][DISPLAY_MATRIX_COLUMNS]);
         ~InGameMenu () {}   //NOTE: Default destructor. Does nothing.
         options menu () override;
         static std::string save_game (uint8_t*[DISPLAY_MATRIX_COLUMNS]);
+        bool get_window_resized () const;
 };
 
 #endif

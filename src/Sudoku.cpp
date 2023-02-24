@@ -798,26 +798,32 @@ void Sudoku::start_game (const bool USE_IN_GAME_MENU, const SavedPuzzle* SAVED_P
     //nodelay(stdscr, true);
     timeout(250);
     do {
-        int16_t input = getch();
+        int16_t input = getch();    //NOTE: Signed needed because getch can return ERR=-1 on timeout
         if (tolower(input) == 'q') {    //NOTE: This check has to be here first for this
             quit_game = true;           //      to work as expected. Not sure why.
         }
         else if (tolower(input) == 'm' and USE_IN_GAME_MENU) {
-            // NOTE: Allows re-using the same in-game menu object on each loop iteration
+            //NOTE: Allows re-using the same in-game menu object on each loop iteration
             static InGameMenu in_game_menu(display_matrix); 
             
+            //NOTE: Toggle hotkey meaning while in in-game menu
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> return to game");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
             in_game_menu.menu();
-            
+            cell saved_pos = cursor_pos;                        //NOTE: Save cursor position before
+            if (in_game_menu.get_window_resized()) printw();    //      (potentially) needing to
+                                                                //      reprint the puzzle
+            //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
             attron(COLOR_PAIR(MENU_SELECTION));
             mvprintw(getmaxy(stdscr) - LINE_OFFSET_TWEAK, ORIGIN.second, "m -> in-game menu");
             attroff(COLOR_PAIR(MENU_SELECTION));
             clrtoeol();
             
+            refresh();
+            cursor_pos = saved_pos; //NOTE: Restore cursor position before resetting
             reset_cursor();
         }
         else if (tolower(input) == 's' and not USE_IN_GAME_MENU) {

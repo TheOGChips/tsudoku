@@ -240,7 +240,7 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
     char name[NAME_SIZE];           //      in-game menu mode
     nodelay(stdscr, false);
     echo();
-    getnstr(name, NAME_SIZE - 1);
+    getnstr(name, NAME_SIZE - 1);   //TODO: When resizing, this will save the game as ".csv"
     noecho();
     nodelay(stdscr, true);
     
@@ -283,15 +283,21 @@ string InGameMenu::save_game (uint8_t* display_matrix[DISPLAY_MATRIX_COLUMNS]) {
     return string(name);
 }
 
+void InGameMenu::set_window_resized (const bool WINDOW_RESIZED) {
+    window_resized = WINDOW_RESIZED;
+}
+
 /* NOTE:
  * Name: menu (overload)
  * Purpose: Controls the menu display based on the option chosen by the user.
  * Parameters: None
  */
-options InGameMenu::menu () {    
+options InGameMenu::menu () {
     curs_set(false);    //NOTE: Turn off the cursor while in the in-game menu
+    set_window_resized(false);
     options opt = options::RULES;
-    uint16_t input;
+    int16_t input;  //NOTE: Signed needed because getch can return ERR=-1 on timeout
+    //NOTE: No timeout needed because that is set by the in-game menu
     do {
         refresh();
         display_menu(cell {TOP_PADDING, IN_GAME_MENU_LEFT_EDGE}, opt);
@@ -326,7 +332,11 @@ options InGameMenu::menu () {
                     
                     default:;   //NOTE: opt will never be NONE based on this logic
                 }
-            default:;
+            default:
+                if (invalid_window_size_handler()) {
+                    set_window_resized(true);
+                    mvprintw(TOP_PADDING, LEFT_PADDING, "Press 'm' to restore the game");
+                }
         }
     } while (tolower(input) != 'm');
     opt = options::NONE;
@@ -334,4 +344,8 @@ options InGameMenu::menu () {
     curs_set(true); //NOTE: Turn the cursor back on before returning to the game
     
     return opt;
+}
+
+bool InGameMenu::get_window_resized () const {
+    return window_resized;
 }
