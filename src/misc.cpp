@@ -12,10 +12,10 @@ cell WINDOW_REQ;    //NOTE: The size requirements for the terminal window.
  *          user will be updated as to whether the window is the correct size or not after pressing
  *          the Enter key twice. The reason the Enter key must be hit twice is actually a bug I
  *          decided to make a feature. For some reason, it's required to hit twice only in this
- *          section. Since it doesn't affect anything else, I just left it alone.
+ *          section. Since it doesn't affect anything else, I just left it alone. I now suspect it
+ *          has something to do with how NCurses handles window resizing, and might not be fixable
+ *          anyway.
  * Parameters: None
- * 
- * TODO: Fix up the text that displays after a player fixes the terminal window size
  */
 bool invalid_window_size_handler () {
     uint8_t x_max,
@@ -49,13 +49,6 @@ bool invalid_window_size_handler () {
         } while (y_max != WINDOW_REQ.first or x_max != WINDOW_REQ.second); //      pressed twice here
         clear();
         
-        string msg1 = "The window is now an appropriate size",
-               msg2 = "Press Enter to continue";
-        mvprintw(y_max/2,     x_max/2 - msg1.size()/2, "%s", msg1.c_str());
-        mvprintw(y_max/2 + 1, x_max/2 - msg2.size()/2, "%s", msg2.c_str());
-        refresh();
-        while (getch() != KEY_ENTER);
-        clear();
         return true;
     }
     else return false;
