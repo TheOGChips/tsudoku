@@ -189,21 +189,18 @@ options MainMenu::menu () {
     uint16_t input;
     timeout(250);
     do {
+        display_menu(cell {y_max, x_max}, opt);
         input = getch();
         switch (input) {
             case KEY_DOWN:
                 ++opt;
-                display_menu(cell {y_max, x_max}, opt);
                 break;
                             
             case KEY_UP:
                 --opt;
-                display_menu(cell {y_max, x_max}, opt);
                 break;
                 
-            default:
-                invalid_window_size_handler();
-                display_menu(cell {y_max, x_max}, opt);
+            default: invalid_window_size_handler();
         }
     } while (input != KEY_ENTER);
     
