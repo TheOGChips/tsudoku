@@ -3,31 +3,34 @@
 
 #include "Menu.hpp"
 
-//enum class options { NEW_GAME, RESUME_GAME, SHOW_STATS };   //TODO: Add EXIT option
-
+/* NOTE:
+ * Class: MainMenu
+ * Purpose: Menu-derived class that displays and controls the main menu the user sees before and
+ *          after every game.
+ * Private variables:
+ *      BOTTOM_PADDING -> Empty space between the bottom of the terminal window and the in-terminal
+ *                        display.
+ *      RIGHT_PADDING -> Empty space between the right side of the terminal window and the in
+ *                       terminal display.
+ *      RESULT_MSG_SPACE -> Minimum number of lines required to properly display the puzzle's
+ *                          evaluation result.
+ */
 class MainMenu : public Menu {
     private:
-        const uint8_t BOTTOM_PADDING = TOP_PADDING, //blank space on all the edges of the window
+        const uint8_t BOTTOM_PADDING = TOP_PADDING,
                       RIGHT_PADDING = LEFT_PADDING,
-                      RESULT_MSG_SPACE = 3,     //space for the evaluation result to appear
-                      WINDOW_YMIN = TOP_PADDING + PUZZLE_SPACE + RESULT_MSG_SPACE + BOTTOM_PADDING;
-        uint8_t WINDOW_XMIN;
+                      RESULT_MSG_SPACE = 3;
         
-        void display_menu (const uint8_t, const uint8_t, const options) override;
+        void display_menu (const cell, const options) override;
         void set_VERTICAL_DIVIDER (const uint8_t);
         void set_IN_GAME_MENU_DISPLAY_SPACING (const uint8_t);
-        void set_WINDOW_XMIN ();
+        void set_WINDOW_REQ ();
         
     public:        
         MainMenu ();
         ~MainMenu ();
         options menu () override;
         options menu (const bool);
-        //friend options operator ++ (options&);
-        //friend options operator -- (options&);
 };
-
-options operator ++ (options&);
-options operator -- (options&);
 
 #endif

@@ -1,4 +1,5 @@
 sudoku.code-workspace
 test_puzzle.png
+lib
+tsudoku
 .pyvenv-tsudoku
-
