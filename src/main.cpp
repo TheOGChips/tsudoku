@@ -85,9 +85,11 @@ int main (int argc, char** argv) {
     } while (opt != options::EXIT); //NOTE: Exit the program
     
     clear();
-    printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));  //TODO: Enclose this under DEBUG
-    printw("sizeof(Sudoku): %.7f kB", sizeof(Sudoku) / 1024.0);
-    refresh();
-    getch();
+    #if DEBUG
+        printw("sizeof(Sudoku): %lu B\n", sizeof(Sudoku));
+        printw("sizeof(Sudoku): %.7f kB", sizeof(Sudoku) / 1024.0);
+        refresh();
+        getch();
+    #endif
     return 0;
 }
