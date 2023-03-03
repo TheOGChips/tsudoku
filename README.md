@@ -96,8 +96,6 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
 >`$ make`
 
-## Status update: 6 February 2023
+## Status update: 3 March 2023
 
-Great news: tsudoku is now ready for play testing! Anyone who is playing tsudoku after this update is free to play and submit any feedback to myself as desired. I hope everyone likes it.
-
-I still have some stuff that I need/would like to do, but most of that will be transparent to the player (unless it completely breaks the game, in which case it will be opaque). Unless there are any game-breaking bugs that need to be fixed, the next update will follow once these remaining things are taken care of and tsudoku is ready for its first official release.
+tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
