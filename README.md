@@ -32,15 +32,19 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 #### Step 1: Clone the project from Github.
 
-- Git over HTTPS
+- Git via HTTPS
 >`$ git clone https://github.com/TheOGChips/tsudoku.git && cd tsudoku`
 
-- Git over SSH
+- Git via SSH
 >`$ git clone git@github.com:TheOGChips/tsudoku.git && cd tsudoku`
 
 - Direct download from the main branch
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`
+
+#### Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the *tsudoku* directory of the cloned source code.
+
+>`$ make`
 
 ## Usage
 
