@@ -12,6 +12,18 @@ The below operating systems have been tested for working condition. Other Unix-b
 >\- MacOS  
 >\- WSL (Windows Subsystem for Linux)
 
+**Note for MacOS users**: It's possible that certain (e.g. the Makefile and this README) will be marked as executable during the install process and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
+
+>`$ less README.md`  
+>`$ view README.md`  
+>`$ nano -v README.md`
+
+**Note for inexperienced WSL users**: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running `wsl.exe` at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference https://learn.microsoft.com/en-us/windows/wsl/install .
+
+- Ex: Running tsudoku from Windows Command Prompt
+>`>wsl.exe`  
+>`$ tsudoku`
+
 ## Prerequisites
 
 NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
