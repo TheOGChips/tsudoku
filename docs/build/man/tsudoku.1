@@ -1,0 +1,229 @@
+.\" Man page generated from reStructuredText.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "TSUDOKU" "1" "Mar 03, 2023" "" "tsudoku"
+.SH NAME
+tsudoku \- tsudoku 1.0
+.sp
+\fBtsudoku\fP is a simple sudoku game you can play from the comfort of your terminal.
+.sp
+Check out the \fI\%Installation\fP section for further information.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+This project is still currently in beta but is nearing completion.
+.UNINDENT
+.UNINDENT
+.SH INSTALLATION
+.SS From source
+.sp
+Step 1: Download it from it’s Github repository.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip \-O tsudoku.zip
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Step 2: Unzip the archive and change into tsudoku’s top directory.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ unzip tsudoku.zip && mv tsudoku\-main tsudoku && cd tsudoku
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Step 3: Compile the source code
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ make
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH TSUDOKU
+.SS Description
+.sp
+tsudoku (both short for “terminal sudoku” and inspired phonetically by other Japanese words such as “tsunami”) is a user\-friendly implementation of the classic game of sudoku that you can play in your terminal.
+.SS Supported systems
+.sp
+The below operating systems have been tested for working condition. Other Unix\-based OSs are also likely to also be supported.
+.INDENT 0.0
+.INDENT 3.5
+\- Debian Linux\- MacOS\- WSL (Windows Subsystem for Linux)
+.UNINDENT
+.UNINDENT
+.sp
+\fBNote for MacOS users\fP: It’s possible that certain (e.g. the Makefile and this README) will be marked as executable during the install process and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility \fBless\fP or terminal\-based text editors such as \fBvim\fP/\fBview\fP or \fBnano\fP\&. The easiest and simplest to use is \fBless\fP\&. Examples are below:
+.INDENT 0.0
+.INDENT 3.5
+\fB$ less README.md\fP\fB$ view README.md\fP\fB$ nano \-v README.md\fP
+.UNINDENT
+.UNINDENT
+.sp
+\fBNote for inexperienced WSL users\fP: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running \fBwsl.exe\fP at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference https://learn.microsoft.com/en\-us/windows/wsl/install .
+.INDENT 0.0
+.IP \(bu 2
+Ex: Running tsudoku from Windows Command Prompt
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+\fB>wsl.exe\fP\fB$ tsudoku\fP
+.UNINDENT
+.UNINDENT
+.SS Prerequisites
+.sp
+NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS’s package manager (see \fBPrerequisites Installation\fP section).
+.INDENT 0.0
+.INDENT 3.5
+\- g++ (tsudoku compiles using the C++17 standard)\- ncurses
+.UNINDENT
+.UNINDENT
+.SS Prerequisites Installation
+.sp
+If either of the prerquisites are not pre\-installed by your operating system, you can install them from your package manager.
+.INDENT 0.0
+.INDENT 3.5
+\fB$ sudo apt install g++\fP\fB$ sudo apt install libncurses\-dev\fP
+.UNINDENT
+.UNINDENT
+.SS Installation
+.SS From source
+.SS Step 1: Clone the project from Github.
+.INDENT 0.0
+.IP \(bu 2
+Option 1: Git via HTTPS
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+\fB$ git clone https://github.com/TheOGChips/tsudoku.git && cd tsudoku\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.IP \(bu 2
+Option 2: Git via SSH
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+\fB$ git clone git@github.com:TheOGChips/tsudoku.git && cd tsudoku\fP
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.IP \(bu 2
+Option 3: Direct download from the main branch
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+\fB$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip \-O tsudoku.zip\fP\fB$ unzip tsudoku.zip && mv tsudoku\-main tsudoku && cd tsudoku\fP
+.UNINDENT
+.UNINDENT
+.SS Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the \fItsudoku\fP directory of the cloned source code.
+.INDENT 0.0
+.INDENT 3.5
+\fB$ make\fP
+.UNINDENT
+.UNINDENT
+.SS Step 3: Source your shell’s RC file to allow running \fItsudoku\fP in the current shell instance.
+.INDENT 0.0
+.IP \(bu 2
+Examples:
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+\fB$ source ~/.bashrc    # if using bash\fP\fB$ source ~/.zshrc     # if using zsh\fP
+.UNINDENT
+.UNINDENT
+.SS Usage
+.SS With in\-game menu enabled:
+.INDENT 0.0
+.INDENT 3.5
+\fB$ tsudoku\fP
+.UNINDENT
+.UNINDENT
+.SS With in\-game menu disabled:
+.INDENT 0.0
+.INDENT 3.5
+\fB$ tsudoku \-n\fPor\fB$ tsudoku \-\-no\-in\-game\-menu\fP
+.UNINDENT
+.UNINDENT
+.SS Display usage information:
+.INDENT 0.0
+.INDENT 3.5
+\fB$ tsudoku \-\-help\fP
+.UNINDENT
+.UNINDENT
+.SS Remove all saved games
+.INDENT 0.0
+.INDENT 3.5
+\fB$ tsudoku \-d\fPor\fB$ tsudoku \-\-delete\-saved\-games\fP
+.UNINDENT
+.UNINDENT
+.SS Updates
+.SS From source
+.SS If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the \fItsudoku\fP directory, then perform the following steps:
+.INDENT 0.0
+.INDENT 3.5
+\fB$ git pull\fP\fB$ make upgrade\fP
+.UNINDENT
+.UNINDENT
+.SS If installed via direct downloaded (option 3), delete the \fItsudoku\fP directory and repeat the installation process as described in the \fBInstallation\fP section again.
+.INDENT 0.0
+.INDENT 3.5
+\fB$ rm \-rf tsudoku\fP\fB$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip \-O tsudoku.zip\fP\fB$ unzip tsudoku.zip && mv tsudoku\-main tsudoku && cd tsudoku\fP\fB$ make\fP
+.UNINDENT
+.UNINDENT
+.SS Status update: 3 March 2023
+.sp
+tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one\-time donation. Have fun playing!
+.INDENT 0.0
+.IP \(bu 2
+\fI\%Index\fP
+.IP \(bu 2
+\fI\%Module Index\fP
+.IP \(bu 2
+\fI\%Search Page\fP
+.UNINDENT
+.SH AUTHOR
+Chris Swindell
+.SH COPYRIGHT
+2023, Chris Swindell
+.\" Generated by docutils manpage writer.
+.
