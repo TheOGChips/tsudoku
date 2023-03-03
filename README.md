@@ -32,13 +32,13 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 #### Step 1: Clone the project from Github.
 
-- Git via HTTPS
+- Option 1: Git via HTTPS
 >`$ git clone https://github.com/TheOGChips/tsudoku.git && cd tsudoku`
 
-- Git via SSH
+- Option 2: Git via SSH
 >`$ git clone git@github.com:TheOGChips/tsudoku.git && cd tsudoku`
 
-- Direct download from the main branch
+- Option 3: Direct download from the main branch
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`
 
@@ -67,6 +67,22 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ tsudoku -d`  
 >or  
 >`$ tsudoku --delete-saved-games`
+
+## Updates
+
+### From source
+
+#### If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the *tsudoku* directory, then perform the following steps:
+
+>`$ git pull`  
+>`$ make upgrade`
+
+#### If installed via direct downloaded (option 3), delete the *tsudoku* directory and repeat the installation process as described in the **Installation** section again.
+
+>`$ rm -rf tsudoku`  
+>`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
+>`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
+>`$ make`
 
 ## Status update: 6 February 2023
 
