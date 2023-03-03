@@ -1,6 +1,5 @@
 # NOTE: The compiler to use
-# TODO: Change this to g++ when the time comes
-COMPILER = clang++
+COMPILER = g++
 
 # NOTE: Everything needed to compile
 INCLUDE_PATH = include
