@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>sudoku-tui &#8212; tsudoku 1.0 documentation</title>
+    <title>tsudoku &#8212; tsudoku 1.0 documentation</title>
     
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/scrolls.css" />
@@ -26,31 +26,199 @@
     <div id="content">
       <div class="header">
         <h1 class="heading"><a href="index.html"
-          title="back to the documentation overview"><span>sudoku-tui</span></a></h1>
+          title="back to the documentation overview"><span>tsudoku</span></a></h1>
       </div>
       <div class="relnav" role="navigation" aria-label="related navigation">
         <a href="installation.html">&laquo; Installation</a> |
-        <a href="#">sudoku-tui</a>
+        <a href="#">tsudoku</a>
       </div>
       <div id="contentwrapper">
         <div id="toc" role="navigation" aria-label="table of contents navigation">
           <h3>Table of Contents</h3>
           <ul>
-<li><a class="reference internal" href="#">sudoku-tui</a></li>
-<li><a class="reference internal" href="#status-update-31-january-2023">Status update: 31 January 2023</a></li>
+<li><a class="reference internal" href="#">tsudoku</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#supported-systems">Supported systems</a></li>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#prerequisites-installation">Prerequisites Installation</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#from-source">From source</a><ul>
+<li><a class="reference internal" href="#step-1-clone-the-project-from-github">Step 1: Clone the project from Github.</a></li>
+<li><a class="reference internal" href="#step-2-compile-the-source-code-using-the-provided-makefile-performing-any-of-the-three-methods-above-should-have-already-placed-you-inside-the-tsudoku-directory-of-the-cloned-source-code">Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the <em>tsudoku</em> directory of the cloned source code.</a></li>
+<li><a class="reference internal" href="#step-3-source-your-shell-s-rc-file-to-allow-running-tsudoku-in-the-current-shell-instance">Step 3: Source your shell’s RC file to allow running <em>tsudoku</em> in the current shell instance.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#with-in-game-menu-enabled">With in-game menu enabled:</a></li>
+<li><a class="reference internal" href="#with-in-game-menu-disabled">With in-game menu disabled:</a></li>
+<li><a class="reference internal" href="#display-usage-information">Display usage information:</a></li>
+<li><a class="reference internal" href="#remove-all-saved-games">Remove all saved games</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#updates">Updates</a><ul>
+<li><a class="reference internal" href="#id1">From source</a><ul>
+<li><a class="reference internal" href="#if-installed-using-git-via-https-or-ssh-options-1-or-2-navigate-to-the-tsudoku-directory-then-perform-the-following-steps">If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the <em>tsudoku</em> directory, then perform the following steps:</a></li>
+<li><a class="reference internal" href="#if-installed-via-direct-downloaded-option-3-delete-the-tsudoku-directory-and-repeat-the-installation-process-as-described-in-the-installation-section-again">If installed via direct downloaded (option 3), delete the <em>tsudoku</em> directory and repeat the installation process as described in the <strong>Installation</strong> section again.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#status-update-3-march-2023">Status update: 3 March 2023</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
         <div role="main">
         
-  <section id="sudoku-tui">
-<h1>sudoku-tui<a class="headerlink" href="#sudoku-tui" title="Permalink to this heading">¶</a></h1>
-<p>This will be a user-friendly implementation of the classic game of sudoku that you can play in your terminal. As such, it will be all text-based, but should be extremely easy to play. More in-depth explanations as far as how to play the game will be provided, assuming I remember to do so (I’m currently going through graduate school, so it’s very likely that I’ll forget to update this or will go long stretches of time without any updates).</p>
+  <section id="tsudoku">
+<h1>tsudoku<a class="headerlink" href="#tsudoku" title="Permalink to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p>tsudoku (both short for “terminal sudoku” and inspired phonetically by other Japanese words such as “tsunami”) is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.</p>
 </section>
-<section id="status-update-31-january-2023">
-<h1>Status update: 31 January 2023<a class="headerlink" href="#status-update-31-january-2023" title="Permalink to this heading">¶</a></h1>
-<p>Games can now be saved both when the in-game menu is and isn’t enabled. I’ve also made some other minor adjustments to the in-game menu display.</p>
-<p>Next is adding the ability to resume games. This will (hopefully) be the last difficult left to do. After that, it should just be cleaning up some leftover TODOs.</p>
+<section id="supported-systems">
+<h2>Supported systems<a class="headerlink" href="#supported-systems" title="Permalink to this heading">¶</a></h2>
+<p>The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported.</p>
+<blockquote>
+<div><p>- Debian Linux<br />
+- MacOS<br />
+- WSL (Windows Subsystem for Linux)</p>
+</div></blockquote>
+<p><strong>Note for MacOS users</strong>: It’s possible that certain (e.g. the Makefile and this README) will be marked as executable during the install process and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility <code class="docutils literal notranslate"><span class="pre">less</span></code> or terminal-based text editors such as <code class="docutils literal notranslate"><span class="pre">vim</span></code>/<code class="docutils literal notranslate"><span class="pre">view</span></code> or <code class="docutils literal notranslate"><span class="pre">nano</span></code>. The easiest and simplest to use is <code class="docutils literal notranslate"><span class="pre">less</span></code>. Examples are below:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">less</span> <span class="pre">README.md</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">view</span> <span class="pre">README.md</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">nano</span> <span class="pre">-v</span> <span class="pre">README.md</span></code></p>
+</div></blockquote>
+<p><strong>Note for inexperienced WSL users</strong>: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running <code class="docutils literal notranslate"><span class="pre">wsl.exe</span></code> at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference https://learn.microsoft.com/en-us/windows/wsl/install .</p>
+<ul class="simple">
+<li><p>Ex: Running tsudoku from Windows Command Prompt</p></li>
+</ul>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">&gt;wsl.exe</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span></code></p>
+</div></blockquote>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">¶</a></h2>
+<p>NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS’s package manager (see <strong>Prerequisites Installation</strong> section).</p>
+<blockquote>
+<div><p>- g++ (tsudoku compiles using the C++17 standard)<br />
+- ncurses</p>
+</div></blockquote>
+</section>
+<section id="prerequisites-installation">
+<h2>Prerequisites Installation<a class="headerlink" href="#prerequisites-installation" title="Permalink to this heading">¶</a></h2>
+<p>If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">g++</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">libncurses-dev</span></code></p>
+</div></blockquote>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<section id="from-source">
+<h3>From source<a class="headerlink" href="#from-source" title="Permalink to this heading">¶</a></h3>
+<section id="step-1-clone-the-project-from-github">
+<h4>Step 1: Clone the project from Github.<a class="headerlink" href="#step-1-clone-the-project-from-github" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Option 1: Git via HTTPS</p></li>
+</ul>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/TheOGChips/tsudoku.git</span> <span class="pre">&amp;&amp;</span> <span class="pre">cd</span> <span class="pre">tsudoku</span></code></p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Option 2: Git via SSH</p></li>
+</ul>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">git</span> <span class="pre">clone</span> <span class="pre">git&#64;github.com:TheOGChips/tsudoku.git</span> <span class="pre">&amp;&amp;</span> <span class="pre">cd</span> <span class="pre">tsudoku</span></code></p>
+</div></blockquote>
+<ul class="simple">
+<li><p>Option 3: Direct download from the main branch</p></li>
+</ul>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">wget</span> <span class="pre">https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip</span> <span class="pre">-O</span> <span class="pre">tsudoku.zip</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">unzip</span> <span class="pre">tsudoku.zip</span> <span class="pre">&amp;&amp;</span> <span class="pre">mv</span> <span class="pre">tsudoku-main</span> <span class="pre">tsudoku</span> <span class="pre">&amp;&amp;</span> <span class="pre">cd</span> <span class="pre">tsudoku</span></code></p>
+</div></blockquote>
+</section>
+<section id="step-2-compile-the-source-code-using-the-provided-makefile-performing-any-of-the-three-methods-above-should-have-already-placed-you-inside-the-tsudoku-directory-of-the-cloned-source-code">
+<h4>Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the <em>tsudoku</em> directory of the cloned source code.<a class="headerlink" href="#step-2-compile-the-source-code-using-the-provided-makefile-performing-any-of-the-three-methods-above-should-have-already-placed-you-inside-the-tsudoku-directory-of-the-cloned-source-code" title="Permalink to this heading">¶</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span></code></p>
+</div></blockquote>
+</section>
+<section id="step-3-source-your-shell-s-rc-file-to-allow-running-tsudoku-in-the-current-shell-instance">
+<h4>Step 3: Source your shell’s RC file to allow running <em>tsudoku</em> in the current shell instance.<a class="headerlink" href="#step-3-source-your-shell-s-rc-file-to-allow-running-tsudoku-in-the-current-shell-instance" title="Permalink to this heading">¶</a></h4>
+<ul class="simple">
+<li><p>Examples:</p></li>
+</ul>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">source</span> <span class="pre">~/.bashrc</span>&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">if</span> <span class="pre">using</span> <span class="pre">bash</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">source</span> <span class="pre">~/.zshrc</span>&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">if</span> <span class="pre">using</span> <span class="pre">zsh</span></code></p>
+</div></blockquote>
+</section>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<section id="with-in-game-menu-enabled">
+<h3>With in-game menu enabled:<a class="headerlink" href="#with-in-game-menu-enabled" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span></code></p>
+</div></blockquote>
+</section>
+<section id="with-in-game-menu-disabled">
+<h3>With in-game menu disabled:<a class="headerlink" href="#with-in-game-menu-disabled" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span> <span class="pre">-n</span></code><br />
+or<br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span> <span class="pre">--no-in-game-menu</span></code></p>
+</div></blockquote>
+</section>
+<section id="display-usage-information">
+<h3>Display usage information:<a class="headerlink" href="#display-usage-information" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span> <span class="pre">--help</span></code></p>
+</div></blockquote>
+</section>
+<section id="remove-all-saved-games">
+<h3>Remove all saved games<a class="headerlink" href="#remove-all-saved-games" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span> <span class="pre">-d</span></code><br />
+or<br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">tsudoku</span> <span class="pre">--delete-saved-games</span></code></p>
+</div></blockquote>
+</section>
+</section>
+<section id="updates">
+<h2>Updates<a class="headerlink" href="#updates" title="Permalink to this heading">¶</a></h2>
+<section id="id1">
+<h3>From source<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<section id="if-installed-using-git-via-https-or-ssh-options-1-or-2-navigate-to-the-tsudoku-directory-then-perform-the-following-steps">
+<h4>If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the <em>tsudoku</em> directory, then perform the following steps:<a class="headerlink" href="#if-installed-using-git-via-https-or-ssh-options-1-or-2-navigate-to-the-tsudoku-directory-then-perform-the-following-steps" title="Permalink to this heading">¶</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">git</span> <span class="pre">pull</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">upgrade</span></code></p>
+</div></blockquote>
+</section>
+<section id="if-installed-via-direct-downloaded-option-3-delete-the-tsudoku-directory-and-repeat-the-installation-process-as-described-in-the-installation-section-again">
+<h4>If installed via direct downloaded (option 3), delete the <em>tsudoku</em> directory and repeat the installation process as described in the <strong>Installation</strong> section again.<a class="headerlink" href="#if-installed-via-direct-downloaded-option-3-delete-the-tsudoku-directory-and-repeat-the-installation-process-as-described-in-the-installation-section-again" title="Permalink to this heading">¶</a></h4>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">rm</span> <span class="pre">-rf</span> <span class="pre">tsudoku</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">wget</span> <span class="pre">https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip</span> <span class="pre">-O</span> <span class="pre">tsudoku.zip</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">unzip</span> <span class="pre">tsudoku.zip</span> <span class="pre">&amp;&amp;</span> <span class="pre">mv</span> <span class="pre">tsudoku-main</span> <span class="pre">tsudoku</span> <span class="pre">&amp;&amp;</span> <span class="pre">cd</span> <span class="pre">tsudoku</span></code><br />
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span></code></p>
+</div></blockquote>
+</section>
+</section>
+</section>
+<section id="status-update-3-march-2023">
+<h2>Status update: 3 March 2023<a class="headerlink" href="#status-update-3-march-2023" title="Permalink to this heading">¶</a></h2>
+<p>tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g&#64;gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!</p>
+</section>
 </section>
 
 

@@ -16,7 +16,7 @@ Check out the :doc:`installation` section for further information.
 
 .. toctree::
    installation
-   README
+   README.md
    :maxdepth: 1
    :caption: Contents:
 
