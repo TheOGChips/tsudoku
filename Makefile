@@ -34,6 +34,9 @@ all:	$(OBJ)
 	$(LINK) $(TGT) -lncurses
 	@mkdir -p $(SYMLINK_PATH)
 	-@ln -s $(PWD)/$(TGT) $(SYMLINK_PATH)
+	@echo -e '\nInstallation of tsudoku has completed!'
+	@echo "Remember to either open a new terminal window or source your shell's RC file"
+	@echo -e 'in order to run "tsudoku" in the current window\n'
 
 %.o:	$(SRC)/%.cpp $(COMMON_HDRS)
 		$(COMPILE) $<

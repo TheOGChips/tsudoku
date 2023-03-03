@@ -58,6 +58,12 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 >`$ make`
 
+#### Step 3: Source your shell's RC file to allow running *tsudoku* in the current shell instance.
+
+- Examples:
+>`$ source ~/.bashrc    # if using bash`  
+>`$ source ~/.zshrc     # if using zsh`
+
 ## Usage
 
 ### With in-game menu enabled:
