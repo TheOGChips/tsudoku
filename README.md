@@ -28,8 +28,8 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
 
->\- g++ (tsudoku compiles using the C++17 standard)  
->\- ncurses
+>\- The GNU C++ compiler `g++` (tsudoku compiles using the C++17 standard)  
+>\- NCurses C API
 
 ## Prerequisites Installation
 
@@ -37,6 +37,8 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 >`$ sudo apt install g++`  
 >`$ sudo apt install libncurses-dev`
+
+**Note for MacOS Users**: The best option for a MacOS package manager is Homebrew and is relatively similar to a Linux package manager such as that found on Linux and WSL. MacOS should come pre-installed with `clang++`, which should be mapped to `g++`. You can use this instead if you wish. Homebrew's version of an NCurses package is likely just called `ncurses`.
 
 ## Installation
 
