@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="SavedGameMenu_8cpp" kind="file" language="C++">
+    <compoundname>SavedGameMenu.cpp</compoundname>
+    <includes local="no">ncurses.h</includes>
+    <includes local="yes">SavedGameMenu.hpp</includes>
+    <includes local="yes">colors.hpp</includes>
+    <includes local="no">fstream</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/chris/Documents/tsudoku/src/SavedGameMenu.cpp</label>
+        <link refid="SavedGameMenu_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>SavedGameMenu.hpp</label>
+      </node>
+      <node id="4">
+        <label>colors.hpp</label>
+      </node>
+      <node id="5">
+        <label>fstream</label>
+      </node>
+      <node id="2">
+        <label>ncurses.h</label>
+      </node>
+    </incdepgraph>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;ncurses.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;SavedGameMenu.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;colors.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;fstream&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="keyword">using<sp/>namespace<sp/></highlight><highlight class="normal">std;</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*<sp/>Name:<sp/>display_menu<sp/>(pure<sp/>virtual<sp/>override)</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Displays<sp/>the<sp/>saved<sp/>games<sp/>menu.<sp/>The<sp/>options<sp/>listed<sp/>are<sp/>saved<sp/>games<sp/>in<sp/>CSV<sp/>files<sp/>from<sp/>the</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>~/.tsudoku<sp/>directory.<sp/>The<sp/>currently<sp/>selected<sp/>option<sp/>is<sp/>always<sp/>highlighted.<sp/>The<sp/>saved</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>games<sp/>menu<sp/>is<sp/>re-rendered<sp/>each<sp/>time<sp/>the<sp/>player<sp/>uses<sp/>the<sp/>Up/Down<sp/>keys<sp/>to<sp/>highlight<sp/>a</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>different<sp/>option.</highlight></codeline>
+<codeline lineno="14"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>EDGE<sp/>-&gt;<sp/>Starting<sp/>cell<sp/>the<sp/>saved<sp/>games<sp/>menu<sp/>will<sp/>display<sp/>at.<sp/>The<sp/>menu<sp/>title<sp/>should<sp/>display<sp/>on</highlight></codeline>
+<codeline lineno="16"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>the<sp/>line<sp/>below<sp/>the<sp/>top<sp/>padding<sp/>and<sp/>the<sp/>column<sp/>after<sp/>the<sp/>vertical<sp/>divider.</highlight></codeline>
+<codeline lineno="17"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>(unused<sp/>options<sp/>enum)<sp/>-&gt;<sp/>Unused<sp/>variable<sp/>with<sp/>a<sp/>named<sp/>reference.<sp/>Required<sp/>because<sp/>of<sp/>the</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>function<sp/>prototype<sp/>inherited<sp/>from<sp/>Menu.</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SavedGameMenu::display_menu<sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>cell<sp/>EDGE,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>options)<sp/>{</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/>display_line<sp/>=<sp/>EDGE.first;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/>clear();</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/>mvprintw(display_line++,<sp/>EDGE.second,<sp/></highlight><highlight class="stringliteral">&quot;Saved<sp/>Games:&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(list_iter<sp/>iter<sp/>=<sp/>saved_games.begin();<sp/>iter<sp/>!=<sp/>saved_games.end();<sp/>iter++)<sp/>{</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(*selection<sp/>==<sp/>*iter)<sp/>attron(COLOR_PAIR(MENU_SELECTION));</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(++display_line,<sp/>EDGE.second,<sp/></highlight><highlight class="stringliteral">&quot;%s&quot;</highlight><highlight class="normal">,<sp/>iter-&gt;c_str());</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(*selection<sp/>==<sp/>*iter)<sp/>attroff(COLOR_PAIR(MENU_SELECTION));</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/>refresh();</highlight></codeline>
+<codeline lineno="30"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="33"><highlight class="comment"><sp/>*<sp/>Name:<sp/>generate_saved_games_list</highlight></codeline>
+<codeline lineno="34"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Creates<sp/>the<sp/>list<sp/>of<sp/>saved<sp/>games<sp/>from<sp/>the<sp/>names<sp/>of<sp/>available<sp/>CSV<sp/>files<sp/>in<sp/>the<sp/>~/.tsudoku</highlight></codeline>
+<codeline lineno="35"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>directory.<sp/>This<sp/>entries<sp/>in<sp/>this<sp/>list<sp/>are<sp/>what<sp/>will<sp/>be<sp/>displayed<sp/>to<sp/>the<sp/>player.<sp/>The</highlight></codeline>
+<codeline lineno="36"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>entries<sp/>are<sp/>stored<sp/>without<sp/>the<sp/>&quot;.csv&quot;<sp/>file<sp/>extension.<sp/>Text<sp/>files<sp/>with<sp/>extension<sp/>&quot;.txt&quot;</highlight></codeline>
+<codeline lineno="37"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>are<sp/>ignored<sp/>so<sp/>as<sp/>to<sp/>avoid<sp/>adding<sp/>the<sp/>completed<sp/>games<sp/>file<sp/>to<sp/>the<sp/>list.</highlight></codeline>
+<codeline lineno="38"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="39"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SavedGameMenu::generate_saved_games_list<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">using<sp/>namespace<sp/></highlight><highlight class="normal">filesystem;<sp/></highlight><highlight class="comment">//NOTE:<sp/>Use<sp/>C++17&apos;s<sp/>filesystem<sp/>library</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">typedef</highlight><highlight class="normal"><sp/>directory_iterator<sp/>dir_iter;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(dir_iter<sp/>iter(DIR);<sp/>iter<sp/>!=<sp/>end(dir_iter());<sp/>iter++)<sp/>{</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(iter-&gt;path().extension()<sp/>==<sp/></highlight><highlight class="stringliteral">&quot;.csv&quot;</highlight><highlight class="normal">)<sp/>saved_games.push_back(iter-&gt;path().stem().string());</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/>saved_games.sort();</highlight></codeline>
+<codeline lineno="48"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="51"><highlight class="comment"><sp/>*<sp/>Name:<sp/>select_saved_game</highlight></codeline>
+<codeline lineno="52"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Controls<sp/>iterating<sp/>through<sp/>the<sp/>list<sp/>from<sp/>player<sp/>input<sp/>and<sp/>highlighting<sp/>the<sp/>name<sp/>of<sp/>the</highlight></codeline>
+<codeline lineno="53"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>current<sp/>game<sp/>that<sp/>will<sp/>be<sp/>loaded<sp/>once<sp/>the<sp/>player<sp/>presses<sp/>Enter.<sp/>If<sp/>there<sp/>are<sp/>no<sp/>saved</highlight></codeline>
+<codeline lineno="54"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>games,<sp/>the<sp/>player<sp/>will<sp/>instead<sp/>be<sp/>notified<sp/>as<sp/>much<sp/>and<sp/>then<sp/>prompted<sp/>to<sp/>continue.</highlight></codeline>
+<codeline lineno="55"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="56"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>SavedGameMenu::select_saved_game<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/>uint16_t<sp/>input,</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>size_offset;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal"><sp/><sp/><sp/><sp/>selection<sp/>=<sp/>saved_games.begin();</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"><sp/><sp/><sp/><sp/>curs_set(</highlight><highlight class="keyword">false</highlight><highlight class="normal">);<sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Turn<sp/>off<sp/>cursor<sp/>while<sp/>in<sp/>the<sp/>menu.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/>timeout(250);</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(saved_games.empty())<sp/>{</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">do</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>input<sp/>=<sp/>getch();</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Somehow<sp/>this<sp/>displays<sp/>without<sp/>me<sp/>needing<sp/>to<sp/>call<sp/>refresh</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(TOP_PADDING,<sp/>LEFT_PADDING,<sp/></highlight><highlight class="stringliteral">&quot;You<sp/>have<sp/>no<sp/>saved<sp/>games.&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(TOP_PADDING<sp/>+<sp/>saved_games.size()<sp/>+<sp/>3,<sp/>LEFT_PADDING,<sp/></highlight><highlight class="stringliteral">&quot;Press<sp/>ENTER<sp/>to<sp/>continue...&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><ref refid="misc_8cpp_1a4df753caf9fd310b30e1fa38cbac4abf" kindref="member">invalid_window_size_handler</ref>();</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}<sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(input<sp/>!=<sp/>KEY_ENTER);</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">do</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>display_menu(cell<sp/>{TOP_PADDING,<sp/>LEFT_PADDING},<sp/>options::NONE);</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>input<sp/>=<sp/>getch();</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>((input<sp/>==<sp/>KEY_DOWN<sp/>or<sp/>input<sp/>==<sp/></highlight><highlight class="charliteral">&apos;s&apos;</highlight><highlight class="normal">)<sp/>and</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*selection<sp/>!=<sp/>saved_games.back())<sp/>selection++;</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>((input<sp/>==<sp/>KEY_UP<sp/>or<sp/>input<sp/>==<sp/></highlight><highlight class="charliteral">&apos;w&apos;</highlight><highlight class="normal">)<sp/>and</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>*selection<sp/>!=<sp/>saved_games.front())<sp/>selection--;</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/><ref refid="misc_8cpp_1a4df753caf9fd310b30e1fa38cbac4abf" kindref="member">invalid_window_size_handler</ref>();</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}<sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(input<sp/>!=<sp/>KEY_ENTER);</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/>refresh();</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/>nodelay(stdscr,<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/>curs_set(</highlight><highlight class="keyword">true</highlight><highlight class="normal">);<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Turn<sp/>cursor<sp/>back<sp/>on<sp/>before<sp/>leaving<sp/>the<sp/>menu.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>not<sp/>saved_games.empty();</highlight></codeline>
+<codeline lineno="90"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="93"><highlight class="comment"><sp/>*<sp/>Name:<sp/>read_saved_game</highlight></codeline>
+<codeline lineno="94"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Reads<sp/>a<sp/>saved<sp/>game<sp/>from<sp/>it&apos;s<sp/>CSV<sp/>file<sp/>to<sp/>the<sp/>saved<sp/>game<sp/>and<sp/>color<sp/>code<sp/>matrices.</highlight></codeline>
+<codeline lineno="95"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="96"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="97"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SavedGameMenu::read_saved_game<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/>ifstream<sp/>infile<sp/>(DIR<sp/>+<sp/></highlight><highlight class="stringliteral">&quot;/&quot;</highlight><highlight class="normal"><sp/>+<sp/>*selection<sp/>+<sp/></highlight><highlight class="stringliteral">&quot;.csv&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>DISPLAY_MATRIX_ROWS;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>row;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>getline(infile,<sp/>row);</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>j<sp/>=<sp/>0;<sp/>j<sp/>&lt;<sp/>DISPLAY_MATRIX_COLUMNS;<sp/>j++)<sp/>{</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>index;</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>saved_game[i][j]<sp/>=<sp/>stoi(row,<sp/>&amp;index);<sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Read<sp/>in<sp/>number</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>saved_color_codes[i][j]<sp/>=<sp/>row[index];<sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Read<sp/>in<sp/>color<sp/>code<sp/>character</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Drop<sp/>over<sp/>to<sp/>next<sp/>entry<sp/>in<sp/>string.<sp/>Index<sp/>will<sp/>cause<sp/>a<sp/>thrown<sp/>out_of_range<sp/>exception<sp/>on<sp/>the<sp/>last<sp/>number<sp/>in<sp/>the<sp/>string.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">try</highlight><highlight class="normal"><sp/>{<sp/>row<sp/>=<sp/>row.substr(index<sp/>+<sp/>2);<sp/>}</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">catch</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>out_of_range)<sp/>{<sp/>row<sp/>=<sp/>row.substr(index<sp/>+<sp/>1);<sp/>}</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"><sp/><sp/><sp/><sp/>infile.close();</highlight></codeline>
+<codeline lineno="113"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"></highlight></codeline>
+<codeline lineno="115"><highlight class="normal"></highlight><highlight class="preprocessor">#if<sp/>DEBUG</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="116"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="117"><highlight class="comment"><sp/>*<sp/>Name:<sp/>print_saved_game</highlight></codeline>
+<codeline lineno="118"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Prints<sp/>the<sp/>matrices<sp/>of<sp/>saved<sp/>game<sp/>values<sp/>and<sp/>color<sp/>codes<sp/>side<sp/>by<sp/>side.<sp/>This<sp/>is<sp/>only</highlight></codeline>
+<codeline lineno="119"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>available<sp/>when<sp/>the<sp/>program<sp/>has<sp/>been<sp/>compiled<sp/>with<sp/>debug<sp/>mode<sp/>enabled.</highlight></codeline>
+<codeline lineno="120"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="121"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="122"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SavedGameMenu::print_saved_game<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/>clear();</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>DISPLAY_MATRIX_ROWS;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>j<sp/>=<sp/>0;<sp/>j<sp/>&lt;<sp/>DISPLAY_MATRIX_COLUMNS;<sp/>j++)<sp/>{</highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(TOP_PADDING<sp/>+<sp/>i,<sp/>LEFT_PADDING<sp/>+<sp/>j,<sp/></highlight><highlight class="stringliteral">&quot;%c&quot;</highlight><highlight class="normal">,<sp/>saved_game[i][j]);</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(TOP_PADDING<sp/>+<sp/>i,<sp/>LEFT_PADDING<sp/>+<sp/>j<sp/>+<sp/>30,<sp/></highlight><highlight class="stringliteral">&quot;%c&quot;</highlight><highlight class="normal">,<sp/>saved_color_codes[i][j]);</highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/>refresh();</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/>getch();</highlight></codeline>
+<codeline lineno="132"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="134"><highlight class="normal"></highlight></codeline>
+<codeline lineno="135"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="136"><highlight class="comment"><sp/>*<sp/>Name:<sp/>get_saved_game</highlight></codeline>
+<codeline lineno="137"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Wraps<sp/>the<sp/>selected<sp/>saved<sp/>game<sp/>value<sp/>and<sp/>color<sp/>code<sp/>matrices<sp/>into<sp/>a<sp/>SavedPuzzle<sp/>object</highlight></codeline>
+<codeline lineno="138"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>which<sp/>is<sp/>returned<sp/>to<sp/>the<sp/>calling<sp/>function.<sp/>This<sp/>makes<sp/>passing<sp/>around<sp/>the<sp/>saved<sp/>game</highlight></codeline>
+<codeline lineno="139"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>information<sp/>easier.</highlight></codeline>
+<codeline lineno="140"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="141"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="142"><highlight class="normal">SavedPuzzle<sp/>SavedGameMenu::get_saved_game<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/>SavedPuzzle<sp/>saved_puzzle;</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>DISPLAY_MATRIX_ROWS;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>j<sp/>=<sp/>0;<sp/>j<sp/>&lt;<sp/>DISPLAY_MATRIX_COLUMNS;<sp/>j++)<sp/>{</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>saved_puzzle.puzzle[i][j]<sp/>=<sp/>saved_game[i][j];</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>saved_puzzle.color_codes[i][j]<sp/>=<sp/>saved_color_codes[i][j];</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/>saved_puzzle.filename<sp/>=<sp/>DIR<sp/>+<sp/></highlight><highlight class="stringliteral">&quot;/&quot;</highlight><highlight class="normal"><sp/>+<sp/>*selection<sp/>+<sp/></highlight><highlight class="stringliteral">&quot;.csv&quot;</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>saved_puzzle;</highlight></codeline>
+<codeline lineno="152"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="153"><highlight class="normal"></highlight></codeline>
+<codeline lineno="154"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="155"><highlight class="comment"><sp/>*<sp/>Name:<sp/>menu<sp/>(overload)</highlight></codeline>
+<codeline lineno="156"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Coordinates<sp/>generating<sp/>the<sp/>saved<sp/>games<sp/>list,<sp/>displaying<sp/>the<sp/>list<sp/>to<sp/>the<sp/>player<sp/>in<sp/>menu</highlight></codeline>
+<codeline lineno="157"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>form,<sp/>and<sp/>reading<sp/>in<sp/>the<sp/>saved<sp/>game<sp/>chosen<sp/>by<sp/>the<sp/>player.</highlight></codeline>
+<codeline lineno="158"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="159"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="160"><highlight class="normal">options<sp/>SavedGameMenu::menu<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="161"><highlight class="normal"><sp/><sp/><sp/><sp/>generate_saved_games_list();</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(select_saved_game())<sp/>{</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>read_saved_game();</highlight></codeline>
+<codeline lineno="164"><highlight class="normal"></highlight><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>#if<sp/>DEBUG</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="165"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>print_saved_game();</highlight></codeline>
+<codeline lineno="166"><highlight class="normal"></highlight><highlight class="preprocessor"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>#endif</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>options::SAVE_READY;</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>options::NO_SAVES;</highlight></codeline>
+<codeline lineno="170"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="/home/chris/Documents/tsudoku/src/SavedGameMenu.cpp"/>
+  </compounddef>
+</doxygen>

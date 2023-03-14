@@ -1,0 +1,292 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="MainMenu_8cpp" kind="file" language="C++">
+    <compoundname>MainMenu.cpp</compoundname>
+    <includes local="no">ncurses.h</includes>
+    <includes local="yes">MainMenu.hpp</includes>
+    <includes local="yes">colors.hpp</includes>
+    <includes local="no">map</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/chris/Documents/tsudoku/src/MainMenu.cpp</label>
+        <link refid="MainMenu_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>MainMenu.hpp</label>
+      </node>
+      <node id="4">
+        <label>colors.hpp</label>
+      </node>
+      <node id="5">
+        <label>map</label>
+      </node>
+      <node id="2">
+        <label>ncurses.h</label>
+      </node>
+    </incdepgraph>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="MainMenu_8cpp_1acb68b8cbbd852dad6f0eb564203bf620" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>options</type>
+        <definition>options operator++</definition>
+        <argsstring>(options &amp;opt)</argsstring>
+        <name>operator++</name>
+        <param>
+          <type>options &amp;</type>
+          <declname>opt</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/chris/Documents/tsudoku/src/MainMenu.cpp" line="14" column="9" bodyfile="/home/chris/Documents/tsudoku/src/MainMenu.cpp" bodystart="14" bodyend="31"/>
+      </memberdef>
+      <memberdef kind="function" id="MainMenu_8cpp_1a5cdc8484a2f3935b98567e1242114c27" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>options</type>
+        <definition>options operator--</definition>
+        <argsstring>(options &amp;opt)</argsstring>
+        <name>operator--</name>
+        <param>
+          <type>options &amp;</type>
+          <declname>opt</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/home/chris/Documents/tsudoku/src/MainMenu.cpp" line="39" column="9" bodyfile="/home/chris/Documents/tsudoku/src/MainMenu.cpp" bodystart="39" bodyend="56"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;ncurses.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MainMenu.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;colors.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;map&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="keyword">using<sp/>namespace<sp/></highlight><highlight class="normal">std;</highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*<sp/>Name:<sp/>Operator<sp/>++<sp/>(pre-increment,<sp/>overloaded)</highlight></codeline>
+<codeline lineno="10"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Shorthand<sp/>convenience<sp/>for<sp/>changing<sp/>main<sp/>menu<sp/>options.</highlight></codeline>
+<codeline lineno="11"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>-&gt;<sp/>The<sp/>previously<sp/>selected<sp/>main<sp/>menu<sp/>option<sp/>to<sp/>update.</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal">options<sp/><ref refid="MainMenu_8cpp_1acb68b8cbbd852dad6f0eb564203bf620" kindref="member">operator ++ </ref>(options&amp;<sp/>opt)<sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">switch</highlight><highlight class="normal"><sp/>(opt)<sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::NEW_GAME:</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::RESUME_GAME;</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::RESUME_GAME:</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::SHOW_STATS;</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::SHOW_STATS:</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::EXIT;</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">:<sp/>opt<sp/>=<sp/>options::EXIT;</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>opt;</highlight></codeline>
+<codeline lineno="31"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="34"><highlight class="comment"><sp/>*<sp/>Name:<sp/>Operator<sp/>--<sp/>(pre-decrement,<sp/>overloaded)</highlight></codeline>
+<codeline lineno="35"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Shorthand<sp/>convenience<sp/>for<sp/>changing<sp/>main<sp/>menu<sp/>options.</highlight></codeline>
+<codeline lineno="36"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="37"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>-&gt;<sp/>The<sp/>previously<sp/>selected<sp/>main<sp/>menu<sp/>option<sp/>to<sp/>update.</highlight></codeline>
+<codeline lineno="38"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal">options<sp/><ref refid="MainMenu_8cpp_1a5cdc8484a2f3935b98567e1242114c27" kindref="member">operator -- </ref>(options&amp;<sp/>opt)<sp/>{</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">switch</highlight><highlight class="normal"><sp/>(opt)<sp/>{</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::EXIT:</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::SHOW_STATS;</highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::SHOW_STATS:</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::RESUME_GAME;</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>options::RESUME_GAME:</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>opt<sp/>=<sp/>options::NEW_GAME;</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="52"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="53"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">:<sp/>opt<sp/>=<sp/>options::NEW_GAME;</highlight></codeline>
+<codeline lineno="54"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="55"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>opt;</highlight></codeline>
+<codeline lineno="56"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="59"><highlight class="comment"><sp/>*<sp/>Name:<sp/>Class<sp/>Constructor</highlight></codeline>
+<codeline lineno="60"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Initializes<sp/>the<sp/>NCurses<sp/>environment<sp/>and<sp/>global<sp/>NCurses<sp/>settings.</highlight></codeline>
+<codeline lineno="61"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="62"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal">MainMenu::MainMenu<sp/>()<sp/>{<sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/>initscr();</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/>cbreak();</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/>noecho();</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/>keypad(stdscr,<sp/></highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/>start_color();</highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/>init_pair(MENU_SELECTION,<sp/>COLOR_BLACK,<sp/>COLOR_WHITE);</highlight></codeline>
+<codeline lineno="71"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="74"><highlight class="comment"><sp/>*<sp/>Name:<sp/>Class<sp/>Destructor</highlight></codeline>
+<codeline lineno="75"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Unsets<sp/>the<sp/>NCurses<sp/>environment<sp/>once<sp/>the<sp/>user<sp/>chooses<sp/>to<sp/>exit<sp/>the<sp/>program.</highlight></codeline>
+<codeline lineno="76"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="77"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal">MainMenu::~MainMenu<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>echo();</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/>nocbreak();</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/>endwin();</highlight></codeline>
+<codeline lineno="82"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight></codeline>
+<codeline lineno="84"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="85"><highlight class="comment"><sp/>*<sp/>Name:<sp/>display_menu<sp/>(pure<sp/>virtual<sp/>override)</highlight></codeline>
+<codeline lineno="86"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Displays<sp/>the<sp/>main<sp/>menu.<sp/>The<sp/>currently<sp/>selected<sp/>option<sp/>is<sp/>always<sp/>highlighted.<sp/>The<sp/>main</highlight></codeline>
+<codeline lineno="87"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>menu<sp/>is<sp/>re-rendered<sp/>each<sp/>time<sp/>the<sp/>user<sp/>uses<sp/>the<sp/>Up/Down<sp/>keys<sp/>to<sp/>highlight<sp/>a<sp/>different</highlight></codeline>
+<codeline lineno="88"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>option.</highlight></codeline>
+<codeline lineno="89"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="90"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>MAX<sp/>-&gt;<sp/>Bottom<sp/>right<sp/>corner<sp/>cell<sp/>of<sp/>the<sp/>terminal<sp/>window.<sp/>Signifies<sp/>the<sp/>max<sp/>number<sp/>of<sp/>lines</highlight></codeline>
+<codeline lineno="91"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>and<sp/>columns<sp/>in<sp/>the<sp/>window.</highlight></codeline>
+<codeline lineno="92"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>OPT<sp/>-&gt;<sp/>The<sp/>currently<sp/>selected<sp/>main<sp/>menu<sp/>option.</highlight></codeline>
+<codeline lineno="93"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>MainMenu::display_menu<sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>cell<sp/>MAX,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>options<sp/>OPT)<sp/>{</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>TITLE<sp/>=<sp/></highlight><highlight class="stringliteral">&quot;MAIN<sp/>MENU&quot;</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>Y_CENTER<sp/>=<sp/>MAX.first/2,</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>X_CENTER<sp/>=<sp/>MAX.second/2<sp/>-<sp/>TITLE.size()/2,</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>NUM_OPTS<sp/>=<sp/>4;</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">string</highlight><highlight class="normal"><sp/>OPTS[NUM_OPTS]<sp/>=<sp/>{<sp/></highlight><highlight class="stringliteral">&quot;New<sp/>Game&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;Resume<sp/>Game&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;Show<sp/>#<sp/>Finished<sp/>Games&quot;</highlight><highlight class="normal">,<sp/></highlight><highlight class="stringliteral">&quot;Exit&quot;</highlight><highlight class="normal"><sp/>};</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>map&lt;uint8_t,<sp/>options&gt;<sp/>opt_map;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/>opt_map[0]<sp/>=<sp/>options::NEW_GAME;</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/>opt_map[1]<sp/>=<sp/>options::RESUME_GAME;</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/>opt_map[2]<sp/>=<sp/>options::SHOW_STATS;</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/>opt_map[3]<sp/>=<sp/>options::EXIT;</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/>mvprintw(Y_CENTER<sp/>-<sp/>2,<sp/>X_CENTER,<sp/></highlight><highlight class="stringliteral">&quot;%s&quot;</highlight><highlight class="normal">,<sp/>TITLE.c_str());</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(uint8_t<sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>NUM_OPTS;<sp/>i++)<sp/>{</highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(OPT<sp/>==<sp/>opt_map[i])<sp/>attron(COLOR_PAIR(MENU_SELECTION));</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>mvprintw(Y_CENTER<sp/>+<sp/>i,<sp/>X_CENTER,<sp/></highlight><highlight class="stringliteral">&quot;%s&quot;</highlight><highlight class="normal">,<sp/>OPTS[i].c_str());</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(OPT<sp/>==<sp/>opt_map[i])<sp/>attroff(COLOR_PAIR(MENU_SELECTION));</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"><sp/><sp/><sp/><sp/>refresh();</highlight></codeline>
+<codeline lineno="113"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"></highlight></codeline>
+<codeline lineno="115"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="116"><highlight class="comment"><sp/>*<sp/>Name:<sp/>set_VERTICAL_DIVIDER</highlight></codeline>
+<codeline lineno="117"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Sets<sp/>the<sp/>value<sp/>of<sp/>the<sp/>vertical<sp/>divider<sp/>between<sp/>the<sp/>display<sp/>puzzle<sp/>and<sp/>the<sp/>in-game<sp/>menu.</highlight></codeline>
+<codeline lineno="118"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="119"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>VAL<sp/>-&gt;<sp/>The<sp/>number<sp/>of<sp/>columns<sp/>to<sp/>be<sp/>used<sp/>as<sp/>the<sp/>vertical<sp/>divider.<sp/>If<sp/>the<sp/>in-game<sp/>menu<sp/>is</highlight></codeline>
+<codeline lineno="120"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>disabled,<sp/>the<sp/>vertical<sp/>divider<sp/>is<sp/>set<sp/>to<sp/>0.</highlight></codeline>
+<codeline lineno="121"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="122"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>MainMenu::set_VERTICAL_DIVIDER<sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>VAL)<sp/>{</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/>VERTICAL_DIVIDER<sp/>=<sp/>VAL;</highlight></codeline>
+<codeline lineno="124"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"></highlight></codeline>
+<codeline lineno="126"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="127"><highlight class="comment"><sp/>*<sp/>Name:<sp/>set_IN_GAME_MENU_DISPLAY_SPACING</highlight></codeline>
+<codeline lineno="128"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Sets<sp/>the<sp/>number<sp/>of<sp/>columns<sp/>used<sp/>to<sp/>display<sp/>the<sp/>in-game<sp/>menu.</highlight></codeline>
+<codeline lineno="129"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="130"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>VAL<sp/>-&gt;<sp/>The<sp/>number<sp/>of<sp/>columns<sp/>to<sp/>be<sp/>used<sp/>to<sp/>display<sp/>the<sp/>in-game<sp/>menu.<sp/>If<sp/>the<sp/>in-game<sp/>menu<sp/>is</highlight></codeline>
+<codeline lineno="131"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>disabled,<sp/>the<sp/>number<sp/>of<sp/>columns<sp/>is<sp/>set<sp/>to<sp/>0.</highlight></codeline>
+<codeline lineno="132"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>MainMenu::set_IN_GAME_MENU_DISPLAY_SPACING<sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>VAL)<sp/>{</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/>IN_GAME_MENU_DISPLAY_SPACING<sp/>=<sp/>VAL;</highlight></codeline>
+<codeline lineno="135"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="136"><highlight class="normal"></highlight></codeline>
+<codeline lineno="137"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="138"><highlight class="comment"><sp/>*<sp/>Name:<sp/>set_WINDOW_XMIN</highlight></codeline>
+<codeline lineno="139"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Sets<sp/>the<sp/>number<sp/>of<sp/>lines<sp/>and<sp/>columns<sp/>the<sp/>terminal<sp/>window<sp/>must<sp/>be<sp/>in<sp/>order<sp/>to</highlight></codeline>
+<codeline lineno="140"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>play.<sp/>This<sp/>size<sp/>is<sp/>dependent<sp/>on<sp/>whether<sp/>the<sp/>in-game<sp/>menu<sp/>is<sp/>enabled.</highlight></codeline>
+<codeline lineno="141"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="142"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="143"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>MainMenu::set_WINDOW_REQ<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>WINDOW_REQ<sp/>is<sp/>defined<sp/>in<sp/>misc.hpp<sp/>and<sp/>misc.cpp</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="misc_8cpp_1a144d37a686256a8360827479151a7ba8" kindref="member">WINDOW_REQ</ref>.first<sp/>=<sp/>TOP_PADDING<sp/>+<sp/>PUZZLE_SPACE<sp/>+<sp/>RESULT_MSG_SPACE<sp/>+<sp/>BOTTOM_PADDING;</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="misc_8cpp_1a144d37a686256a8360827479151a7ba8" kindref="member">WINDOW_REQ</ref>.second<sp/>=<sp/>LEFT_PADDING<sp/>+<sp/>PUZZLE_SPACE<sp/>+<sp/>VERTICAL_DIVIDER<sp/>+</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>IN_GAME_MENU_DISPLAY_SPACING<sp/>+<sp/>RIGHT_PADDING;</highlight></codeline>
+<codeline lineno="148"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"></highlight></codeline>
+<codeline lineno="150"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="151"><highlight class="comment"><sp/>*<sp/>Name:<sp/>menu<sp/>(overload)</highlight></codeline>
+<codeline lineno="152"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Sets<sp/>class-level<sp/>global<sp/>variables<sp/>before<sp/>running<sp/>the<sp/>actual<sp/>main<sp/>menu.</highlight></codeline>
+<codeline lineno="153"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="154"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>USE_IN_GAME_MENU<sp/>-&gt;<sp/>Boolean<sp/>indicating<sp/>whether<sp/>the<sp/>in-game<sp/>menu<sp/>is<sp/>disabled<sp/>or<sp/>not.<sp/>This</highlight></codeline>
+<codeline lineno="155"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>affects<sp/>the<sp/>enforced<sp/>size<sp/>of<sp/>the<sp/>terminal<sp/>window.</highlight></codeline>
+<codeline lineno="156"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="157"><highlight class="normal">options<sp/>MainMenu::menu<sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>USE_IN_GAME_MENU)<sp/>{</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(not<sp/>USE_IN_GAME_MENU)<sp/>{</highlight></codeline>
+<codeline lineno="159"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>set_VERTICAL_DIVIDER(0);</highlight></codeline>
+<codeline lineno="160"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>set_IN_GAME_MENU_DISPLAY_SPACING(0);</highlight></codeline>
+<codeline lineno="161"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"><sp/><sp/><sp/><sp/>set_WINDOW_REQ();</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="164"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>menu();</highlight></codeline>
+<codeline lineno="165"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="166"><highlight class="normal"></highlight></codeline>
+<codeline lineno="167"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="168"><highlight class="comment"><sp/>*<sp/>Name:<sp/>menu<sp/>(pure<sp/>virtual<sp/>override)</highlight></codeline>
+<codeline lineno="169"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>On<sp/>the<sp/>first<sp/>call,<sp/>determines<sp/>whether<sp/>the<sp/>terminal<sp/>window<sp/>meets<sp/>the<sp/>size<sp/>requirments.<sp/>If</highlight></codeline>
+<codeline lineno="170"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>not,<sp/>the<sp/>program<sp/>does<sp/>not<sp/>proceed<sp/>until<sp/>the<sp/>user<sp/>resizes<sp/>the<sp/>terminal<sp/>window</highlight></codeline>
+<codeline lineno="171"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>appropriately.<sp/>Afterwards<sp/>and<sp/>on<sp/>subsequent<sp/>calls,<sp/>displays<sp/>the<sp/>main<sp/>menu.</highlight></codeline>
+<codeline lineno="172"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="173"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="174"><highlight class="normal">options<sp/>MainMenu::menu<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/>x_max,</highlight></codeline>
+<codeline lineno="176"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>y_max;</highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//static<sp/>bool<sp/>first_pass<sp/>=<sp/>true;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="178"><highlight class="normal"><sp/><sp/><sp/><sp/>getmaxyx(stdscr,<sp/>y_max,<sp/>x_max);</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/>curs_set(</highlight><highlight class="keyword">false</highlight><highlight class="normal">);<sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Turn<sp/>the<sp/>cursor<sp/>off<sp/>while<sp/>in<sp/>the<sp/>main<sp/>menu.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="180"><highlight class="normal"></highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="misc_8cpp_1a4df753caf9fd310b30e1fa38cbac4abf" kindref="member">invalid_window_size_handler</ref>();<sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Enforce<sp/>window<sp/>size</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="182"><highlight class="normal"><sp/><sp/><sp/><sp/>::clear();</highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Display<sp/>the<sp/>main<sp/>menu<sp/>starting<sp/>with<sp/>the<sp/>&quot;New<sp/>Game&quot;<sp/>option<sp/>highlighted</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/>options<sp/>opt<sp/>=<sp/>options::NEW_GAME;</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/>display_menu(cell<sp/>{y_max,<sp/>x_max},<sp/>opt);</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="188"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//NOTE:<sp/>Cycle<sp/>through<sp/>the<sp/>menu<sp/>until<sp/>the<sp/>user<sp/>selects<sp/>an<sp/>option</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="189"><highlight class="normal"><sp/><sp/><sp/><sp/>uint16_t<sp/>input;</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"><sp/><sp/><sp/><sp/>timeout(250);</highlight></codeline>
+<codeline lineno="191"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">do</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="192"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>display_menu(cell<sp/>{y_max,<sp/>x_max},<sp/>opt);</highlight></codeline>
+<codeline lineno="193"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>input<sp/>=<sp/>getch();</highlight></codeline>
+<codeline lineno="194"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">switch</highlight><highlight class="normal"><sp/>(input)<sp/>{</highlight></codeline>
+<codeline lineno="195"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/></highlight><highlight class="charliteral">&apos;s&apos;</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>KEY_DOWN:</highlight></codeline>
+<codeline lineno="197"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>++opt;</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="199"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="200"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/></highlight><highlight class="charliteral">&apos;w&apos;</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="201"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/>KEY_UP:</highlight></codeline>
+<codeline lineno="202"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>--opt;</highlight></codeline>
+<codeline lineno="203"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="204"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="205"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">default</highlight><highlight class="normal">:<sp/><ref refid="misc_8cpp_1a4df753caf9fd310b30e1fa38cbac4abf" kindref="member">invalid_window_size_handler</ref>();</highlight></codeline>
+<codeline lineno="206"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="207"><highlight class="normal"><sp/><sp/><sp/><sp/>}<sp/></highlight><highlight class="keywordflow">while</highlight><highlight class="normal"><sp/>(input<sp/>!=<sp/>KEY_ENTER);</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="209"><highlight class="normal"><sp/><sp/><sp/><sp/>::clear();</highlight></codeline>
+<codeline lineno="210"><highlight class="normal"><sp/><sp/><sp/><sp/>nodelay(stdscr,<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/>curs_set(</highlight><highlight class="keyword">true</highlight><highlight class="normal">);<sp/></highlight><highlight class="comment">//NOTE:<sp/>Turn<sp/>the<sp/>cursor<sp/>back<sp/>on<sp/>before<sp/>leaving<sp/>the<sp/>main<sp/>menu</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>opt;</highlight></codeline>
+<codeline lineno="213"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="/home/chris/Documents/tsudoku/src/MainMenu.cpp"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="Menu_8cpp" kind="file" language="C++">
+    <compoundname>Menu.cpp</compoundname>
+    <includes local="no">ncurses.h</includes>
+    <includes local="yes">Menu.hpp</includes>
+    <includes local="no">csignal</includes>
+    <incdepgraph>
+      <node id="1">
+        <label>/home/chris/Documents/tsudoku/src/Menu.cpp</label>
+        <link refid="Menu_8cpp"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>Menu.hpp</label>
+      </node>
+      <node id="4">
+        <label>csignal</label>
+      </node>
+      <node id="2">
+        <label>ncurses.h</label>
+      </node>
+    </incdepgraph>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#include<sp/>&lt;ncurses.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Menu.hpp&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;csignal&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="6"><highlight class="comment"><sp/>*<sp/>Name:<sp/>Class<sp/>Constructor</highlight></codeline>
+<codeline lineno="7"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Sets<sp/>a<sp/>signal<sp/>handler<sp/>for<sp/>signal<sp/>SIGINT.<sp/>All<sp/>derived<sp/>classes<sp/>will<sp/>be<sp/>aware<sp/>of<sp/>this.</highlight></codeline>
+<codeline lineno="8"><highlight class="comment"><sp/>*<sp/>Parameters:<sp/>None</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal">Menu::Menu<sp/>()<sp/>{</highlight></codeline>
+<codeline lineno="11"><highlight class="normal"><sp/><sp/><sp/><sp/>signal(SIGINT,<sp/><ref refid="misc_8cpp_1a5bc07dfc665846f5f9d8b050d5344a40" kindref="member">SIGINT_handler</ref>);</highlight></codeline>
+<codeline lineno="12"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="comment">/*<sp/>NOTE:</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"><sp/>*<sp/>Name:<sp/>SIGINT_handler</highlight></codeline>
+<codeline lineno="16"><highlight class="comment"><sp/>*<sp/>Purpose:<sp/>Resets<sp/>the<sp/>terminal<sp/>settings<sp/>to<sp/>their<sp/>previous<sp/>state<sp/>from<sp/>before<sp/>the<sp/>NCurses<sp/>environment</highlight></codeline>
+<codeline lineno="17"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>was<sp/>initialized.<sp/>This<sp/>function<sp/>is<sp/>inherited<sp/>by<sp/>all<sp/>its<sp/>derived<sp/>classes.</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/>*<sp/>Parameters:</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/>(unused<sp/>32-bit<sp/>integer)<sp/>-&gt;<sp/>The<sp/>signal<sp/>being<sp/>caught<sp/>by<sp/>this<sp/>handler,<sp/>in<sp/>this<sp/>case<sp/>SIGINT.</highlight></codeline>
+<codeline lineno="20"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>Since<sp/>it&apos;s<sp/>value<sp/>is<sp/>never<sp/>used,<sp/>it<sp/>does<sp/>not<sp/>need<sp/>a<sp/>name<sp/>for</highlight></codeline>
+<codeline lineno="21"><highlight class="comment"><sp/>*<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>reference.</highlight></codeline>
+<codeline lineno="22"><highlight class="comment"><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="misc_8cpp_1a5bc07dfc665846f5f9d8b050d5344a40" kindref="member">Menu::SIGINT_handler</ref><sp/>(int32_t)<sp/>{</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"><sp/><sp/><sp/><sp/>curs_set(</highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"><sp/><sp/><sp/><sp/>echo();</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"><sp/><sp/><sp/><sp/>nocbreak();</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/>endwin();</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/>exit(EXIT_SUCCESS);</highlight></codeline>
+<codeline lineno="29"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="/home/chris/Documents/tsudoku/src/Menu.cpp"/>
+  </compounddef>
+</doxygen>

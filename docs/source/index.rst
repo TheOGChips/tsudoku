@@ -8,6 +8,7 @@ Welcome to tsudoku's documentation!
 
 **tsudoku** is a simple sudoku game you can play from the comfort of your terminal.
 
+.. TODO: Change this to point to Installation section in README.md
 Check out the :doc:`installation` section for further information.
 
 .. note::
@@ -17,9 +18,11 @@ Check out the :doc:`installation` section for further information.
 .. toctree::
    installation
    README.md
-   :maxdepth: 1
+   main
+   :maxdepth: 2
    :caption: Contents:
-
+   :glob:
+   
 Indices and tables
 ==================
 

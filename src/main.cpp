@@ -1,3 +1,9 @@
+/**
+ * @file main.cpp
+ * 
+ * The starting file.
+ */
+
 /* NOTE: NCurses is included first in all files where its needed so that the KEY_ENTER
  *       redefinition in values.hpp persists across files the way I wanted.
  */
@@ -9,17 +15,15 @@
                         //      this file; however, there don't appear to be any for some reason.
 #include <cstring>      //strcmp
 
-/* NOTE:
- * Name: main
- * Purpose: The main function from the which the program starts. Tsudoku only accepts one option at
+/**
+ * The main function from the which the program starts. Tsudoku only accepts one option at
  *          run time.
- * Parameters:
- *      argc -> The total number of items entered on the command line. "tsudoku" will always be
+ * @param argc The total number of items entered on the command line. "tsudoku" will always be
  *              index 0 and any option, if provided, will start at index 1.
- *      argv -> The list of items entered on the command line. Possible tsudoku options are:
- *                  1. "--no-in-game-menu" or "-n" to disable the in-game menu
- *                  2. "--help" to display the help information
- *                  3. "--delete-saved-games" or "-d" to delete all saved games
+ * @param argv The list of items entered on the command line. Possible tsudoku options are:
+ *   -# "--no-in-game-menu" or "-n" to disable the in-game menu
+ *   -# "--help" to display the help information
+ *   -# "--delete-saved-games" or "-d" to delete all saved games
  */
 int main (int argc, char** argv) {
     //NOTE: Detemine whether the in-game menu should be enabled and if there is any input error

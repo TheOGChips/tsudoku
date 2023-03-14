@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.4" xml:lang="en-US">
+  <compounddef id="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir">
+    <compoundname>/home/chris/Documents/tsudoku/src</compoundname>
+    <innerfile refid="Container_8cpp">Container.cpp</innerfile>
+    <innerfile refid="DifficultyMenu_8cpp">DifficultyMenu.cpp</innerfile>
+    <innerfile refid="Grid_8cpp">Grid.cpp</innerfile>
+    <innerfile refid="InGameMenu_8cpp">InGameMenu.cpp</innerfile>
+    <innerfile refid="main_8cpp">main.cpp</innerfile>
+    <innerfile refid="MainMenu_8cpp">MainMenu.cpp</innerfile>
+    <innerfile refid="Menu_8cpp">Menu.cpp</innerfile>
+    <innerfile refid="misc_8cpp">misc.cpp</innerfile>
+    <innerfile refid="SavedGameMenu_8cpp">SavedGameMenu.cpp</innerfile>
+    <innerfile refid="Sudoku_8cpp">Sudoku.cpp</innerfile>
+    <innerfile refid="tsudoku_8cpp">tsudoku.cpp</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="/home/chris/Documents/tsudoku/src/"/>
+  </compounddef>
+</doxygen>
