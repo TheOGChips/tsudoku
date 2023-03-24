@@ -12,7 +12,7 @@ Check out the :doc:`README` README for further information on how to get started
 
 .. note::
 
-   This project is still currently in beta but is nearing completion.
+   While this project is complete and ready for official release, this documentation is still currently in development.
 
 .. toctree::
    README.md
