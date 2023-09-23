@@ -33,7 +33,7 @@ NOTE: These are likely already installed depending on your operating system. If 
 
 ## Prerequisites Installation
 
-If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager. The following example assumes Debian or a Debian-based OS using the APT package manager.
+If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager.
 
 >`$ sudo apt install g++`  
 >`$ sudo apt install libncurses-dev`
