@@ -2,3 +2,8 @@ sudoku.code-workspace
 test_puzzle.png
 lib
 tsudoku
+
+
+# Added by cargo
+
+/target
