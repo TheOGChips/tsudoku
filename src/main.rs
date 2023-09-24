@@ -57,7 +57,9 @@ fn main() -> Result<(), &'static str> {
             let _ = fs::remove_file(file.unwrap().path());
         }
     }
-    //TODO: Create ~/.tsudoku directory, if it doesn't already exist
+
+    let _ = fs::create_dir(dir);
+    //TODO: Actually start and play the game
 
     Ok(())
 }
