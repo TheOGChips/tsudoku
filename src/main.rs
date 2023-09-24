@@ -2,8 +2,12 @@ use clap::{
     command,
     arg,
 };
+use std::fs;
+//use std::io;
 
-fn main() {
+//struct NumCLArgsError;
+
+fn main() -> Result<(), &'static str> {
     let matches = command!()
         .arg(
             arg!(-n --"no-in-game-menu"
@@ -32,10 +36,39 @@ fn main() {
         else { false };
 
     if num_clargs > 1 {
-        eprintln!("\nError: Too many arguments. Only one argument can be accepted.\n");
-        return;
+        return Err("\nError: Too many arguments. Only one argument can be accepted.\n");
     }
     println!("use_in_game_menu: {}", use_in_game_menu);
     println!("delete_saved_games: {}", delete_saved_games);
-    //TODO: Print error message about invalid argument
+
+    let dir: &str = &(std::env::var("HOME").expect("Home directory should exist") + "/.tsudoku");
+    if delete_saved_games {
+        //for file in fs::read_dir("$HOME/.tsudoku/") {
+        //for file in fs::read_dir(".") {
+        //if let Ok(dir) = fs::read_dir(".") {
+        /*for file in fs::read_dir(".") {
+            println!("{}", file.path());
+        }*/
+        /*for file in fs::read_dir("~").unwrap() {
+            println!("{}", file.unwrap().path().display());
+        }*/
+        //println!("{}", HOME);
+        //let dir: fs::ReadDir = fs::read_dir(dir.clone()).expect(&(dir + " doesn't exist"));
+        let dir: fs::ReadDir = match fs::read_dir(dir) {
+            Ok(list) => list,
+            Err(msg) => {
+                eprintln!("{}", msg.to_string());
+                std::process::exit(1);
+                //return Err(&(msg.to_string()));
+            },
+        };
+        //TODO: Only remove *.csv files
+        for file in dir {
+            println!("{}", file.as_ref().unwrap().path().display());
+            let _ = fs::remove_file(file.unwrap().path());
+        }
+    }
+    //TODO: Create ~/.tsudoku directory, if it doesn't already exist
+
+    Ok(())
 }
