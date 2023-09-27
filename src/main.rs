@@ -5,6 +5,23 @@ use clap::{
 use std::fs;
 //use std::io;
 
+#[cxx::bridge]
+mod ffi {
+    unsafe extern "C++" {
+        include!("tsudoku/include/tsudoku.hpp");
+        include!("tsudoku/include/MainMenu.hpp");
+        include!("tsudoku/include/SavedGameMenu.hpp");
+        include!("tsudoku/include/Sudoku.hpp");
+
+        type MainMenu;
+        type options;
+
+        /*impl MainMenu {
+            fn menu (use_in_game_menu: bool) -> Self;
+        }*/
+    }
+}
+
 //struct NumCLArgsError;
 
 fn main() -> Result<(), &'static str> {
@@ -60,6 +77,10 @@ fn main() -> Result<(), &'static str> {
 
     let _ = fs::create_dir(dir);
     //TODO: Actually start and play the game
+
+    //TODO: Separate function to return a MainMenu?
+    let main_menu: crate::ffi::MainMenu;
+    let opt: crate::ffi::options = main_menu.menu(use_in_game_menu);
 
     Ok(())
 }
