@@ -6,6 +6,15 @@
 using namespace std;
 
 /* NOTE:
+ * Name: Class constructor
+ * Purpose: Empty constructor needed so that Rust will correctly associate a new function with this
+ *          class.
+ * Parameters: None
+ */
+SavedGameMenu::SavedGameMenu () {
+}
+
+/* NOTE:
  * Name: display_menu (pure virtual override)
  * Purpose: Displays the saved games menu. The options listed are saved games in CSV files from the
  *          ~/.tsudoku directory. The currently selected option is always highlighted. The saved
@@ -167,4 +176,10 @@ options SavedGameMenu::menu () {
         return options::SAVE_READY;
     }
     else return options::NO_SAVES;
+}
+
+/* NOTE:
+ */
+options SavedGameMenu::run_menu() {
+    return menu();
 }

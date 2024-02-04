@@ -36,9 +36,10 @@ class SavedGameMenu : public Menu {
         void print_saved_game ();
         
     public:
-        SavedGameMenu () {}     //NOTE: Default constructor. Does nothing.
+        SavedGameMenu ();       //NOTE: Default constructor. Does nothing.
         ~SavedGameMenu () {}    //NOTE: Default destructor. Does nothing.
         options menu () override;
+        options run_menu ();
         SavedPuzzle get_saved_game ();
 };
 

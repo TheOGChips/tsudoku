@@ -1,28 +1,20 @@
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+
 use clap::{
     command,
     arg,
 };
-use std::fs;
-//use std::io;
+use std::{
+    fs,
+    ptr::null,
+};
 
-#[cxx::bridge]
-mod ffi {
-    unsafe extern "C++" {
-        include!("tsudoku/include/tsudoku.hpp");
-        include!("tsudoku/include/MainMenu.hpp");
-        include!("tsudoku/include/SavedGameMenu.hpp");
-        include!("tsudoku/include/Sudoku.hpp");
-
-        type MainMenu;
-        type options;
-
-        /*impl MainMenu {
-            fn menu (use_in_game_menu: bool) -> Self;
-        }*/
-    }
+extern "C" {
+    fn clear ();    //ncurses.h
 }
-
-//struct NumCLArgsError;
 
 fn main() -> Result<(), &'static str> {
     let matches = command!()
@@ -42,9 +34,9 @@ fn main() -> Result<(), &'static str> {
     let use_in_game_menu: bool =
         if matches.get_flag("no-in-game-menu") {
             num_clargs += 1;
-            true
+            false
         }
-        else { false };
+        else { true };
     let delete_saved_games: bool =
         if matches.get_flag("delete-saved-games") {
             num_clargs += 1;
@@ -76,11 +68,35 @@ fn main() -> Result<(), &'static str> {
     }
 
     let _ = fs::create_dir(dir);
-    //TODO: Actually start and play the game
 
-    //TODO: Separate function to return a MainMenu?
-    let main_menu: crate::ffi::MainMenu;
-    let opt: crate::ffi::options = main_menu.menu(use_in_game_menu);
+    unsafe {
+        let mut main_menu = MainMenu::new();
+        //Example of how enums and enum classes are handled (look at constified_enums):
+        //  https://mdaverde.com/posts/rust-bindgen-enum/
+        let mut opt: i32;// = options_NEW_GAME;
+        loop {
+            opt = main_menu.menu(use_in_game_menu);
+            if opt == options_NEW_GAME {
+                let mut puzzle = Sudoku::new(null());
+                puzzle.start_game(use_in_game_menu, null());
+            }
+            else if opt == options_RESUME_GAME {
+                let mut saved_game_menu = SavedGameMenu::new();
+                if saved_game_menu.run_menu() == options_SAVE_READY {
+                    let saved_puzzle = saved_game_menu.get_saved_game();
+                    let mut puzzle = Sudoku::new(&saved_puzzle);
+                    puzzle.start_game(use_in_game_menu, &saved_puzzle);
+                }
+            }
+            else if opt == options_SHOW_STATS {
+                display_completed_puzzles();
+            }
+            else if opt == options_EXIT {
+                break;
+            }
+        }
+        clear();
+    }
 
     Ok(())
 }
