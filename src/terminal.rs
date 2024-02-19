@@ -1,5 +1,5 @@
 /// Redefines the value of the Enter key because the pre-defined NCurses value doesn't seem to work.
-pub const KEY_ENTER: i32 = 10;
+pub const KEY_ENTER: i32 = '\n' as i32;
 
 /// A cell in the terminal display.
 pub struct Cell (u8, u8);
