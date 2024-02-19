@@ -1,7 +1,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+//include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 use clap::{
     command,
@@ -9,12 +9,21 @@ use clap::{
 };
 use std::{
     fs,
-    ptr::null,
+    //ptr::null,
+};
+use ncurses::clear;
+use menu::{
+    Menu,
+    MainMenu,
+    MainMenuOption,
 };
 
-extern "C" {
+pub mod menu;
+pub mod terminal;
+
+/*extern "C" {
     fn clear ();    //ncurses.h
-}
+}*/
 
 fn main() -> Result<(), &'static str> {
     let matches = command!()
@@ -49,6 +58,8 @@ fn main() -> Result<(), &'static str> {
     }
     println!("use_in_game_menu: {}", use_in_game_menu);
     println!("delete_saved_games: {}", delete_saved_games);
+    println!("ncurses::KEY_ENTER: {}", ncurses::KEY_ENTER);
+    //println!("KEY_ENTER: {}", KEY_ENTER);
 
     let dir: &str = &(std::env::var("HOME").expect("Home directory should exist") + "/.tsudoku");
     if delete_saved_games {
@@ -69,7 +80,12 @@ fn main() -> Result<(), &'static str> {
 
     let _ = fs::create_dir(dir);
 
-    unsafe {
+    let main_menu = MainMenu::new(use_in_game_menu);
+    let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
+    while opt != MainMenuOption::EXIT {
+        opt = main_menu.menu();
+    }
+    /*unsafe {
         let mut main_menu = MainMenu::new();
         //Example of how enums and enum classes are handled (look at constified_enums):
         //  https://mdaverde.com/posts/rust-bindgen-enum/
@@ -96,7 +112,8 @@ fn main() -> Result<(), &'static str> {
             }
         }
         clear();
-    }
+    }*/
 
+    clear();
     Ok(())
 }
