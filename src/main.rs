@@ -9,9 +9,18 @@ use clap::{
 };
 use std::{
     fs,
-    //ptr::null,
+    path::PathBuf,
+    ptr::null,
 };
-use ncurses::clear;
+use ncurses::{
+    clear,
+    stdscr,
+    getmaxyx,
+    curs_set, CURSOR_VISIBILITY,
+    mvprintw,
+    refresh,
+    getch,
+};
 use menu::{
     Menu,
     MainMenu,
@@ -63,6 +72,7 @@ fn main() -> Result<(), &'static str> {
 
     let dir: &str = &(std::env::var("HOME").expect("Home directory should exist") + "/.tsudoku");
     if delete_saved_games {
+        // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
         let dir = match fs::read_dir(dir) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
@@ -78,12 +88,19 @@ fn main() -> Result<(), &'static str> {
         }
     }
 
+    /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if it
+     * doesn't already exist.
+     */
     let _ = fs::create_dir(dir);
 
     let main_menu = MainMenu::new(use_in_game_menu);
-    let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
-    while opt != MainMenuOption::EXIT {
-        opt = main_menu.menu();
+    loop {
+        match main_menu.menu() {
+            //TODO: Convert display_completed_puzzles
+            MainMenuOption::SHOW_STATS => display_completed_puzzles(),
+            MainMenuOption::EXIT => break,
+            _ => (),
+        }
     }
     /*unsafe {
         let mut main_menu = MainMenu::new();
@@ -116,4 +133,32 @@ fn main() -> Result<(), &'static str> {
 
     clear();
     Ok(())
+}
+
+/**
+ * Reads in the current number of games the player has successfully completed and then displays that
+ * information to the screen in the terminal window.
+ */
+fn display_completed_puzzles () {
+    let COMPLETED: PathBuf = PathBuf::from(env!("HOME")).join(".tsudoku").join("completed_puzzles.txt");
+    let num_completed = fs::read_to_string(COMPLETED).expect("Error 404: File Not Found");
+    //TODO: Keep this around for later when I have to update the number read in
+    //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
+    //    .expect("Unable to parse number of completed puzzles");
+
+    let prompt1: String = format!("Completed Sudoku puzzles: {}", num_completed);
+    let prompt2: &str = "Press Enter to continue";
+
+    let mut y_max: i32 = 0;
+    let mut x_max: i32 = 0;
+    getmaxyx(stdscr(), &mut y_max, &mut x_max);
+
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+    clear();
+    mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, prompt1.as_str());
+    mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
+    refresh();
+
+    while getch() != terminal::KEY_ENTER {}
+    curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
 }
