@@ -23,8 +23,10 @@ use ncurses::{
 };
 use menu::{
     Menu,
+    MenuOption,
     MainMenu,
     MainMenuOption,
+    SavedGameMenu,
 };
 
 pub mod menu;
@@ -95,11 +97,16 @@ fn main() -> Result<(), &'static str> {
 
     let main_menu = MainMenu::new(use_in_game_menu);
     loop {
-        match main_menu.menu() {
-            //TODO: Convert display_completed_puzzles
-            MainMenuOption::SHOW_STATS => display_completed_puzzles(),
-            MainMenuOption::EXIT => break,
-            _ => (),
+        if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
+            match main_menu_option {
+                //TODO: Convert NEW_GAME & RESUME_GAME (probably NEW_GAME first)
+                MainMenuOption::NEW_GAME => (),
+                MainMenuOption::RESUME_GAME => {
+                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
+                },
+                MainMenuOption::SHOW_STATS => display_completed_puzzles(),
+                MainMenuOption::EXIT => break,
+            }
         }
     }
     /*unsafe {

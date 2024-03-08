@@ -47,8 +47,13 @@ use crate::terminal::{
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
 const MENU_SELECTION: i16 = 1;
 
+pub enum MenuOption {
+    MAIN_MENU(MainMenuOption),
+    SAVED_GAME_MENU(SavedGameMenuOption),
+}
+
 /// Options displayed on the main menu.
-#[derive(PartialEq, EnumIter, EnumCount, VariantArray)]
+#[derive(PartialEq, EnumIter, EnumCount, VariantArray, Copy, Clone)]
 pub enum MainMenuOption {
     /// Start a new game
     NEW_GAME,
@@ -61,7 +66,6 @@ pub enum MainMenuOption {
     //RULES,
     //MANUAL,
     //SAVE_GAME,
-    //SAVE_READY,
     //NO_SAVES,
     //NONE
 }
@@ -77,9 +81,14 @@ impl MainMenuOption {
     }
 }
 
+///Options displayed on the saved game menu.
+enum SavedGameMenuOption {
+    SAVE_READY,
+}
+
 pub trait Menu {
-    fn display_menu (&self, _: &Cell, _: &MainMenuOption);
-    fn menu (&self) -> MainMenuOption;
+    fn display_menu (&self, _: &Cell, _: &MenuOption);
+    fn menu (&self) -> MenuOption;
 
     /**
      * Resets the terminal settings to their previous state from before the NCurses environment was
@@ -121,14 +130,21 @@ impl Menu for MainMenu {
      *             and columns in the window.
      *      OPT -> The currently selected main menu option.
      */
-    fn display_menu (&self, MAX: &Cell, OPT: &MainMenuOption) {
+    fn display_menu (&self, MAX: &Cell, OPT: &MenuOption) {
         let TITLE: &str = "MAIN MENU";
         let Y_CENTER: u8 = MAX.y()/2;
         let X_CENTER: u8 = MAX.x()/2 - TITLE.len() as u8/2;
+        let opt: &MainMenuOption = if let MenuOption::MAIN_MENU(option) = OPT {
+                option
+            }
+            else {
+                println!("Error: Did not receive a MainMenuOption. Exiting...");
+                std::process::exit(1);
+            };
 
         mvprintw(Y_CENTER as i32 - 2, X_CENTER as i32, TITLE);
         for (i, variant) in MainMenuOption::enumerate() {
-            if *OPT == variant {
+            if *opt == variant {
                 attron(COLOR_PAIR(MENU_SELECTION));
             }
             mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
@@ -137,7 +153,7 @@ impl Menu for MainMenu {
                 MainMenuOption::SHOW_STATS => "Show # Finished Games",
                 MainMenuOption::EXIT => "Exit",
             });
-            if *OPT == variant {
+            if *opt == variant {
                 attroff(COLOR_PAIR(MENU_SELECTION));
             }
         }
@@ -148,7 +164,7 @@ impl Menu for MainMenu {
      * Implements the logic behind the main menu. Controls which option will be highlighted when
      * displaying all options indicating the current selection.
      */
-    fn menu (&self) -> MainMenuOption {
+    fn menu (&self) -> MenuOption {
         unsafe {
             if !self.in_game_menu_enabled {
                 set_VERTICAL_DIVIDER(0);
@@ -173,7 +189,7 @@ impl Menu for MainMenu {
         while input != KEY_ENTER {
             invalid_window_size_handler();
             clear();
-            self.display_menu(&max, &opt);
+            self.display_menu(&max, &MenuOption::MAIN_MENU(opt));
             input = getch();
             opt =
                 if input == KEY_UP || input == 'w' as i32 {
@@ -198,7 +214,7 @@ impl Menu for MainMenu {
         clear();
         nodelay(stdscr(), false);
         curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
-        opt
+        MenuOption::MAIN_MENU(opt)
     }
 }
 
@@ -252,3 +268,26 @@ impl Drop for MainMenu {
         //TODO: Probably unnecessary, but consider unregistering the SIGINT handler function.
     }
 }
+
+pub struct SavedGameMenu {
+    saved_games: Vec<String>,
+    saved_game: [[u8; 9]; 9],
+    saved_color_codes: [[char; 9]; 9],
+}
+
+impl SavedGameMenu {
+    pub fn new () -> Self {
+        Self {
+            saved_games: Vec::new(),
+            saved_game: [[0; 9]; 9],
+            saved_color_codes: [[' '; 9]; 9],
+        }
+    }
+}
+
+/*impl Menu for SavedGameMenu {
+    fn display_menu (&self, MAX: &Cell, OPT: &MenuOption) {
+    }
+    fn menu (&self) -> MenuOption {
+    }
+}*/
