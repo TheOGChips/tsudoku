@@ -27,10 +27,13 @@ use menu::{
     MainMenu,
     MainMenuOption,
     SavedGameMenu,
+    SavedGameMenuOption,
 };
+use common::DIR;
 
 pub mod menu;
 pub mod terminal;
+pub mod common;
 
 /*extern "C" {
     fn clear ();    //ncurses.h
@@ -72,10 +75,9 @@ fn main() -> Result<(), &'static str> {
     println!("ncurses::KEY_ENTER: {}", ncurses::KEY_ENTER);
     //println!("KEY_ENTER: {}", KEY_ENTER);
 
-    let dir: &str = &(std::env::var("HOME").expect("Home directory should exist") + "/.tsudoku");
     if delete_saved_games {
         // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
-        let dir = match fs::read_dir(dir) {
+        let dir = match fs::read_dir(DIR()) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
             ),
@@ -93,7 +95,7 @@ fn main() -> Result<(), &'static str> {
     /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if it
      * doesn't already exist.
      */
-    let _ = fs::create_dir(dir);
+    let _ = fs::create_dir(DIR());
 
     let main_menu = MainMenu::new(use_in_game_menu);
     loop {
@@ -101,9 +103,12 @@ fn main() -> Result<(), &'static str> {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME (probably NEW_GAME first)
                 MainMenuOption::NEW_GAME => (),
-                MainMenuOption::RESUME_GAME => {
+                MainMenuOption::RESUME_GAME => /*{
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
-                },
+                    if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
+                        //TODO: Finish this block
+                    }
+                }*/(),
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,
             }
@@ -147,8 +152,8 @@ fn main() -> Result<(), &'static str> {
  * information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
-    let COMPLETED: PathBuf = PathBuf::from(env!("HOME")).join(".tsudoku").join("completed_puzzles.txt");
-    let num_completed = fs::read_to_string(COMPLETED).expect("Error 404: File Not Found");
+    let num_completed = fs::read_to_string(DIR().join("completed_puzzles.txt"))
+        .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
     //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
     //    .expect("Unable to parse number of completed puzzles");
