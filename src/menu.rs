@@ -27,21 +27,25 @@ use strum::{
     EnumCount,
     VariantArray,
 };
-use crate::terminal::{
-    KEY_ENTER,
-    Cell,
-    display::{
-        TOP_PADDING,
-        LEFT_PADDING,
-        PUZZLE_SPACE,
-        WINDOW_REQ,
-        VERTICAL_DIVIDER,
-        IN_GAME_MENU_DISPLAY_SPACING,
-        set_VERTICAL_DIVIDER,
-        set_IN_GAME_MENU_DISPLAY_SPACING,
-        invalid_window_size_handler,
+use crate::{
+    terminal::{
+        KEY_ENTER,
+        Cell,
+        display::{
+            TOP_PADDING,
+            LEFT_PADDING,
+            PUZZLE_SPACE,
+            WINDOW_REQ,
+            VERTICAL_DIVIDER,
+            IN_GAME_MENU_DISPLAY_SPACING,
+            set_VERTICAL_DIVIDER,
+            set_IN_GAME_MENU_DISPLAY_SPACING,
+            invalid_window_size_handler,
+        },
     },
+    common::DIR,
 };
+use std::fs;
 
 //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
@@ -82,8 +86,10 @@ impl MainMenuOption {
 }
 
 ///Options displayed on the saved game menu.
-enum SavedGameMenuOption {
+pub enum SavedGameMenuOption {
     SAVE_READY,
+    NO_SAVES,
+    NONE,
 }
 
 pub trait Menu {
@@ -278,16 +284,63 @@ pub struct SavedGameMenu {
 impl SavedGameMenu {
     pub fn new () -> Self {
         Self {
-            saved_games: Vec::new(),
+            saved_games: Self::generate_saved_games_list(),
             saved_game: [[0; 9]; 9],
             saved_color_codes: [[' '; 9]; 9],
         }
     }
+
+    fn generate_saved_games_list () -> Vec<String> {
+        match fs::read_dir(DIR()) {
+            Ok(list) => list.filter(
+                |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
+            )
+            .map(|file| file.unwrap().file_name().to_str().unwrap().to_string())
+            .collect(),
+            Err(msg) => {
+                eprintln!("{}", msg.to_string());
+                std::process::exit(1);
+            },
+        }
+    }
+
+    fn select_saved_game (&self) -> bool {
+        let mut input: i32 = -1;
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+        timeout(250);
+        if self.saved_games.is_empty() {
+            while input != KEY_ENTER {
+                mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32, "You have no saved games.");
+                mvprintw(
+                    TOP_PADDING as i32 + self.saved_games.len() as i32 + 3,
+                    LEFT_PADDING as i32,
+                    "Press ENTER to continue..."
+                );
+                refresh();
+                input = getch();    //NOTE: This needs to be here for the display to work correctly
+                invalid_window_size_handler();
+            }
+        }
+        else {}
+
+        refresh();
+        nodelay(stdscr(), false);
+        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+
+        !self.saved_games.is_empty()
+    }
 }
 
-/*impl Menu for SavedGameMenu {
+impl Menu for SavedGameMenu {
     fn display_menu (&self, MAX: &Cell, OPT: &MenuOption) {
     }
+
     fn menu (&self) -> MenuOption {
+        //self.generate_saved_games_list();
+        if self.select_saved_game() {}
+        //TODO: Sort the saved games list (although this might not be necessary)
+        //TODO: implement select_saved_game
+        //TODO: Finish this function
+        MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
     }
-}*/
+}

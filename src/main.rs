@@ -77,6 +77,7 @@ fn main() -> Result<(), &'static str> {
 
     if delete_saved_games {
         // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
+        //TODO: Change "dir" to "saved_games"
         let dir = match fs::read_dir(DIR()) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
@@ -103,12 +104,12 @@ fn main() -> Result<(), &'static str> {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME (probably NEW_GAME first)
                 MainMenuOption::NEW_GAME => (),
-                MainMenuOption::RESUME_GAME => /*{
+                MainMenuOption::RESUME_GAME => {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         //TODO: Finish this block
                     }
-                }*/(),
+                },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,
             }
