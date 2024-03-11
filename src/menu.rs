@@ -321,7 +321,17 @@ impl SavedGameMenu {
                 invalid_window_size_handler();
             }
         }
-        else {}
+        else {
+            while input != KEY_ENTER {
+                self.display_menu(
+                    &Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
+                );
+                //TODO: Finish this else block
+                mvprintw(10, 10, "testing...");
+                input = getch();
+                invalid_window_size_handler();
+            }
+        }
 
         refresh();
         nodelay(stdscr(), false);
@@ -332,7 +342,21 @@ impl SavedGameMenu {
 }
 
 impl Menu for SavedGameMenu {
-    fn display_menu (&self, MAX: &Cell, OPT: &MenuOption) {
+    fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
+        let mut display_line: u8 = EDGE.y();
+        clear();
+        mvprintw(display_line as i32, EDGE.x() as i32, "Saved Games:");
+        display_line += 2;
+        for game in &self.saved_games {
+            //TODO: Highlight the current selection
+            mvprintw(
+                display_line as i32,
+                EDGE.x() as i32,
+                format!("{}", game.strip_suffix(".csv").unwrap())
+                    .as_str()
+            );
+            display_line += 1;
+        }
     }
 
     fn menu (&self) -> MenuOption {
