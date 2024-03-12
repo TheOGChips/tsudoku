@@ -335,10 +335,21 @@ impl SavedGameMenu {
                 self.display_menu(
                     &Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
                 );
-                //TODO: Finish this else block
-                mvprintw(10, 10, "testing...");
+
                 input = getch();
-                invalid_window_size_handler();
+                let selection: String = self.selection.borrow().to_string();
+                let i: usize = self.saved_games.binary_search(&selection.to_string()).unwrap();
+                if (input == KEY_DOWN || input as u8 as char == 's') &&
+                    selection.as_str() != self.saved_games.last().unwrap() {
+                        *self.selection.borrow_mut() = self.saved_games.get(i + 1).unwrap().to_string();
+                }
+                else if (input == KEY_UP || input as u8 as char == 'w') &&
+                    selection.as_str() != self.saved_games.first().unwrap() {
+                        *self.selection.borrow_mut() = self.saved_games.get(i - 1).unwrap().to_string();
+                }
+                else {
+                    invalid_window_size_handler();
+                }
             }
         }
 
@@ -351,7 +362,7 @@ impl SavedGameMenu {
 }
 
 impl Menu for SavedGameMenu {
-    fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
+    fn display_menu (&self, EDGE: &Cell, _: &MenuOption) {
         let mut display_line: u8 = EDGE.y();
         clear();
         mvprintw(display_line as i32, EDGE.x() as i32, "Saved Games:");
@@ -374,10 +385,9 @@ impl Menu for SavedGameMenu {
     }
 
     fn menu (&self) -> MenuOption {
-        //self.generate_saved_games_list();
-        if self.select_saved_game() {}
-        //TODO: Sort the saved games list (although this might not be necessary)
-        //TODO: implement select_saved_game
+        if self.select_saved_game() {
+            //TODO
+        }
         //TODO: Finish this function
         MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
     }
