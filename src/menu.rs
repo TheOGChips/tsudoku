@@ -357,13 +357,18 @@ impl Menu for SavedGameMenu {
         mvprintw(display_line as i32, EDGE.x() as i32, "Saved Games:");
         display_line += 2;
         for game in &self.saved_games {
-            //TODO: Highlight the current selection
+            if self.selection.borrow().to_string() == *game {
+                attron(COLOR_PAIR(MENU_SELECTION));
+            }
             mvprintw(
                 display_line as i32,
                 EDGE.x() as i32,
                 format!("{}", game.strip_suffix(".csv").unwrap())
                     .as_str()
             );
+            if self.selection.borrow().to_string() == *game {
+                attroff(COLOR_PAIR(MENU_SELECTION));
+            }
             display_line += 1;
         }
     }
