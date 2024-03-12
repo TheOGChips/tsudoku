@@ -43,7 +43,10 @@ use crate::{
             invalid_window_size_handler,
         },
     },
-    common::DIR,
+    common::{
+        DIR,
+        csv,
+    },
 };
 use std::{
     fs,
@@ -359,6 +362,14 @@ impl SavedGameMenu {
 
         !self.saved_games.is_empty()
     }
+
+    fn read_saved_game (&self) {
+        let game_data: Vec<u8> = csv::read_csv(
+            DIR().join(self.selection.borrow().to_string() + (".csv")).to_str().unwrap()
+            )
+            .unwrap();
+        //TODO: Load saved game into 2D array (increment row counter when newline byte is read)
+    }
 }
 
 impl Menu for SavedGameMenu {
@@ -387,6 +398,7 @@ impl Menu for SavedGameMenu {
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
             //TODO
+            self.read_saved_game();
         }
         //TODO: Finish this function
         MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
