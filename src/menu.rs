@@ -45,7 +45,10 @@ use crate::{
     },
     common::DIR,
 };
-use std::fs;
+use std::{
+    fs,
+    cell::RefCell,
+};
 
 //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
@@ -279,19 +282,23 @@ pub struct SavedGameMenu {
     saved_games: Vec<String>,
     saved_game: [[u8; 9]; 9],
     saved_color_codes: [[char; 9]; 9],
+    selection: RefCell<String>,
 }
 
 impl SavedGameMenu {
     pub fn new () -> Self {
+        let saved_games: Vec<String> = Self::generate_saved_games_list();
+        let selection: String = String::clone(&saved_games[0]);
         Self {
-            saved_games: Self::generate_saved_games_list(),
+            saved_games: saved_games,
             saved_game: [[0; 9]; 9],
             saved_color_codes: [[' '; 9]; 9],
+            selection: RefCell::new(selection),
         }
     }
 
     fn generate_saved_games_list () -> Vec<String> {
-        match fs::read_dir(DIR()) {
+        let mut saved_games: Vec<String> = match fs::read_dir(DIR()) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
             )
@@ -301,7 +308,9 @@ impl SavedGameMenu {
                 eprintln!("{}", msg.to_string());
                 std::process::exit(1);
             },
-        }
+        };
+        saved_games.sort();
+        saved_games
     }
 
     fn select_saved_game (&self) -> bool {
