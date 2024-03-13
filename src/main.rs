@@ -26,6 +26,7 @@ use menu::{
     MenuOption,
     MainMenu,
     MainMenuOption,
+    SavedPuzzle,
     SavedGameMenu,
     SavedGameMenuOption,
 };
@@ -107,6 +108,7 @@ fn main() -> Result<(), &'static str> {
                 MainMenuOption::RESUME_GAME => {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
+                        let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                         //TODO: Finish this block
                     }
                 },

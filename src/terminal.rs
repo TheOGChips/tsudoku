@@ -103,6 +103,9 @@ pub mod display {
      */
     pub static mut IN_GAME_MENU_DISPLAY_SPACING: u8 = 80;
 
+    pub const DISPLAY_MATRIX_ROWS: usize = 27;
+    pub const DISPLAY_MATRIX_COLUMNS: usize = DISPLAY_MATRIX_ROWS;
+
     /**
      * Sets the value of the vertical divider between the display puzzle and the in-game menu.
      *

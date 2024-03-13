@@ -41,11 +41,14 @@ use crate::{
             set_VERTICAL_DIVIDER,
             set_IN_GAME_MENU_DISPLAY_SPACING,
             invalid_window_size_handler,
+            DISPLAY_MATRIX_ROWS,
+            DISPLAY_MATRIX_COLUMNS,
         },
     },
     common::{
         DIR,
         csv,
+        dbgprint,
     },
 };
 use std::{
@@ -75,9 +78,6 @@ pub enum MainMenuOption {
     EXIT,
     //RULES,
     //MANUAL,
-    //SAVE_GAME,
-    //NO_SAVES,
-    //NONE
 }
 
 impl MainMenuOption {
@@ -281,10 +281,16 @@ impl Drop for MainMenu {
     }
 }
 
+#[derive(Clone)]
+pub struct SavedPuzzle {
+    puzzle: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    filename: String,
+}
+
 pub struct SavedGameMenu {
     saved_games: Vec<String>,
-    saved_game: [[u8; 9]; 9],
-    saved_color_codes: [[char; 9]; 9],
+    saved_game: RefCell<SavedPuzzle>,
     selection: RefCell<String>,
 }
 
@@ -294,9 +300,12 @@ impl SavedGameMenu {
         let selection: String = String::clone(&saved_games[0]);
         Self {
             saved_games: saved_games,
-            saved_game: [[0; 9]; 9],
-            saved_color_codes: [[' '; 9]; 9],
-            selection: RefCell::new(selection),
+            saved_game: RefCell::new(SavedPuzzle {
+                puzzle: [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+                color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+                filename: String::new(),
+            }),
+            selection: RefCell::new(selection), //NOTE: This does contain the CSV extension
         }
     }
 
@@ -364,11 +373,46 @@ impl SavedGameMenu {
     }
 
     fn read_saved_game (&self) {
-        let game_data: Vec<u8> = csv::read_csv(
-            DIR().join(self.selection.borrow().to_string() + (".csv")).to_str().unwrap()
+        let game_data: Vec<u8> = csv::read(
+            DIR().join(self.selection.borrow().to_string()).to_str().unwrap()
             )
             .unwrap();
+
         //TODO: Load saved game into 2D array (increment row counter when newline byte is read)
+        let mut i: usize = 0;
+        let mut j: usize = 0;
+        let mut saved_game: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
+            [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
+        let mut saved_color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
+            [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
+        for byte in game_data {
+            if (byte as char).is_numeric() {
+                saved_game[i][j] = byte;
+            }
+            else if (byte as char).is_alphabetic() {
+                saved_color_codes[i][j] = byte as char;
+                i += 1;
+            }
+            else if byte == '\n' as u8 {
+                i = 0;
+                j += 1;
+            }
+        }
+
+        dbgprint(self.selection.borrow().as_str());
+        let puzzle: SavedPuzzle = SavedPuzzle {
+            puzzle: saved_game,
+            color_codes: saved_color_codes,
+            filename: DIR().join(self.selection.borrow().as_str())
+                .to_str()
+                .unwrap()
+                .to_string(),
+        };
+        *self.saved_game.borrow_mut() = puzzle;
+    }
+
+    pub fn get_saved_game (&self) -> SavedPuzzle {
+        self.saved_game.borrow().clone()
     }
 }
 
@@ -399,8 +443,11 @@ impl Menu for SavedGameMenu {
         if self.select_saved_game() {
             //TODO
             self.read_saved_game();
+            MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY)
         }
         //TODO: Finish this function
-        MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
+        else {
+            MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
+        }
     }
 }

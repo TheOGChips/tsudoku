@@ -5,11 +5,18 @@ pub fn DIR () -> PathBuf {
 }
 
 pub mod csv {
-    pub fn read_csv (filename: &str) -> Result<Vec<u8>, std::io::Error> {
+    pub fn read (filename: &str) -> Result<Vec<u8>, std::io::Error> {
         let mut data: Vec<u8> = std::fs::read(filename)?;
         data.retain(|&b| b != ',' as u8);   //NOTE: Strip commas from vector
         Ok(data)
     }
 
-    pub fn write_csv (data: Vec<u8>) {}
+    pub fn write (data: Vec<u8>) {}
+}
+
+pub fn dbgprint (msg: &str) {
+    ncurses::clear();
+    ncurses::mvprintw(10, 10, msg);
+    ncurses::refresh();
+    ncurses::getch();
 }
