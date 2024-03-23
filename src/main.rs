@@ -103,13 +103,13 @@ fn main() -> Result<(), &'static str> {
     loop {
         if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
             match main_menu_option {
-                //TODO: Convert NEW_GAME & RESUME_GAME (probably NEW_GAME first)
+                //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => (),
                 MainMenuOption::RESUME_GAME => {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
-                        //TODO: Finish this block
+                        //TODO: Finish this block after converting over NEW_GAME
                     }
                 },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),

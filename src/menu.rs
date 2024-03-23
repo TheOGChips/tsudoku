@@ -1,4 +1,3 @@
-//TODO: Copy over notes for Menu and MainMenu
 use ncurses::{
     initscr, endwin,
     nocbreak, cbreak,
@@ -60,8 +59,11 @@ use std::{
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
 const MENU_SELECTION: i16 = 1;
 
+/// A wrapper enum to enforce a certain type of MenuOption be used
 pub enum MenuOption {
+    /// Wrapper to enforce using a MainMenuOption variant
     MAIN_MENU(MainMenuOption),
+    /// Wrapper to enforce using a SavedGameMenuOption variant
     SAVED_GAME_MENU(SavedGameMenuOption),
 }
 
@@ -93,8 +95,11 @@ impl MainMenuOption {
 
 ///Options displayed on the saved game menu.
 pub enum SavedGameMenuOption {
+    /// Indicates that a saved game is available and ready to be loaded
     SAVE_READY,
+    /// Indicates that no saved games are available to be resumed
     NO_SAVES,
+    /// Used when a SavedGameMenuOption isn't applicable in the current context
     NONE,
 }
 
@@ -118,7 +123,7 @@ pub trait Menu {
     }
 }
 
-/// displays and controls the main menu the user sees before and after every game.
+/// Displays and controls the main menu the user sees before and after every game.
 pub struct MainMenu {
     /// Empty space between the bottom of the terminal window and the in-terminal display.
     BOTTOM_PADDING: u8,
@@ -281,20 +286,45 @@ impl Drop for MainMenu {
     }
 }
 
+/// Holds data for a saved game that is selected to be resumed
 #[derive(Clone)]
 pub struct SavedPuzzle {
+    /// A 9x9 matrix containing the values in the puzzle cells
     puzzle: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    /// A 9x9 matrix containing the current color codes of the puzzle cells
     color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    /// The name of the file the puzzle is saved under
     filename: String,
 }
 
+/* The use of RefCell was a workaround during the port from the pure C++ version.
+ * There's probably a better way to handle this that doesn't involve use of RefCells,
+ * but that would require a much deeper refactoring than I'm willing to give it at this 
+ * point.
+ */
+/// Provides the functionality to allow a player to load and resume a saved game.
 pub struct SavedGameMenu {
+    /**
+     * The list of saved games to be displayed to the screen. Each will appear as an
+     * option the user can choose from.
+     */
     saved_games: Vec<String>,
+    /// The matrix used to read a saved game into. This later becomes the display matrix.
     saved_game: RefCell<SavedPuzzle>,
+    /**
+     * The currently highlighted game from the displayed list. If the user presses Enter,
+     * this becomes the game loaded.
+     */
     selection: RefCell<String>,
 }
 
 impl SavedGameMenu {
+    /**
+     * Returns an instance of a SavedGameMenu containing a list of the current saved
+     * games. The saved game to be used will be initially be set to a "blank" 
+     * SavedPuzzle object. The current selection from the `saved_games` list will be
+     * preset to the first file in the list.
+     */
     pub fn new () -> Self {
         let saved_games: Vec<String> = Self::generate_saved_games_list();
         let selection: String = String::clone(&saved_games[0]);
@@ -305,10 +335,17 @@ impl SavedGameMenu {
                 color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
                 filename: String::new(),
             }),
-            selection: RefCell::new(selection), //NOTE: This does contain the CSV extension
+            selection: RefCell::new(selection), //NOTE: This contains the CSV extension
         }
     }
 
+    /**
+     * Creates the list of saved games from the names of available CSV files in the 
+     * ~/.tsudoku directory. This entries in this list are what will be displayed to the 
+     * player. The entries are stored without the ".csv" file extension. Text files with 
+     * extension ".txt" are ignored so as to avoid adding the completed games file to 
+     * the list.
+     */
     fn generate_saved_games_list () -> Vec<String> {
         let mut saved_games: Vec<String> = match fs::read_dir(DIR()) {
             Ok(list) => list.filter(
@@ -325,9 +362,15 @@ impl SavedGameMenu {
         saved_games
     }
 
+    /**
+     * Controls iterating through the list from player input and highlighting the name 
+     * of the current game that will be loaded once the player presses Enter. If there 
+     * are no saved games, the player will instead be notified as much and then prompted
+     * to continue.
+     */
     fn select_saved_game (&self) -> bool {
         let mut input: i32 = -1;
-        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);  //Turn off cursor while in menu
         timeout(250);
         if self.saved_games.is_empty() {
             while input != KEY_ENTER {
@@ -338,7 +381,7 @@ impl SavedGameMenu {
                     "Press ENTER to continue..."
                 );
                 refresh();
-                input = getch();    //NOTE: This needs to be here for the display to work correctly
+                input = getch();    //This needs to be here for the display to work correctly
                 invalid_window_size_handler();
             }
         }
@@ -372,13 +415,13 @@ impl SavedGameMenu {
         !self.saved_games.is_empty()
     }
 
+    /// Reads a saved game from it's CSV file to the saved game and color code matrices.
     fn read_saved_game (&self) {
         let game_data: Vec<u8> = csv::read(
             DIR().join(self.selection.borrow().to_string()).to_str().unwrap()
             )
             .unwrap();
 
-        //TODO: Load saved game into 2D array (increment row counter when newline byte is read)
         let mut i: usize = 0;
         let mut j: usize = 0;
         let mut saved_game: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
@@ -411,12 +454,29 @@ impl SavedGameMenu {
         *self.saved_game.borrow_mut() = puzzle;
     }
 
+    /**
+     * Wraps the selected saved game value and color code matrices into a SavedPuzzle 
+     * object which is returned to the calling function. This makes passing around the 
+     * saved game information easier.
+     */
     pub fn get_saved_game (&self) -> SavedPuzzle {
         self.saved_game.borrow().clone()
     }
 }
 
 impl Menu for SavedGameMenu {
+    /**
+     * Displays the saved games menu. The options listed are saved games in CSV files 
+     * from the ~/.tsudoku directory. The currently selected option is always 
+     * highlighted. The saved games menu is re-rendered each time the player uses the 
+     * Up/Down keys to highlight a different option.
+     * 
+     *      EDGE -> Starting cell the saved games menu will display at. The menu title 
+     *              should display on the line below the top padding and the column 
+     *              after the vertical divider.
+     *      unused MenuOption enum variant -> Required because of the function prototype 
+     *                                        inherited from Menu.
+     */
     fn display_menu (&self, EDGE: &Cell, _: &MenuOption) {
         let mut display_line: u8 = EDGE.y();
         clear();
@@ -439,13 +499,15 @@ impl Menu for SavedGameMenu {
         }
     }
 
+    /**
+     * Coordinates generating the saved games list, displaying the list to the player in 
+     * menu form, and reading in the saved game chosen by the player.
+     */
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
-            //TODO
             self.read_saved_game();
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY)
         }
-        //TODO: Finish this function
         else {
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
         }
