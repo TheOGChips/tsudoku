@@ -7,8 +7,25 @@ use crate::terminal::{
     Cell,
 };
 use std::collections::HashMap;
+use ncurses::{
+    has_colors,
+    init_pair,
+    COLOR_WHITE,
+    COLOR_BLACK,
+    COLOR_RED,
+    COLOR_YELLOW,
+    COLOR_BLUE,
+    COLOR_GREEN,
+};
 
 const GRID_SIZE: u8 = 81;
+
+/// Display matrix color codes
+const UNKNOWN: i16 = 1;
+const GIVEN: i16 = 2;
+const CANDIDATES_Y: i16 = 3;
+const CANDIDATES_B: i16 = 4;
+const GUESS: i16 = 5;
 
 enum neighbor_cells {
     TL,
@@ -73,8 +90,9 @@ impl Sudoku {
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (/*saved_puzzle: &SavedPuzzle*/) -> Self {
+    pub fn new (/* saved_puzzle: &SavedPuzzle */) -> Self {
         let (grid2display, display2grid) = Self::create_maps();
+        Self::set_color_pairs();
         Self {
             display_matrix: [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
             color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
@@ -117,6 +135,30 @@ impl Sudoku {
         }
 
         (grid2display, display2grid)
+    }
+
+    /**
+     * Establishes the color pairs used while printing anywhere in the display matrix.
+     * The color pair MENU_SELECTION is defined inside MainMenu.cpp, and its value is
+     * carried over throughout the rest of the program. In the case coloring is not
+     * available (in the event this somehow finds its way onto some old machine), a
+     * monochrome mode is also provided where everything but guesses are the same color.
+     */
+    fn set_color_pairs () {
+        if has_colors() {
+            init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
+            init_pair(GIVEN, COLOR_RED, COLOR_BLACK);
+            init_pair(CANDIDATES_Y, COLOR_YELLOW, COLOR_BLACK);
+            init_pair(CANDIDATES_B, COLOR_BLUE, COLOR_BLACK);
+            init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+        }
+        else {  //Monochrome mode
+            init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
+            init_pair(GIVEN, COLOR_BLACK, COLOR_WHITE); //Reversed to better stand out
+            init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
+            init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
+            init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+        }
     }
 }
 
