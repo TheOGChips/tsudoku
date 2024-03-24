@@ -2,6 +2,7 @@
 pub const KEY_ENTER: i32 = '\n' as i32;
 
 /// A cell in the terminal display.
+#[derive(Eq, Hash, PartialEq, Copy, Clone)]
 pub struct Cell (u8, u8);
 impl Cell {
     /**

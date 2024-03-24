@@ -31,10 +31,12 @@ use menu::{
     SavedGameMenuOption,
 };
 use common::DIR;
+use sudoku::Sudoku;
 
 pub mod menu;
 pub mod terminal;
 pub mod common;
+pub mod sudoku;
 
 /*extern "C" {
     fn clear ();    //ncurses.h
@@ -104,7 +106,9 @@ fn main() -> Result<(), &'static str> {
         if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME
-                MainMenuOption::NEW_GAME => (),
+                MainMenuOption::NEW_GAME => {
+                    let puzzle: Sudoku = Sudoku::new();
+                },
                 MainMenuOption::RESUME_GAME => {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
