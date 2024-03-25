@@ -26,12 +26,14 @@ use menu::{
     MenuOption,
     MainMenu,
     MainMenuOption,
-    SavedPuzzle,
     SavedGameMenu,
     SavedGameMenuOption,
 };
 use common::DIR;
-use sudoku::Sudoku;
+use sudoku::{
+    Sudoku,
+    SavedPuzzle,
+};
 
 pub mod menu;
 pub mod terminal;

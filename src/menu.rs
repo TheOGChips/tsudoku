@@ -49,6 +49,7 @@ use crate::{
         csv,
         dbgprint,
     },
+    sudoku::SavedPuzzle,
 };
 use std::{
     fs,
@@ -286,17 +287,6 @@ impl Drop for MainMenu {
     }
 }
 
-/// Holds data for a saved game that is selected to be resumed
-#[derive(Clone)]
-pub struct SavedPuzzle {
-    /// A 9x9 matrix containing the values in the puzzle cells
-    puzzle: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-    /// A 9x9 matrix containing the current color codes of the puzzle cells
-    color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-    /// The name of the file the puzzle is saved under
-    filename: String,
-}
-
 /* The use of RefCell was a workaround during the port from the pure C++ version.
  * There's probably a better way to handle this that doesn't involve use of RefCells,
  * but that would require a much deeper refactoring than I'm willing to give it at this 
@@ -330,11 +320,7 @@ impl SavedGameMenu {
         let selection: String = String::clone(&saved_games[0]);
         Self {
             saved_games: saved_games,
-            saved_game: RefCell::new(SavedPuzzle {
-                puzzle: [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-                color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-                filename: String::new(),
-            }),
+            saved_game: RefCell::new(SavedPuzzle::new()),
             selection: RefCell::new(selection), //NOTE: This contains the CSV extension
         }
     }
@@ -443,14 +429,13 @@ impl SavedGameMenu {
         }
 
         dbgprint(self.selection.borrow().as_str());
-        let puzzle: SavedPuzzle = SavedPuzzle {
-            puzzle: saved_game,
-            color_codes: saved_color_codes,
-            filename: DIR().join(self.selection.borrow().as_str())
-                .to_str()
-                .unwrap()
-                .to_string(),
-        };
+        let mut puzzle: SavedPuzzle = SavedPuzzle::new();
+        puzzle.set_puzzle(saved_game);
+        puzzle.set_color_codes(saved_color_codes);
+        puzzle.set_filename(DIR().join(self.selection.borrow().as_str())
+            .to_str()
+            .unwrap()
+        );
         *self.saved_game.borrow_mut() = puzzle;
     }
 
