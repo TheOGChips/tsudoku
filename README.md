@@ -104,6 +104,10 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
 >`$ make`
 
-## Status update: 3 March 2023
+## Status update: 18 May 2024
 
-tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
+Current release version: 1.0.1
+
+tsudoku is now ready for official release! Barring any potential future bug fixes (except for a handy couple of additions for you WSL users in the near future), this will be the last update for the C++ version until the Rust port is finished. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net .
+
+If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
