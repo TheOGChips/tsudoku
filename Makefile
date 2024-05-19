@@ -1,15 +1,15 @@
 # NOTE: The compiler to use
-COMPILER = clang++
+COMPILER = g++
 CXX_VERSION = $(shell ls /usr/include/c++/ | head -n 1)
 
 # NOTE: Everything needed to compile
 INCLUDE_PATH = include
-INCLUDE_FLAGS = -I $(INCLUDE_PATH)/ -I /usr/include/c++/$(CXX_VERSION) -I /usr/include/x86_64-linux-gnu/c++/$(CXX_VERSION) -std=c++17
+INCLUDE_FLAGS = -I $(INCLUDE_PATH)/ -std=c++17 -O0
 COMPILE = $(COMPILER) -c $(INCLUDE_FLAGS)
 
 # NOTE: Everything needed to link
 LIB = lib
-LINK = $(COMPILER) -L /usr/lib/gcc/x86_64-linux-gnu/$(CXX_VERSION) $(LIB)/*.o -o
+LINK = $(COMPILER) $(LIB)/*.o -o
 VPATH = $(LIB)
 
 # NOTE: Helpful common filepaths and filenames

@@ -106,7 +106,7 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 ## Status update: 18 May 2024
 
-Current release version: 1.0.1
+Current release version: 1.0.2
 
 tsudoku is now ready for official release! Barring any potential future bug fixes (except for a handy couple of additions for you WSL users in the near future), this will be the last update for the C++ version until the Rust port is finished. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net .
 
