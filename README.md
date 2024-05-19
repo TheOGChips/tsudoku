@@ -24,6 +24,8 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 >`> wsl.exe '~/.local/tsudoku'`
 
+This can also be found in `tsudoku.bat`, which is also provided for Windows/WSL users. Double-clicking on this batch file should open up a Windows Terminal and automatically start tsudoku. Note that quitting tsudoku will also automatically close the instance/tab in Windows Terminal.
+
 **Note for PowerShell users**: It's recommended to add the following function to your PowerShell profile. This file can be found by running `> $env:USERPROFILE` at a PowerShell prompt. This will allow you to run tsudoku directly from PowerShell in one step. Note that you will have to start a new instance of PowerShell after adding this to your PowerShell profile.
 
 >`function { wsl.exe '~/.local/tsudoku' }`
@@ -114,7 +116,7 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 ## Status update: 18 May 2024
 
-Current release version: 1.0.6
+Current release version: 1.0.7
 
 tsudoku is now ready for official release! Barring any potential future bug fixes (except for a handy couple of additions for you WSL users in the near future), this will be the last update for the C++ version until the Rust port is finished. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net .
 
