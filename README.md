@@ -20,9 +20,8 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 **Note for inexperienced WSL users**: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running `wsl.exe` at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference https://learn.microsoft.com/en-us/windows/wsl/install . It's recommended to install on Debian Bullseye or newer.
 
-- Ex: Running tsudoku from Windows Command Prompt
->`>wsl.exe`  
->`$ tsudoku`
+- Ex: Running tsudoku from Windows Command Prompt or PowerShell
+>`> wsl.exe '~/.local/tsudoku'`
 
 ## Prerequisites
 
@@ -110,7 +109,7 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 ## Status update: 18 May 2024
 
-Current release version: 1.0.4
+Current release version: 1.0.5
 
 tsudoku is now ready for official release! Barring any potential future bug fixes (except for a handy couple of additions for you WSL users in the near future), this will be the last update for the C++ version until the Rust port is finished. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net .
 
