@@ -34,7 +34,7 @@ This can also be found in `tsudoku.bat`, which is also provided for Windows/WSL 
 
 NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
 
->\- The GNU C++ compiler `g++` (tsudoku compiles using the C++17 standard)  
+>\- The Clang C++ compiler `clang++` (tsudoku compiles using the C++17 standard)  
 >\- NCurses C API
 >\- GNU Make
 >\- The `unzip` utility
@@ -43,12 +43,12 @@ NOTE: These are likely already installed depending on your operating system. If 
 
 If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager. The following example assumes Debian or a Debian-based OS using the APT package manager.
 
->`$ sudo apt install g++`  
+>`$ sudo apt install clang++`  
 >`$ sudo apt install libncurses-dev`
 >`$ sudo apt install make`
 >`$ sudo apt install unzip`
 
-**Note for MacOS Users**: The best option for a MacOS package manager is Homebrew and is relatively similar to a Linux package manager such as that found on Linux and WSL. MacOS should come pre-installed with `clang++`, which should be mapped to `g++`. You can use this instead if you wish. Homebrew's version of an NCurses package is likely just called `ncurses`.
+**Note for MacOS Users**: The best option for a MacOS package manager is Homebrew and is relatively similar to a Linux package manager such as that found on Linux and WSL. MacOS should come pre-installed with `clang++`, which should also be mapped to `g++`. You can use this instead if you wish. Homebrew's version of an NCurses package is likely just called `ncurses`.
 
 ## Installation
 
