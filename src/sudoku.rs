@@ -299,6 +299,7 @@ impl Sudoku {
 struct Grid {
     grid_map: HashMap<u8, Cell>,
     known_positions: [bool; GRID_SIZE as usize],
+    rows: [Row; CONTAINER_SIZE as usize],
 }
 
 impl Grid {
@@ -311,10 +312,13 @@ impl Grid {
     fn init (diff: DifficultyMenuOption) -> Self {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
+        //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
+        let rows: [Row; CONTAINER_SIZE as usize] = from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
         
         Self {
             grid_map: grid_map,
             known_positions: known_positions,
+            rows: rows,
         }
     }
     
@@ -372,7 +376,7 @@ impl Grid {
             DifficultyMenuOption::MEDIUM => 45,
             DifficultyMenuOption::HARD => 30,
             DifficultyMenuOption::EXPERT => 17,
-        }
+        };
         for i in 0..NUM_POSITIONS {
             let POS: u8 = positions[i];
             self.set_value(POS, solved_puzzle[POS as usize]);
@@ -747,10 +751,14 @@ impl Grid {
     }
 
     /**
+     * Returns an address to the Row Container from this Grid's internal Row array. This
+     * allows the Row object to be mutable from the Grid when an input is passed from the Sudoku
+     * object.
      * 
+     *      INDEX -> The index to return from the Grid's internal Row array.
      */
-    fn get_row (&self, INDEX: usize) -> {
-
+    fn get_row (&self, INDEX: usize) -> &Row {
+        &self.rows[INDEX]
     }
 
     /**
