@@ -336,7 +336,7 @@ impl Grid {
      */
     pub fn new (diff: DifficultyMenuOption) -> Self {
         let grid: Grid = Self::init(diff);
-        self.set_starting_positions(diff);
+        grid.set_starting_positions(diff);
         //TODO: call 
         //Self
     }
@@ -366,7 +366,7 @@ impl Grid {
     /**
      * 
      */
-    fn set_starting_positions (&self, diff: DifficultyMenuOption) {
+    fn set_starting_positions (&mut self, diff: DifficultyMenuOption) {
         let seed: i32 = unsafe {
             time(0x0)
         };
