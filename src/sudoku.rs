@@ -364,7 +364,11 @@ impl Grid {
     }
 
     /**
+     * Set starting grid positions for a new game from a randomly generated solved puzzle.
      * 
+     *      NUM_POSITIONS -> The number of given positions to initialize the puzzle. This value
+     *                       will be based on difficulty level chosen by the user from the main
+     *                       menu.
      */
     fn set_starting_positions (&mut self, diff: DifficultyMenuOption) {
         let seed: i32 = unsafe {
@@ -386,8 +390,13 @@ impl Grid {
         for i in 0..NUM_POSITIONS {
             let POS: u8 = positions[i];
             self.set_value(POS, solved_puzzle[POS as usize]);
+            self.known_positions[POS as usize] = true;
         }
-        //TODO
+
+        //TODO: Either uncomment this or get rid of it depending on if it's needed
+        /*for i in NUM_POSITIONS..GRID_SIZE as usize {
+            self.known_positions[positions[i] as usize] = false;
+        }*/
     }
 
     /**
