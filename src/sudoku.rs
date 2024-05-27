@@ -763,8 +763,8 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Row array.
      */
-    fn get_row (&self, INDEX: usize) -> &Row {
-        &self.rows[INDEX]
+    fn get_row (&mut self, INDEX: usize) -> &mut Row {
+        &mut self.rows[INDEX]
     }
 
     /**
@@ -774,8 +774,8 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Column array.
      */
-    fn get_column (&self, INDEX: usize) -> &Column {
-        &self.columns[INDEX]
+    fn get_column (&mut self, INDEX: usize) -> &mut Column {
+        &mut self.columns[INDEX]
     }
 
     /**
@@ -785,23 +785,31 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Box array.
      */
-    fn get_box (&self, INDEX: usize) -> &Box {
-        &self.boxes[INDEX]
+    fn get_box (&mut self, INDEX: usize) -> &mut Box {
+        &mut self.boxes[INDEX]
     }
 
     /**
+     * Places a value into the correct position (row, column, and box) in the grid.
      * 
+     *      POS -> The grid position 0-80 where the value will be placed.
+     *      VALUE -> The value to be placed in the grid.
      */
-    fn set_value (&self, POS: u8, VALUE: u8) {
+    fn set_value (&mut self, POS: u8, VALUE: u8) {
         let ROW_NUMBER: usize = Self::map_row(POS);
         let COLUMN_NUMBER: usize = Self::map_column(POS);
         let BOX_NUMBER: usize = Self::map_box(ROW_NUMBER, COLUMN_NUMBER);
         let (INDEX_ROW, INDEX_COLUMN, INDEX_BOX): (usize, usize, usize) = Self::get_container_indeces(POS);
 
         // NOTE: Check the row, column, and box for the value.
-        let row: &Row = self.get_row(ROW_NUMBER);
-        let column: &Column = self.get_column(COLUMN_NUMBER);
-        let box: &Box = self.get_box(BOX_NUMBER);
+        let row: &mut Row = self.get_row(ROW_NUMBER);
+        let column: &mut Column = self.get_column(COLUMN_NUMBER);
+        let r#box: &mut Box = self.get_box(BOX_NUMBER);
+
+        // NOTE: Add value from solved puzzle to empty puzzle
+        row.set_value(INDEX_ROW, VALUE);
+        column.set_value(INDEX_COLUMN, VALUE);
+        r#box.set_value(INDEX_BOX, VALUE);
     }
 }
 
