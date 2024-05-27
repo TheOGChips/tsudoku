@@ -301,6 +301,7 @@ struct Grid {
     known_positions: [bool; GRID_SIZE as usize],
     rows: [Row; CONTAINER_SIZE as usize],
     columns: [Column; CONTAINER_SIZE as usize],
+    boxes: [Box; CONTAINER_SIZE as usize],
 }
 
 impl Grid {
@@ -314,14 +315,16 @@ impl Grid {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
-        let rows: [Row; CONTAINER_SIZE as usize] = from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
-        let columns: [Column; CONTAINER_SIZE as usize] = from_fn(|_| Column::new(CONTAINER::COLUMN, [0; CONTAINER_SIZE as usize]));
+        let rows: [Row; NUM_CONTAINERS as usize] = from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
+        let columns: [Column; NUM_CONTAINERS as usize] = from_fn(|_| Column::new(CONTAINER::COLUMN, [0; CONTAINER_SIZE as usize]));
+        let boxes: [Box; NUM_CONTAINERS as usize] = from_fn(|_| Box::new(CONTAINER::BOX, [0; CONTAINER_SIZE as usize]));
         
         Self {
             grid_map: grid_map,
             known_positions: known_positions,
             rows: rows,
             columns: columns,
+            boxes: boxes,
         }
     }
     
@@ -776,6 +779,17 @@ impl Grid {
     }
 
     /**
+     * Returns an address to the Box Container from this Grid's internal Box array. This allows
+     * the Box object to be mutable from the Grid when an input is passed from the Sudoku
+     * object.
+     * 
+     *      INDEX -> The index to return from the Grid's internal Box array.
+     */
+    fn get_box (&self, INDEX: usize) -> &Box {
+        &self.boxes[INDEX]
+    }
+
+    /**
      * 
      */
     fn set_value (&self, POS: u8, VALUE: u8) {
@@ -787,6 +801,7 @@ impl Grid {
         // NOTE: Check the row, column, and box for the value.
         let row: &Row = self.get_row(ROW_NUMBER);
         let column: &Column = self.get_column(COLUMN_NUMBER);
+        let box: &Box = self.get_box(BOX_NUMBER);
     }
 }
 
