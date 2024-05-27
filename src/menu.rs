@@ -66,6 +66,8 @@ pub enum MenuOption {
     MAIN_MENU(MainMenuOption),
     /// Wrapper to enforce using a SavedGameMenuOption variant
     SAVED_GAME_MENU(SavedGameMenuOption),
+    /// Wrapper to enforce using a DifficultyMenuOption variant
+    DIFFICULTY_MENU(DifficultyMenuOption),
 }
 
 /// Options displayed on the main menu.
@@ -102,6 +104,35 @@ pub enum SavedGameMenuOption {
     NO_SAVES,
     /// Used when a SavedGameMenuOption isn't applicable in the current context
     NONE,
+}
+
+/* According to https://www.101computing.net/sudoku-generator-algorithm/, the minimum
+ * amount of tiles that need to be filled in in order to create a uniquely solvable
+ * puzzle is 17.
+ */
+/// Different difficulty levels used to determing how many clues the puzzle starts with
+#[derive(PartialEq, EnumIter, EnumCount, VariantArray, Copy, Clone)]
+pub enum DifficultyMenuOption {
+    /// The puzzle will begin with 60 clues
+    EASY,
+    /// The puzzle will begin with 45 clues
+    MEDIUM,
+    /// The puzzle will begin with 30 clues
+    HARD,
+    /// The puzzle will begin with 17 clues, the minimum number for a unique solution.
+    EXPERT,
+}
+
+impl DifficultyMenuOption {
+    /**
+     * Returns a zipped iterator associating an 8-bit integer with each
+     * DifficultyMenuOption variant. This helps in determining the offset for displaying
+     * the options in the terminal window where each 8-bit integer is the offset from the
+     * center of the screen.
+     */
+    fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, DifficultyMenuOptionIter> {
+        (0..Self::COUNT as u8).zip(Self::iter()).into()
+    }
 }
 
 pub trait Menu {
@@ -496,5 +527,103 @@ impl Menu for SavedGameMenu {
         else {
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NO_SAVES)
         }
+    }
+}
+
+/// Allows the user to choose a difficulty level before starting a new game.
+pub struct DifficultyMenu {
+    difficulty_level: DifficultyMenuOption,
+}
+
+impl DifficultyMenu {
+    /**
+     * 
+     */
+    pub fn new () -> Self {
+        Self {
+            difficulty_level: DifficultyMenuOption::EASY,
+        }
+    }
+    
+    /**
+     * 
+     */
+    pub fn set_difficulty_level (&mut self, diff: DifficultyMenuOption) {
+        self.difficulty_level = diff;
+    }
+    
+    /**
+     * 
+     */
+    pub fn get_difficulty_level (&self) -> DifficultyMenuOption {
+        self.difficulty_level
+    }
+}
+
+impl Menu for DifficultyMenu {
+    /**
+     * 
+     */
+    fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
+        let opt: &DifficultyMenuOption = if let MenuOption::DIFFICULTY_MENU(option) = OPT {
+            option
+        }
+        else {
+            println!("Error: Did not receive a MainMenuOption. Exiting...");
+            std::process::exit(1);
+        };
+
+        clear();
+        mvprintw(EDGE.y() as i32, EDGE.x() as i32, "CHOOSE DIFFICULTY SETTING");
+        for (i, variant) in DifficultyMenuOption::enumerate() {
+            if *opt == variant {
+                attron(COLOR_PAIR(MENU_SELECTION));
+            }
+            mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
+                DifficultyMenuOption::EASY => "Easy",
+                DifficultyMenuOption::MEDIUM => "Medium",
+                DifficultyMenuOption::HARD => "Hard",
+                DifficultyMenuOption::EXPERT => "Expert",
+            });
+            if *opt == variant {
+                attroff(COLOR_PAIR(MENU_SELECTION));
+            }
+        }
+        refresh();
+    }
+    
+    /**
+     * 
+     */
+    fn menu (&self) -> MenuOption {
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+        let mut diff: DifficultyMenuOption = DifficultyMenuOption::EASY;
+        let mut input: i32 = 0;
+        timeout(250);
+        while input != KEY_ENTER {
+            refresh();
+            self.display_menu(&Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::DIFFICULTY_MENU(diff));
+            input = getch();
+            diff = 
+                if input == KEY_DOWN || input == 's' as i32 {
+                    match diff {
+                        DifficultyMenuOption::EXPERT => DifficultyMenuOption::HARD,
+                        DifficultyMenuOption::HARD => DifficultyMenuOption::MEDIUM,
+                        _ => DifficultyMenuOption::EASY,
+                    }
+                }
+                else if input == KEY_UP || input == 'w' as i32 {
+                    match diff {
+                        DifficultyMenuOption::EASY => DifficultyMenuOption::MEDIUM,
+                        DifficultyMenuOption::MEDIUM => DifficultyMenuOption::HARD,
+                        _ => DifficultyMenuOption::EXPERT,
+                    }
+                }
+                else { diff }
+        }
+        nodelay(stdscr(), false);
+        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+
+        MenuOption::DIFFICULTY_MENU(diff)
     }
 }

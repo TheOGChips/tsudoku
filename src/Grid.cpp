@@ -417,7 +417,7 @@ void Grid::set_starting_positions (const uint8_t GRID[NUM_CONTAINERS][NUM_CONTAI
     for (uint8_t i = 0; i < GRID_SIZE; i++) {
         const uint8_t VALUE = GRID[i/NUM_CONTAINERS][i%NUM_CONTAINERS];
         set_value(i, VALUE);
-        known_positions[i] = (VALUE == '?') ? false : true;
+        known_positions[ as usizei] = (VALUE == '?') ? false : true;
     }
 }
 
