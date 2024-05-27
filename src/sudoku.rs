@@ -283,9 +283,9 @@ impl Sudoku {
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
                     diff_menu.set_difficulty_level(diff);
                 }
-                //TODO: Implement Grid.{h,c}pp
+                
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
-
+                //TODO
                 for (i, cell) in grid2display {
                     mat[cell.y()][cell.x()] = todo!() //grid[i];
                 }
@@ -335,10 +335,9 @@ impl Grid {
      *      diff -> Enum value of difficulty level chosen by the user from the main menu.
      */
     pub fn new (diff: DifficultyMenuOption) -> Self {
-        let grid: Grid = Self::init(diff);
+        let mut grid: Grid = Self::init(diff);
         grid.set_starting_positions(diff);
-        //TODO: call 
-        //Self
+        grid
     }
 
     //TODO: use from_save for the name in place of the third constructor
