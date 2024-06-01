@@ -285,10 +285,10 @@ impl Sudoku {
                 }
                 
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
-                //TODO
                 for (i, cell) in grid2display {
-                    mat[cell.y()][cell.x()] = todo!() //grid[i];
+                    mat[cell.y()][cell.x()] = grid.at(i);
                 }
+                //TODO
                 todo!()
             },
         }
@@ -818,6 +818,19 @@ impl Grid {
         row.set_value(INDEX_ROW, VALUE);
         column.set_value(INDEX_COLUMN, VALUE);
         r#box.set_value(INDEX_BOX, VALUE);
+    }
+
+    /**
+     * Returns the value at a given index from the Grid. This can be done using Rows, Columns, or
+     * Boxes. Only one type of container needs to return the value, although all three have been
+     * tested for correctness.
+     * 
+     *      INDEX -> Index of the grid to return the value from.
+     */
+    fn at (&mut self, INDEX: u8) -> u8 {
+        self.get_row(Self::map_row(INDEX)).at(Self::get_row_index(INDEX))
+        //self.get_column(self.map_column(INDEX)).at(self.get_column_index(INDEX))
+        //self.get_box(self.map_box_index(INDEX)).at(self.get_box_index(INDEX))
     }
 }
 
