@@ -286,7 +286,7 @@ impl Sudoku {
                 
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
                 for (i, cell) in grid2display {
-                    mat[cell.y()][cell.x()] = grid.at(i);
+                    mat[cell.y() as usize ][cell.x() as usize] = grid.at(i);
                 }
                 //TODO
                 todo!()
@@ -771,7 +771,7 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Row array.
      */
-    fn get_row (&mut self, INDEX: usize) -> &mut Row {
+    fn get_row (&self, INDEX: usize) -> &mut Row {
         &mut self.rows[INDEX]
     }
 
@@ -782,7 +782,7 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Column array.
      */
-    fn get_column (&mut self, INDEX: usize) -> &mut Column {
+    fn get_column (&self, INDEX: usize) -> &mut Column {
         &mut self.columns[INDEX]
     }
 
@@ -793,7 +793,7 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Box array.
      */
-    fn get_box (&mut self, INDEX: usize) -> &mut Box {
+    fn get_box (&self, INDEX: usize) -> &mut Box {
         &mut self.boxes[INDEX]
     }
 
@@ -827,7 +827,7 @@ impl Grid {
      * 
      *      INDEX -> Index of the grid to return the value from.
      */
-    fn at (&mut self, INDEX: u8) -> u8 {
+    fn at (&self, INDEX: u8) -> u8 {
         self.get_row(Self::map_row(INDEX)).at(Self::get_row_index(INDEX))
         //self.get_column(self.map_column(INDEX)).at(self.get_column_index(INDEX))
         //self.get_box(self.map_box_index(INDEX)).at(self.get_box_index(INDEX))
