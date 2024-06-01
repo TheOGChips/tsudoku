@@ -156,10 +156,10 @@ impl Sudoku {
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (saved_puzzle: &SavedPuzzle) -> Self {
+    pub fn new (saved_puzzle: Option<&SavedPuzzle>) -> Self {
         let (grid2display, display2grid) = Self::create_maps();
         Self::set_color_pairs();
-        let (display_matrix, grid) = Self::init_display_matrix(Some(saved_puzzle), &grid2display);
+        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
         //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
         Self {
             display_matrix: display_matrix,
