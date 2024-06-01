@@ -156,19 +156,20 @@ impl Sudoku {
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (/* saved_puzzle: &SavedPuzzle */) -> Self {
+    pub fn new (saved_puzzle: &SavedPuzzle) -> Self {
         let (grid2display, display2grid) = Self::create_maps();
         Self::set_color_pairs();
+        let (display_matrix, grid) = Self::init_display_matrix(Some(saved_puzzle), &grid2display);
         //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
         Self {
-            display_matrix: [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-            color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-            grid: Grid,
+            display_matrix: display_matrix,
+            color_codes: todo!()/*[[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]*/,
+            grid: grid,
             grid2display_map: grid2display,
             display2grip_map: display2grid,
             ORIGIN: ORIGIN,
             cursor_pos: ORIGIN,
-            display_matrix_offset: HashMap::new(),
+            display_matrix_offset: todo!()/*HashMap::new()*/,
         }
     }
 
@@ -237,8 +238,8 @@ impl Sudoku {
      *                      this will be a nullptr. If the user has selected to resume a
      *                      saved game, this object will be read in beforehand.
      */
-    fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: HashMap<u8, Cell>)
-        -> [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] {
+    fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
+        -> ([[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS], Grid) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
          * screen dimensions.
@@ -286,10 +287,10 @@ impl Sudoku {
                 
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
                 for (i, cell) in grid2display {
-                    mat[cell.y() as usize ][cell.x() as usize] = grid.at(i);
+                    mat[cell.y() as usize ][cell.x() as usize] = grid.at(*i);
                 }
-                //TODO
-                todo!()
+
+                (mat, grid)
             },
         }
         //TODO: Return the Grid?
