@@ -27,6 +27,9 @@ use ncurses::{
     COLOR_YELLOW,
     COLOR_BLUE,
     COLOR_GREEN,
+    mv,
+    stdscr,
+    getyx,
 };
 use rand::{
     thread_rng,
@@ -293,7 +296,44 @@ impl Sudoku {
                 (mat, grid)
             },
         }
-        //TODO: Return the Grid?
+        //TODO: Return the color codes?
+    }
+
+    /**
+     * 
+     */
+    fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
+        self.init_display(SAVED_PUZZLE);
+        //TODO
+    }
+
+    /**
+     * 
+     */
+    fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
+        for i in 0..DISPLAY_MATRIX_ROWS as u8 {
+            self.mv(Cell::new(i, 0));
+            //TODO
+        }
+    }
+
+    /**
+     * Moves the cursor to its offset position for the initial printing of the display matrix
+     * from Sudoku::printw. This is necessary so that the the display matrix offset can be mapped
+     * correctly.
+     * 
+     *      COORDS -> Pre-offset display line and column numbers.
+     */
+    fn mv (&mut self, COORDS: Cell) {
+        let TOTAL_OFFSETY: i32 = (COORDS.y() + ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
+        let TOTAL_OFFSETX: i32 = (COORDS.x() + ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
+        mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
+
+        //NOTE: Update cursor_pos after moving
+        let mut new_cursor_y: i32 = 0;
+        let mut new_cursor_x: i32 = 0;
+        getyx(stdscr(), &mut new_cursor_y, &mut new_cursor_x);
+        self.cursor_pos.set(new_cursor_y as u8, new_cursor_x as u8);
     }
 }
 
