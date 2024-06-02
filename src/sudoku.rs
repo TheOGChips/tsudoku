@@ -38,6 +38,7 @@ use ncurses::{
     addstr,
     mvprintw,
     getmaxy,
+    refresh,
 };
 use rand::{
     thread_rng,
@@ -316,6 +317,9 @@ impl Sudoku {
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
+        mv(ORIGIN.y().into(), ORIGIN.x().into());
+        self.cursor_pos.set(ORIGIN.y(), ORIGIN.x());
+        self.refresh();
         //TODO
     }
 
@@ -464,6 +468,14 @@ impl Sudoku {
             hotkey_string,
         );
         attroff(COLOR_PAIR(MENU_SELECTION));
+    }
+
+    /**
+     * Updates the terminal display with any changes. This is a wrapper around the NCurses
+     * function of the same name.
+     */
+    fn refresh (&self) {
+        refresh();
     }
 }
 
