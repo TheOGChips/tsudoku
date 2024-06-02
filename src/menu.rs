@@ -537,7 +537,7 @@ pub struct DifficultyMenu {
 
 impl DifficultyMenu {
     /**
-     * 
+     * Returns the difficulty level the user has chosen to start the new game.
      */
     pub fn new () -> Self {
         Self {
@@ -546,14 +546,16 @@ impl DifficultyMenu {
     }
     
     /**
+     * Records the difficulty level the user has chosen to start a new game.
      * 
+     *      DIFF -> The chosen difficulty level.
      */
     pub fn set_difficulty_level (&mut self, diff: DifficultyMenuOption) {
         self.difficulty_level = diff;
     }
     
     /**
-     * 
+     * Returns the difficulty level the user has chosen to start the new game.
      */
     pub fn get_difficulty_level (&self) -> DifficultyMenuOption {
         self.difficulty_level
@@ -562,7 +564,13 @@ impl DifficultyMenu {
 
 impl Menu for DifficultyMenu {
     /**
+     * Displays the difficulty menu. The currently selected option is always highlighted. The
+     * difficulty menu is re-rendered each time the user uses the Up/Down keys to highlight a
+     * different option.
      * 
+     *      EDGE -> Starting cell the difficulty menu will display at. The menu title should
+     *              display at the origin.
+     *      OPT -> The currently selected difficulty menu option.
      */
     fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
         let opt: &DifficultyMenuOption = if let MenuOption::DIFFICULTY_MENU(option) = OPT {
@@ -593,7 +601,7 @@ impl Menu for DifficultyMenu {
     }
     
     /**
-     * 
+     * Controls the menu display and difficulty level recording.
      */
     fn menu (&self) -> MenuOption {
         curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
