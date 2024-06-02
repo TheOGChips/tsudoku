@@ -12,6 +12,7 @@ use crate::{
         Menu,
         DifficultyMenuOption,
         MenuOption,
+        MENU_SELECTION,
     },
 };
 use std::{
@@ -36,6 +37,7 @@ use ncurses::{
     COLOR_PAIR,
     addstr,
     mvprintw,
+    getmaxy,
 };
 use rand::{
     thread_rng,
@@ -310,6 +312,10 @@ impl Sudoku {
      */
     fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         self.init_display(SAVED_PUZZLE);
+        let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
+        let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
+
+        self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
         //TODO
     }
 
@@ -431,6 +437,33 @@ impl Sudoku {
         let mut x: i32 = 0;
         getyx(stdscr(), &mut y, &mut x);
         self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
+    }
+
+    /**
+     * Displays the hotkey command available in the bottom left corner depending on whether the
+     * in-game menu is enabled.
+     * 
+     *      USE_IN_GAME_MENU -> Boolean controlling whether or not the in-game menu is enabled.
+     *                          This is determined based on whether or not the user runs this
+     *                          program with the "--no-in-game-menu" or "-n" command line
+     *                          options. This also controls which hotkey is available.
+     *      LINE_OFFSET_TWEAK -> Line offset from max line number used to display hotkey command
+     *                           in an ideal location.
+     */
+    fn display_hotkey (&self, USE_IN_GAME_MENU: bool, LINE_OFFSET_TWEAK: u8) {
+        let hotkey_string: &str = if !USE_IN_GAME_MENU {
+            "s -> save game"
+        }
+        else {
+            "m -> in-game menu"
+        };
+        attron(COLOR_PAIR(MENU_SELECTION));
+        mvprintw(
+            getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32,
+            ORIGIN.x().into(),
+            hotkey_string,
+        );
+        attroff(COLOR_PAIR(MENU_SELECTION));
     }
 }
 

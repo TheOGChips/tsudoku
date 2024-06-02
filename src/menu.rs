@@ -58,7 +58,7 @@ use std::{
 
 //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
-const MENU_SELECTION: i16 = 1;
+pub const MENU_SELECTION: i16 = 1;
 
 /// A wrapper enum to enforce a certain type of MenuOption be used
 pub enum MenuOption {
