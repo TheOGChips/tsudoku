@@ -445,7 +445,7 @@ impl Grid {
      * 
      *      SEED -> Seed for the pseudo-random number sequence
      */
-    fn generate_solved_puzzle (&self, seed: &i32) -> [u8; GRID_SIZE as usize] {
+    fn generate_solved_puzzle (&mut self, seed: &i32) -> [u8; GRID_SIZE as usize] {
         //TODO: Is there an easy way to "flatten" a matrix into an array (2D -> 1D)?
         let mut soln: [u8; GRID_SIZE as usize] = [0; GRID_SIZE as usize];
 
@@ -481,8 +481,8 @@ impl Grid {
         /* NOTE: Create row, column, and box objects from partial solution matrix. These arrays
          *       will be used to finish solving the sudoku puzzle recursively.
          */
-        let soln_rows: [Row; NUM_CONTAINERS as usize] = from_fn(|i| Row::new(CONTAINER::ROW, soln_matrix[i]));
-        let soln_columns: [Column; NUM_CONTAINERS as usize] = from_fn(
+        let mut soln_rows: [Row; NUM_CONTAINERS as usize] = from_fn(|i| Row::new(CONTAINER::ROW, soln_matrix[i]));
+        let mut soln_columns: [Column; NUM_CONTAINERS as usize] = from_fn(
             |i| {
                 /*let mut temp_col: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
                 for j in 0..NUM_CONTAINERS {
@@ -492,7 +492,7 @@ impl Grid {
                 Column::new(CONTAINER::COLUMN, from_fn(|j| soln_matrix[j][i]))
             }
         );
-        let soln_boxes: [Box; NUM_CONTAINERS as usize] = from_fn(
+        let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = from_fn(
             |_| {
                 let mut arr: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
                 for j in [1, 4, 7] {
@@ -512,7 +512,7 @@ impl Grid {
             }
         );
 
-        let soln_found: bool = self.solve(1, 1, &soln_rows, &soln_columns, &soln_boxes);
+        let soln_found: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
         
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
@@ -566,9 +566,9 @@ impl Grid {
      *      boxes -> Array of Box objects each representing a box of the solved puzzle. All
      *               recursive iterations have access to the same array.
      */
-    fn solve (&self, BOX: u8, VALUE: u8, rows: &[Row; NUM_CONTAINERS as usize],
-              columns: &[Column; NUM_CONTAINERS as usize],
-              boxes: &[Box; NUM_CONTAINERS as usize]) -> bool {
+    fn solve (&mut self, BOX: u8, VALUE: u8, rows: &mut [Row; NUM_CONTAINERS as usize],
+              columns: &mut [Column; NUM_CONTAINERS as usize],
+              boxes: &mut [Box; NUM_CONTAINERS as usize]) -> bool {
         /* NOTE: Figure out positions in box based on box number.
          *       Start with upper right.
          *
@@ -617,8 +617,8 @@ impl Grid {
          *       are completely separate. Interesting things happened when I tested that out
          *       before I realized why it wouldn't work.
          */
-        let stop: bool = false;
-        let soln: bool = true;
+        let mut stop: bool = false;
+        let mut soln: bool = true;
         //while true {
         while !stop {
             if available_pos.size() == 0 {
@@ -631,7 +631,7 @@ impl Grid {
             //let COLUMN_NUMBER: usize = Self::map_column(next_available_pos);
             //let BOX_NUMBER: usize = BOX as usize;
             let (ROW_NUMBER, COLUMN_NUMBER, BOX_NUMBER): (usize, usize, usize) =
-                Self::map_containers(available_pos);
+                Self::map_containers(next_available_pos);
             //let ROW_INDEX: usize = Self::get_row_index(next_available_pos);
             //let COLUMN_INDEX: usize = Self::get_column_index(next_available_pos);
             //let BOX_INDEX: usize = Self::get_box_index(next_available_pos);
@@ -812,8 +812,8 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Row array.
      */
-    fn get_row (&self, INDEX: usize) -> &mut Row {
-        &mut self.rows[INDEX]
+    fn get_row (&self, INDEX: usize) -> &Row {
+        &self.rows[INDEX]
     }
 
     /**
@@ -823,8 +823,8 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Column array.
      */
-    fn get_column (&self, INDEX: usize) -> &mut Column {
-        &mut self.columns[INDEX]
+    fn get_column (&self, INDEX: usize) -> &Column {
+        &self.columns[INDEX]
     }
 
     /**
@@ -834,7 +834,40 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Box array.
      */
-    fn get_box (&self, INDEX: usize) -> &mut Box {
+    fn get_box (&self, INDEX: usize) -> &Box {
+        &self.boxes[INDEX]
+    }
+
+    /**
+     * Returns a mutable address to the Row Container from this Grid's internal Row array. This
+     * allows the Row object to be mutable from the Grid when an input is passed from the Sudoku
+     * object.
+     * 
+     *      INDEX -> The index to return from the Grid's internal Row array.
+     */
+    fn get_row_mut (&mut self, INDEX: usize) -> &mut Row {
+        &mut self.rows[INDEX]
+    }
+
+    /**
+     * Returns a mutable address to the Column Container from this Grid's internal Column array.
+     * This allows the Column object to be mutable from the Grid when an input is passed from the
+     * Sudoku object.
+     * 
+     *      INDEX -> The index to return from the Grid's internal Column array.
+     */
+    fn get_column_mut (&mut self, INDEX: usize) -> &mut Column {
+        &mut self.columns[INDEX]
+    }
+
+    /**
+     * Returns a mutable address to the Box Container from this Grid's internal Box array. This
+     * allows the Box object to be mutable from the Grid when an input is passed from the Sudoku
+     * object.
+     * 
+     *      INDEX -> The index to return from the Grid's internal Box array.
+     */
+    fn get_box_mut (&mut self, INDEX: usize) -> &mut Box {
         &mut self.boxes[INDEX]
     }
 
@@ -850,14 +883,17 @@ impl Grid {
         let BOX_NUMBER: usize = Self::map_box(ROW_NUMBER, COLUMN_NUMBER);
         let (INDEX_ROW, INDEX_COLUMN, INDEX_BOX): (usize, usize, usize) = Self::get_container_indeces(POS);
 
-        // NOTE: Check the row, column, and box for the value.
-        let row: &mut Row = self.get_row(ROW_NUMBER);
-        let column: &mut Column = self.get_column(COLUMN_NUMBER);
-        let r#box: &mut Box = self.get_box(BOX_NUMBER);
-
-        // NOTE: Add value from solved puzzle to empty puzzle
+        /*
+         * NOTE: Check the row, column, and box for the value and add value from solved puzzle
+         *       to empty puzzle.
+         */
+        let row: &mut Row = self.get_row_mut(ROW_NUMBER);
         row.set_value(INDEX_ROW, VALUE);
+
+        let column: &mut Column = self.get_column_mut(COLUMN_NUMBER);
         column.set_value(INDEX_COLUMN, VALUE);
+
+        let r#box: &mut Box = self.get_box_mut(BOX_NUMBER);
         r#box.set_value(INDEX_BOX, VALUE);
     }
 
