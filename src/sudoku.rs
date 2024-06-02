@@ -39,6 +39,9 @@ use ncurses::{
     mvprintw,
     getmaxy,
     refresh,
+    nodelay,
+    timeout,
+    wgetch,
 };
 use rand::{
     thread_rng,
@@ -320,6 +323,13 @@ impl Sudoku {
         mv(ORIGIN.y().into(), ORIGIN.x().into());
         self.cursor_pos.set(ORIGIN.y(), ORIGIN.x());
         self.refresh();
+
+        let mut quit_game: bool = false;
+        //nodelay(stdscr, true);
+        timeout(250);
+        while !quit_game {
+            let input: char = self.getch() as u8 as char;
+        }
         //TODO
     }
 
@@ -476,6 +486,15 @@ impl Sudoku {
      */
     fn refresh (&self) {
         refresh();
+    }
+
+    /**
+     * Returns the character at the current cursor position. This is a wrapper around the NCurses
+     * macro function of the same name. The underlying call to NCurses wgetch(stdscr) seen here
+     * is the same functionality as the original NCurses getch.
+     */
+    fn getch (&self) -> i32 {
+        wgetch(stdscr())
     }
 }
 
