@@ -68,6 +68,8 @@ pub enum MenuOption {
     SAVED_GAME_MENU(SavedGameMenuOption),
     /// Wrapper to enforce using a DifficultyMenuOption variant
     DIFFICULTY_MENU(DifficultyMenuOption),
+    /// Wrapper to enforce using an InGameMenuOption variant
+    IN_GAME_MENU(InGameMenuOption),
 }
 
 /// Options displayed on the main menu.
@@ -81,8 +83,6 @@ pub enum MainMenuOption {
     SHOW_STATS,
     /// Exit the program
     EXIT,
-    //RULES,
-    //MANUAL,
 }
 
 impl MainMenuOption {
@@ -133,6 +133,15 @@ impl DifficultyMenuOption {
     fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, DifficultyMenuOptionIter> {
         (0..Self::COUNT as u8).zip(Self::iter()).into()
     }
+}
+
+enum InGameMenuOption {
+    /// Display the rules of sudoku
+    RULES,
+    /// Display the tsudoku manual
+    MANUAL,
+    /// Save the state of the current sudoku game
+    SAVE_GAME,
 }
 
 pub trait Menu {
