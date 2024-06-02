@@ -308,11 +308,15 @@ impl Sudoku {
     }
 
     /**
-     * 
+     * Previously Sudoku::printw(SavedPuzzle*) from the C++ version.
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         for i in 0..DISPLAY_MATRIX_ROWS as u8 {
             self.mv(Cell::new(i, 0));
+            for j in 0..DISPLAY_MATRIX_COLUMNS as u8 {
+                self.map_display_matrix_offset(Cell::new(i, j));
+                //TODO
+            }
             //TODO
         }
     }
@@ -334,6 +338,24 @@ impl Sudoku {
         let mut new_cursor_x: i32 = 0;
         getyx(stdscr(), &mut new_cursor_y, &mut new_cursor_x);
         self.cursor_pos.set(new_cursor_y as u8, new_cursor_x as u8);
+    }
+
+    /**
+     * Creates a mapping between a cell in the display matrix and it's actual location on the
+     * screen. A call to this function is made for one cell at a time during the initial printing
+     * of the display matrix to the screen.
+     * 
+     *      DISPLAY_INDECES -> Cell object containing the display line and display column number.
+     * 
+     * NOTE: This looks like it doesn't work as expected, but the use of the overloaded
+     *       Sudoku::move in printw takes care of applying the offset before this function is
+     *       called.
+     */
+    fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
+        let mut y: i32 = 0;
+        let mut x: i32 = 0;
+        getyx(stdscr(), &mut y, &mut x);
+        self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
     }
 }
 
