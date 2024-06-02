@@ -30,6 +30,12 @@ use ncurses::{
     mv,
     stdscr,
     getyx,
+    attron,
+    attroff,
+    A_BOLD,
+    COLOR_PAIR,
+    addstr,
+    mvprintw,
 };
 use rand::{
     thread_rng,
@@ -145,7 +151,7 @@ impl SavedPuzzle {
  */
 pub struct Sudoku {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-    color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    color_codes: [[i16; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     grid: Grid,
     grid2display_map: HashMap<u8, Cell>,
     display2grip_map: HashMap<Cell, u8>,
@@ -308,16 +314,85 @@ impl Sudoku {
     }
 
     /**
-     * Previously Sudoku::printw(SavedPuzzle*) from the C++ version.
+     * Formerly Sudoku::printw(SavedPuzzle*) from the C++ version. Prints the entire sudoku
+     * puzzle (the display matrix) to the screen for initial viewing.
+     * 
+     *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved
+     *                      game. If the user has selected to start a new game, this will be a
+     *                      nullptr. If the user has selected to resume a saved game, this object
+     *                      will be read in beforehand.
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
-        for i in 0..DISPLAY_MATRIX_ROWS as u8 {
-            self.mv(Cell::new(i, 0));
-            for j in 0..DISPLAY_MATRIX_COLUMNS as u8 {
-                self.map_display_matrix_offset(Cell::new(i, j));
-                //TODO
+        for i in 0..DISPLAY_MATRIX_ROWS{
+            self.mv(Cell::new(i as u8, 0));
+            for j in 0..DISPLAY_MATRIX_COLUMNS {
+                self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
+                /*let mut color_pair: i16 = UNKNOWN;
+                if let Some(saved_puzzle) = SAVED_PUZZLE {
+                    if saved_puzzle.color_codes[i][j] == 'u' {
+                        color_pair
+                    }
+                    //TODO
+                }*/
+                let color_pair: i16 = if let Some(saved_puzzle) = SAVED_PUZZLE {
+                    match saved_puzzle.color_codes[i][j] {
+                        'u' => UNKNOWN,
+                        'r' => GIVEN,
+                        'y' => {
+                            attron(A_BOLD());
+                            CANDIDATES_Y
+                        },
+                        'b' => {
+                            attron(A_BOLD());
+                            CANDIDATES_B
+                        },
+                        'g' => GUESS,
+                        _ => 0, // NOTE: Also case 'n'
+                    }
+                }
+                else {
+                    0
+                };
+
+                self.color_codes[i][j] = color_pair;
+                attron(COLOR_PAIR(color_pair));
+                addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
+                if let Some(_) = SAVED_PUZZLE {
+                    attroff(COLOR_PAIR(color_pair));
+                    attroff(A_BOLD());
+                }
+
+                if j == 8 || j == 17 {
+                    addstr("|");
+                }
             }
-            //TODO
+            if i == 8 || i == 17 {
+                mvprintw(
+                    (i as u8 + ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
+                    ORIGIN.x() as i32,
+                    "---------|---------|---------"
+                );
+            }
+        }
+
+        if let Some(_) = SAVED_PUZZLE {
+            for i in 0..self.grid2display_map.len()  {
+                let coords: Cell = self.grid2display_map[&(i as u8)];
+                self.mv(coords);
+
+                let row_index: usize = coords.y().into();
+                let column_index: usize = coords.x().into();
+                let color_pair: i16 = if self.grid.is_known(i) {
+                    GIVEN
+                }
+                else {
+                    UNKNOWN
+                };
+                self.color_codes[row_index][column_index] = color_pair;
+                attron(COLOR_PAIR(color_pair));
+                addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
+                attroff(COLOR_PAIR(color_pair));
+            }
         }
     }
 
