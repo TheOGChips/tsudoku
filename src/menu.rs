@@ -644,3 +644,23 @@ impl Menu for DifficultyMenu {
         MenuOption::DIFFICULTY_MENU(diff)
     }
 }
+
+pub struct InGameMenu {
+    display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+}
+
+impl InGameMenu {
+    /**
+     * Initializes the display matrix, so the in-game menu can track any changes made during
+     * gameplay.
+     * 
+     *      display_matrix -> The display matrix from the main gameplay loop in Sudoku.
+     */
+    pub fn new (display_matrix: &[[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) -> Self {
+        Self {
+            display_matrix: *display_matrix,
+        }
+    }
+}
+
+

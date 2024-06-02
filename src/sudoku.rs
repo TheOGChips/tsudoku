@@ -13,6 +13,7 @@ use crate::{
         DifficultyMenuOption,
         MenuOption,
         MENU_SELECTION,
+        InGameMenu,
     },
 };
 use std::{
@@ -329,6 +330,14 @@ impl Sudoku {
         timeout(250);
         while !quit_game {
             let input: char = self.getch() as u8 as char;
+            if input.to_lowercase().eq(['q']) {
+                quit_game = true;
+            }
+            else if input.to_lowercase().eq(['m']) && USE_IN_GAME_MENU {
+                //TODO: Make this reusable somehow like in the C++ version...
+                let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
+                //TODO
+            }
         }
         //TODO
     }
