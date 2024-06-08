@@ -135,7 +135,7 @@ impl DifficultyMenuOption {
     }
 }
 
-#[derive(PartialEq, EnumIter, EnumCount, VariantArray)]
+#[derive(PartialEq, EnumIter, EnumCount, VariantArray, Copy, Clone)]
 enum InGameMenuOption {
     /// Display the rules of sudoku
     RULES,
@@ -701,7 +701,31 @@ impl Menu for InGameMenu {
      *              on the line below the top padding and the column after the vertical divider.
      *      OPT -> The currently highlighted main menu option.
      */
-    //fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {}
+    fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
+        let opt: &InGameMenuOption = if let MenuOption::IN_GAME_MENU(option) = OPT {
+            option
+        }
+        else {
+            println!("Error: Did not receive an InGameMenuOption. Exiting...");
+            std::process::exit(1);
+        };
+
+        mvprintw(EDGE.y() as i32, EDGE.x() as i32, "IN-GAME MENU");
+        for (i, variant) in InGameMenuOption::enumerate() {
+            if *opt == variant {
+                attron(COLOR_PAIR(MENU_SELECTION));
+            }
+            mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
+                InGameMenuOption::RULES => "View the rules of sudoku",
+                InGameMenuOption::MANUAL => "See game manual",
+                InGameMenuOption::SAVE_GAME => "Save current game",
+            });
+            if *opt == variant {
+                attroff(COLOR_PAIR(MENU_SELECTION));
+            }
+        }
+        refresh();
+    }
 
     /**
      * 
@@ -709,5 +733,11 @@ impl Menu for InGameMenu {
     fn menu (&self) -> MenuOption {
         curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
         self.set_window_resized(false);
+        let opt: InGameMenuOption = InGameMenuOption::RULES;
+
+        loop {
+            refresh();
+            self.display_menu(&Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE), &MenuOption::IN_GAME_MENU(opt));
+        }
     }
 }
