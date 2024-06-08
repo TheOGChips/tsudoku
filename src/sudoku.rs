@@ -43,6 +43,7 @@ use ncurses::{
     nodelay,
     timeout,
     wgetch,
+    clrtoeol,
 };
 use rand::{
     thread_rng,
@@ -336,6 +337,13 @@ impl Sudoku {
             else if input.to_lowercase().eq(['m']) && USE_IN_GAME_MENU {
                 //TODO: Make this reusable somehow like in the C++ version...
                 let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
+
+                attron(COLOR_PAIR(MENU_SELECTION));
+                mvprintw(getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
+                attroff(COLOR_PAIR(MENU_SELECTION));
+                clrtoeol();
+
+                in_game_menu.menu();
                 //TODO
             }
         }

@@ -135,6 +135,7 @@ impl DifficultyMenuOption {
     }
 }
 
+#[derive(PartialEq, EnumIter, EnumCount, VariantArray)]
 enum InGameMenuOption {
     /// Display the rules of sudoku
     RULES,
@@ -142,6 +143,17 @@ enum InGameMenuOption {
     MANUAL,
     /// Save the state of the current sudoku game
     SAVE_GAME,
+}
+
+impl InGameMenuOption {
+    /**
+     * Returns a zipped iterator associating an 8-bit integer with each InGameMenuOption variant.
+     * This helps in determining the offset for displaying the options in the terminal window
+     * where each 8-bit integer is the offset from the center of the screen.
+     */
+    fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, InGameMenuOptionIter> {
+        (0..Self::COUNT as u8).zip(Self::iter()).into()
+    }
 }
 
 pub trait Menu {
@@ -586,7 +598,7 @@ impl Menu for DifficultyMenu {
             option
         }
         else {
-            println!("Error: Did not receive a MainMenuOption. Exiting...");
+            println!("Error: Did not receive a DifficultyMenuOption. Exiting...");
             std::process::exit(1);
         };
 
@@ -647,6 +659,8 @@ impl Menu for DifficultyMenu {
 
 pub struct InGameMenu {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    window_resized: RefCell<bool>,
+    IN_GAME_MENU_LEFT_EDGE: u8,
 }
 
 impl InGameMenu {
@@ -658,9 +672,42 @@ impl InGameMenu {
      */
     pub fn new (display_matrix: &[[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) -> Self {
         Self {
+            //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
             display_matrix: *display_matrix,
+            window_resized: RefCell::new(false),
+            IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
         }
+    }
+
+    /**
+     * Sets whether the window has been resized during gameplay. True indicates the window was
+     * resized.
+     * 
+     *      WINDOW_RESIZED -> Boolean indicating whether the window was resized. Sets the member
+     *                        window_resized to its value.
+     */
+    fn set_window_resized (&self, WINDOW_RESIZED: bool) {
+        &self.window_resized.replace(WINDOW_RESIZED);
     }
 }
 
+impl Menu for InGameMenu {
+    /**
+     * Displays the in-game menu. The currently selected option is always highlighted. The
+     * in-game menu is re-rendered each time the user uses the Up/Down keys to highlight a 
+     * ifferent option.
+     * 
+     *      EDGE -> Starting cell the in-game menu will display at. The menu title should display
+     *              on the line below the top padding and the column after the vertical divider.
+     *      OPT -> The currently highlighted main menu option.
+     */
+    //fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {}
 
+    /**
+     * 
+     */
+    fn menu (&self) -> MenuOption {
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+        self.set_window_resized(false);
+    }
+}
