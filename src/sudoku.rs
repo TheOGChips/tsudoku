@@ -19,6 +19,9 @@ use crate::{
 use std::{
     collections::HashMap,
     array::from_fn,
+    cell::RefCell,
+    thread::sleep,
+    time::Duration,
 };
 use ncurses::{
     has_colors,
@@ -42,8 +45,10 @@ use ncurses::{
     refresh,
     nodelay,
     timeout,
-    wgetch,
+    wgetch, getnstr,
     clrtoeol,
+    echo, noecho,
+    curs_set, CURSOR_VISIBILITY,
 };
 use rand::{
     thread_rng,
@@ -166,6 +171,7 @@ pub struct Sudoku {
     ORIGIN: Cell,
     cursor_pos: Cell,
     display_matrix_offset: HashMap<Cell, Cell>,
+    save_file_name: RefCell<String>,
 }
 
 impl Sudoku {
@@ -187,6 +193,7 @@ impl Sudoku {
             ORIGIN: ORIGIN,
             cursor_pos: ORIGIN,
             display_matrix_offset: todo!()/*HashMap::new()*/,
+            save_file_name: todo!() /* String::new() */,
         }
     }
 
@@ -363,6 +370,10 @@ impl Sudoku {
                 self.refresh();
                 self.cursor_pos = saved_pos;
                 self.reset_cursor();
+                //TODO
+            }
+            else if input == 's' && !USE_IN_GAME_MENU {
+                self.save_game_prompt(DELAY);
                 //TODO
             }
         }
@@ -572,6 +583,63 @@ impl Sudoku {
      */
     fn reset_cursor (&self) {
         mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
+    }
+
+    /**
+     * Prompts the user for the name to save the game under before saving the game. Displays a
+     * status message after having saved. This performs a similar function to
+     * `InGameMenu::saved_game_prompt` for when the in-game menu functionality is disabled.
+     * 
+     *      DELAY -> Amount of time to display the status message before clearing it and
+     *               resuming play.
+     */
+    fn save_game_prompt (&self, DELAY: u8) {
+        let DISPLAY_LINE: i32 = ORIGIN.y() as i32 + DISPLAY_MATRIX_ROWS as i32 + 3;
+        mv(DISPLAY_LINE, 1);
+        clrtoeol();
+        addstr("Enter save file name: ");
+
+        /* NOTE: Copy the display matrix int oa pointer in order to pass along to
+         *       InGameMenu::save_game
+         */
+        let name = self.save_game();
+        mv(DISPLAY_LINE, 1);
+        clrtoeol();
+        //NOTE: Turn off cursor while displaying
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+        addstr(format!("{} saved!", name).as_str());
+        self.refresh();
+
+        //NOTE: Clear output after a delay
+        sleep(Duration::new(DELAY.into(), 0));
+        mv(DISPLAY_LINE, 0);
+        clrtoeol();
+        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+    }
+
+    /**
+     * 
+     */
+    fn save_game (&self) -> String {
+        let NAME_SIZE: i32 = 18;                //NOTE: NAME_SIZE limited by window width
+        let mut name: String = String::new();   //      requirements of no in-game menu mode
+        nodelay(stdscr(), false);
+        echo();
+        getnstr(&mut name, NAME_SIZE - 1);
+        noecho();
+        nodelay(stdscr(), true);
+
+        /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
+         *       message will be handled by the calling function.
+         */
+        if !name.is_empty() {
+            self.save_file_name.replace(name.clone());
+            //TODO
+            name
+        }
+        else {
+            String::from("Game not")
+        }
     }
 }
 
