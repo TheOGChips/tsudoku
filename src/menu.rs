@@ -9,12 +9,13 @@ use ncurses::{
     mvprintw, addstr,
     attron, attroff,
     refresh,
-    getmaxyx,
-    clear,
+    getmaxyx, getmaxy,
+    clear, clrtoeol,
     timeout,
     getch,
     KEY_DOWN, KEY_UP,
     nodelay,
+    mv,
 };
 use signal_hook::{
     consts::SIGINT,
@@ -689,6 +690,22 @@ impl InGameMenu {
     fn set_window_resized (&self, WINDOW_RESIZED: bool) {
         &self.window_resized.replace(WINDOW_RESIZED);
     }
+
+    /**
+     * Clears the in-game menu display area.
+     * 
+     *      EDGE -> Line and column to start clearing from.
+     */
+    fn clear (&self, EDGE: Cell) {
+        let in_game_menu_top_left: i32 = EDGE.y() as i32 +
+            unsafe { IN_GAME_MENU_DISPLAY_SPACING as i32 } +
+            InGameMenuOption::COUNT as i32 +
+            2;
+        for y in in_game_menu_top_left..getmaxy(stdscr()) {
+            mv(y, EDGE.x().into());
+            clrtoeol();
+        }
+    }
 }
 
 impl Menu for InGameMenu {
@@ -733,11 +750,44 @@ impl Menu for InGameMenu {
     fn menu (&self) -> MenuOption {
         curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
         self.set_window_resized(false);
-        let opt: InGameMenuOption = InGameMenuOption::RULES;
+        let mut opt: InGameMenuOption = InGameMenuOption::RULES;
 
         loop {
             refresh();
             self.display_menu(&Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE), &MenuOption::IN_GAME_MENU(opt));
+            let input: u8 = getch() as u8;
+            if (input as char).to_ascii_lowercase() == 'm' {
+                break;
+            }
+            else if (input as char).to_ascii_lowercase() == 's' || input as i32 == KEY_DOWN {
+                opt = match opt {
+                    InGameMenuOption::RULES => InGameMenuOption::MANUAL,
+                    _ => InGameMenuOption::SAVE_GAME,
+                }
+            }
+            else if (input as char).to_ascii_lowercase() == 'w' || input as i32 == KEY_UP {
+                opt = match opt {
+                    InGameMenuOption::SAVE_GAME => InGameMenuOption::MANUAL,
+                    _ => InGameMenuOption::RULES,
+                }
+            }
+            else if input as i32 == KEY_ENTER {
+                let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
+                self.clear(in_game_menu_left_edge);
+                match opt {
+                    InGameMenuOption::RULES => ,
+                    InGameMenuOption::MANUAL => ,
+                    InGameMenuOption::SAVE_GAME => ,
+                }
+            }
+            else {
+                if (invalid_window_size_handler()) {
+                    self.set_window_resized(true);
+                    mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32,
+                             "Press 'm' to restore the game");
+                }
+            }
         }
+        MenuOption::IN_GAME_MENU(opt)
     }
 }
