@@ -683,7 +683,7 @@ impl InGameMenu {
             window_resized: RefCell::new(false),
             IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
             IN_GAME_MENU_TITLE_SPACING: 1,
-            save_file_name: RefCell::new(<String::new()>),
+            save_file_name: RefCell::new(String::new()),
         }
     }
 
@@ -910,16 +910,17 @@ impl Menu for InGameMenu {
     }
 
     /**
-     * 
+     * Controls the menu display based on the option chosen by the user.
      */
     fn menu (&self) -> MenuOption {
         curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
         self.set_window_resized(false);
+        let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
         let mut opt: InGameMenuOption = InGameMenuOption::RULES;
 
         loop {
             refresh();
-            self.display_menu(&Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE), &MenuOption::IN_GAME_MENU(opt));
+            self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(opt));
             let input: u8 = getch() as u8;
             if (input as char).to_ascii_lowercase() == 'm' {
                 break;
@@ -937,7 +938,6 @@ impl Menu for InGameMenu {
                 }
             }
             else if input as i32 == KEY_ENTER {
-                let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
                 self.clear(in_game_menu_left_edge);
                 match opt {
                     InGameMenuOption::RULES => self.display_rules(in_game_menu_left_edge),
@@ -957,6 +957,11 @@ impl Menu for InGameMenu {
                 }
             }
         }
+
+        opt = InGameMenuOption::NONE;
+        self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(opt));
+        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+
         MenuOption::IN_GAME_MENU(opt)
     }
 }
