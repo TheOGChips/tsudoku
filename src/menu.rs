@@ -16,6 +16,7 @@ use ncurses::{
     KEY_DOWN, KEY_UP,
     nodelay,
     mv,
+    getnstr,
 };
 use signal_hook::{
     consts::SIGINT,
@@ -665,6 +666,7 @@ pub struct InGameMenu {
     window_resized: RefCell<bool>,
     IN_GAME_MENU_LEFT_EDGE: u8,
     IN_GAME_MENU_TITLE_SPACING: u8,
+    save_file_name: RefCell<String>,
 }
 
 impl InGameMenu {
@@ -681,6 +683,7 @@ impl InGameMenu {
             window_resized: RefCell::new(false),
             IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
             IN_GAME_MENU_TITLE_SPACING: 1,
+            save_file_name: RefCell::new(<String::new()>),
         }
     }
 
@@ -814,6 +817,59 @@ impl InGameMenu {
             self.screen_reader(EDGE, &string, &mut display_offset);
         }
     }
+
+    /**
+     * Prompts the user for the name to save the game under before saving the game. Displays a
+     * success message after having saved.
+     * 
+     *      EDGE -> Line and column to start the display at. The prompt for the save file name
+     *              will start here.
+     */
+    fn save_game_prompt (&self, EDGE: Cell) {
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+
+        mvprintw(
+            (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
+            EDGE.x().into(),
+            "Enter save file name: ");
+        display_offset += 2;
+
+        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+        /* NOTE: This message will not be seen if there is a window resize, so no error handling
+         *       required.
+         */
+        mvprintw(
+            (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
+            EDGE.x().into(),
+            format!("{} saved!", self.save_game()).as_str()
+        );
+        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+    }
+
+    /**
+     * 
+     */
+    fn save_game (&self) -> String {
+        let NAME_SIZE: i32 = 18;                //NOTE: NAME_SIZE limited by window width
+        let mut name: String = String::new();   //      requirements of no in-game menu mode
+        nodelay(stdscr(), false);
+        echo();
+        getnstr(&mut name, NAME_SIZE - 1);
+        noecho();
+        nodelay(stdscr(), true);
+
+        /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
+         *       message will be handled by the calling function.
+         */
+        if !name.is_empty() {
+            self.save_file_name.replace(name.clone());
+            //TODO
+            name
+        }
+        else {
+            String::from("Game not")
+        }
+    }
 }
 
 impl Menu for InGameMenu {
@@ -888,6 +944,7 @@ impl Menu for InGameMenu {
                     InGameMenuOption::MANUAL => self.display_manual(in_game_menu_left_edge),
                     InGameMenuOption::SAVE_GAME => {
                         self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(InGameMenuOption::NONE));
+                        self.save_game_prompt(in_game_menu_left_edge);
                     },
                     InGameMenuOption::NONE => (),
                 }
