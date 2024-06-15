@@ -766,6 +766,52 @@ impl InGameMenu {
             }
         }
     }
+
+    /**
+     * Displays the tsudoku game manual.
+     * 
+     *      EDGE -> Line and column to start the display at.
+     */
+    fn display_manual (&self, EDGE: Cell) {
+        let TITLE: &str = "TSUDOKU GAME MANUAL";
+        let mut MANUAL_INTRO: String = String::new();
+        MANUAL_INTRO.push_str("Red numbers are givens provided for you when the puzzle ");
+        MANUAL_INTRO.push_str("has been generated. The number of givens present corresponds to ");
+        MANUAL_INTRO.push_str("the difficulty level you have chosen. Cells with white '?' ");
+        MANUAL_INTRO.push_str("symbols are empty cells which you must solve for to complete ");
+        MANUAL_INTRO.push_str("the puzzle. To enter a number 1-9 into an empty cell, simply ");
+        MANUAL_INTRO.push_str("move the cursor over to an empty cell and type the number. The ");
+        MANUAL_INTRO.push_str("'?' symbol will be replaced with the number you entered, which ");
+        MANUAL_INTRO.push_str("will be green in color. To remove a number from one of these ");
+        MANUAL_INTRO.push_str("cells, move the cursor over the cell and press either the ");
+        MANUAL_INTRO.push_str("Backspace or Delete keys; the green number will be replaced ");
+        MANUAL_INTRO.push_str("with a '?' symbol again. The eight blank cells surrounding each ");
+        MANUAL_INTRO.push_str("sudoku puzzle cell are available as a note-taking area when ");
+        MANUAL_INTRO.push_str("analyzing what numbers (candidates) should go in that ");
+        MANUAL_INTRO.push_str("particular cell; numbers entered in these cells will appear ");
+        MANUAL_INTRO.push_str("yellow in color. Numbers in these cells can also be removed by ");
+        MANUAL_INTRO.push_str("pressing either the Backspace or Delete keys while the cursor ");
+        MANUAL_INTRO.push_str("is over the cell. You cannot enter anything in the note-taking ");
+        MANUAL_INTRO.push_str("cells surrounding puzzle cells with red numbers. BEWARE: ");
+        MANUAL_INTRO.push_str("Entering a number in a '?' occupied cell will also erase your ");
+        MANUAL_INTRO.push_str("notes in the eight surrounding cells. This action cannot be ");
+        MANUAL_INTRO.push_str("undone.");
+        let MANUAL_M: String = String::from("m/M -> Enter/Exit the in-game manual");
+        let MANUAL_Q: String = String::from("q/Q -> Quit the game without saving");
+        let MANUAL_DIR_KEYS: String = String::from("Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board");
+        let MANUAL_NUM: String = String::from("1-9 -> Places number in cell highlighted by cursor");
+        let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+
+        mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+            EDGE.x() as i32,
+            TITLE);
+        display_offset += 1;
+        for string in [MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS, MANUAL_NUM, MANUAL_ENTER] {
+            display_offset += 1;
+            self.screen_reader(EDGE, &string, &mut display_offset);
+        }
+    }
 }
 
 impl Menu for InGameMenu {
@@ -836,7 +882,7 @@ impl Menu for InGameMenu {
                 self.clear(in_game_menu_left_edge);
                 match opt {
                     InGameMenuOption::RULES => self.display_rules(in_game_menu_left_edge),
-                    InGameMenuOption::MANUAL => ,
+                    InGameMenuOption::MANUAL => self.display_manual(in_game_menu_left_edge),
                     InGameMenuOption::SAVE_GAME => ,
                 }
             }
