@@ -344,10 +344,25 @@ impl Sudoku {
                 clrtoeol();
 
                 in_game_menu.menu();
+                //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
                 let saved_pos: Cell = self.cursor_pos;
                 if (in_game_menu.get_window_resized()) {
                     self.printw();
                 }
+
+                //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
+                attron(COLOR_PAIR(MENU_SELECTION));
+                mvprintw(
+                    getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32,
+                    ORIGIN.x().into(),
+                    "m -> in-game menu"
+                );
+                attroff(COLOR_PAIR(MENU_SELECTION));
+                clrtoeol();
+
+                self.refresh();
+                self.cursor_pos = saved_pos;
+                self.reset_cursor();
                 //TODO
             }
         }
@@ -548,6 +563,15 @@ impl Sudoku {
                 );
             }
         }
+    }
+
+    /**
+     * Resets the cursor to its last officially recorded position. This is mainly used after
+     * needing to temporarily move to another cell to read or remove a value and gives the
+     * appearance that the cursor never moved at all.
+     */
+    fn reset_cursor (&self) {
+        mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
     }
 }
 
