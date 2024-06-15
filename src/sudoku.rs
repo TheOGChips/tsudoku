@@ -344,6 +344,8 @@ impl Sudoku {
                 clrtoeol();
 
                 in_game_menu.menu();
+                let saved_pos: Cell = self.cursor_pos;
+                if (in_game_menu.get_window_resized()) {}
                 //TODO
             }
         }

@@ -699,6 +699,14 @@ impl InGameMenu {
     }
 
     /**
+     * Lets the caller know whether the window was resized while in the in-game
+     * menu. True indicates the window was resized.
+     */
+    pub fn get_window_resized (&self) -> bool {
+        *self.window_resized.borrow()
+    }
+
+    /**
      * Clears the in-game menu display area.
      * 
      *      EDGE -> Line and column to start clearing from.
