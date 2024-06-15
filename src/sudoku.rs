@@ -345,7 +345,9 @@ impl Sudoku {
 
                 in_game_menu.menu();
                 let saved_pos: Cell = self.cursor_pos;
-                if (in_game_menu.get_window_resized()) {}
+                if (in_game_menu.get_window_resized()) {
+                    self.printw();
+                }
                 //TODO
             }
         }
@@ -514,6 +516,38 @@ impl Sudoku {
      */
     fn getch (&self) -> i32 {
         wgetch(stdscr())
+    }
+
+    /**
+     * Prints the entire sudoku puzzle (the display matrix) to the screen whenever
+     * there has been an update by the player (i.e. removal or insertion of a
+     * value).
+     */
+    fn printw (&mut self) {
+        for i in 0..DISPLAY_MATRIX_ROWS {
+            self.mv(Cell::new(i as u8, 0));
+            for j in 0..DISPLAY_MATRIX_COLUMNS {
+                if (self.color_codes[i][j] == CANDIDATES_Y ||
+                    self.color_codes[i][j] == CANDIDATES_B) {
+                        attron(A_BOLD());
+                    }
+                attron(COLOR_PAIR(self.color_codes[i][j]));
+                addstr(format!("{}", self.display_matrix[i][j]).as_str());
+                attroff(COLOR_PAIR(self.color_codes[i][j]));
+                attroff(A_BOLD());
+
+                if (j == 8 || j == 17) {
+                    addstr("|");
+                }
+            }
+            if (i == 8 || i == 17) {
+                mvprintw(
+                    i as i32 + ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
+                    ORIGIN.x().into(),
+                    "---------|---------|---------"
+                );
+            }
+        }
     }
 }
 
