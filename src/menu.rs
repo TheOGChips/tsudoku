@@ -710,7 +710,9 @@ impl InGameMenu {
     }
 
     /**
+     * Displays the rules of sudoku.
      * 
+     *      EDGE -> Line and column to start the display at.
      */
     fn display_rules (&self, EDGE: Cell) {
         let TITLE: &str = "RULES FOR PLAYING SUDOKU";
@@ -732,7 +734,7 @@ impl InGameMenu {
         display_offset += 1;
         for string in [RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_BOXES] {
             display_offset += 1;
-            self.screen_reader(EDGE, &string, display_offset);
+            self.screen_reader(EDGE, &string, &mut display_offset);
         }
     }
 
