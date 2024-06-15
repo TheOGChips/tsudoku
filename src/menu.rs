@@ -144,6 +144,8 @@ enum InGameMenuOption {
     MANUAL,
     /// Save the state of the current sudoku game
     SAVE_GAME,
+    /// Don't highlight any option
+    NONE,
 }
 
 impl InGameMenuOption {
@@ -842,6 +844,7 @@ impl Menu for InGameMenu {
                 InGameMenuOption::RULES => "View the rules of sudoku",
                 InGameMenuOption::MANUAL => "See game manual",
                 InGameMenuOption::SAVE_GAME => "Save current game",
+                InGameMenuOption::NONE => "",
             });
             if *opt == variant {
                 attroff(COLOR_PAIR(MENU_SELECTION));
@@ -883,7 +886,10 @@ impl Menu for InGameMenu {
                 match opt {
                     InGameMenuOption::RULES => self.display_rules(in_game_menu_left_edge),
                     InGameMenuOption::MANUAL => self.display_manual(in_game_menu_left_edge),
-                    InGameMenuOption::SAVE_GAME => ,
+                    InGameMenuOption::SAVE_GAME => {
+                        self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(InGameMenuOption::NONE));
+                    },
+                    InGameMenuOption::NONE => (),
                 }
             }
             else {
