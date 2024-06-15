@@ -135,7 +135,7 @@ pub mod display {
      * anything else, I just left it alone. I now suspect it has something to do with how NCurses
      * handles window resizing, and might not be fixable anyway.
      */
-    pub fn invalid_window_size_handler () {
+    pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
             register(SIGINT, || SIGINT_handler())
         }.expect("Error: Signal not found");
@@ -143,8 +143,11 @@ pub mod display {
         let mut y_max: i32 = 0;
         let mut x_max: i32 = 0;
         getmaxyx(stdscr(), &mut y_max, &mut x_max);
-
+        
         unsafe {
+            if (y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32) {
+                return false
+            }
             while y_max != WINDOW_REQ.y() as i32 || x_max != WINDOW_REQ.x() as i32 {
                 clear();
                 let msg1: &str = "The current window size is incorrect.";
@@ -172,6 +175,7 @@ pub mod display {
                 getmaxyx(stdscr(), &mut y_max, &mut x_max);
             }
             clear();
+            true
         }
     }
 
