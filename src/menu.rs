@@ -662,6 +662,7 @@ pub struct InGameMenu {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     window_resized: RefCell<bool>,
     IN_GAME_MENU_LEFT_EDGE: u8,
+    IN_GAME_MENU_TITLE_SPACING: u8,
 }
 
 impl InGameMenu {
@@ -677,6 +678,7 @@ impl InGameMenu {
             display_matrix: *display_matrix,
             window_resized: RefCell::new(false),
             IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
+            IN_GAME_MENU_TITLE_SPACING: 1,
         }
     }
 
@@ -704,6 +706,62 @@ impl InGameMenu {
         for y in in_game_menu_top_left..getmaxy(stdscr()) {
             mv(y, EDGE.x().into());
             clrtoeol();
+        }
+    }
+
+    /**
+     * 
+     */
+    fn display_rules (&self, EDGE: Cell) {
+        let TITLE: &str = "RULES FOR PLAYING SUDOKU";
+        let RULES_INTRO: String = format!("{} {} {} {} {}",
+            "Sudoku is a puzzle game using the numbers 1-9. The",
+            "puzzle board is a 9x9 grid that can be broken up evenly in 3",
+            "different ways: rows, columns, and 3x3 boxes. A completed sudoku",
+            "puzzle is one where each cell contains a number, but with the",
+            "following restrictions:"
+        );
+        let RULES_ROWS: String = String::from("1. Each row can only contain one each of the numbers 1-9");
+        let RULES_COLUMNS: String = String::from("2. Each column can only contain one each of the numbers 1-9");
+        let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+
+        mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+            EDGE.x() as i32,
+            TITLE);
+        display_offset += 1;
+        for string in [RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_BOXES] {
+            display_offset += 1;
+            self.screen_reader(EDGE, &string, display_offset);
+        }
+    }
+
+    /**
+     * Prints string of text to the screen in a nicely formatted way that makes it easy to read.
+     * This function parses the input string by spaces and determines when to start printing on a
+     * new line (i.e. if adding another word would overlap with the window border and ruin the
+     * sudoku board display).
+     * 
+     *      EDGE -> Line and column to start the display at.
+     *      str -> Input string to be printed in the in-game menu's display area.
+     *      display_offset -> Line offset to allow displaying correctly below the in-game menu
+     *                        title and options.
+     */
+    fn screen_reader (&self, EDGE: Cell, string: &str, display_offset: &mut i32) {
+        let mut display_str: String = String::new();
+        for word in string.split_whitespace() {
+            if display_str.len() + 1 + word.len() < unsafe { IN_GAME_MENU_DISPLAY_SPACING.into() } {
+                display_str.push_str(word);
+                display_str.push(' ');
+            }
+            else {
+                display_str.pop();  // NOTE: Pop the unnecessary extra space
+                mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
+                    EDGE.x().into(),
+                    &display_str);
+                *display_offset += 1;
+                display_str = String::new();
+            }
         }
     }
 }
@@ -775,7 +833,7 @@ impl Menu for InGameMenu {
                 let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
                 self.clear(in_game_menu_left_edge);
                 match opt {
-                    InGameMenuOption::RULES => ,
+                    InGameMenuOption::RULES => self.display_rules(in_game_menu_left_edge),
                     InGameMenuOption::MANUAL => ,
                     InGameMenuOption::SAVE_GAME => ,
                 }
