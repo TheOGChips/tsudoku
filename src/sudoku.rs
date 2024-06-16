@@ -4,8 +4,10 @@ use crate::{
             DISPLAY_MATRIX_ROWS,
             DISPLAY_MATRIX_COLUMNS,
             ORIGIN,
+            invalid_window_size_handler,
         },
         Cell,
+        KEY_ENTER,
     },
     menu::{
         DifficultyMenu,
@@ -49,6 +51,7 @@ use ncurses::{
     clrtoeol,
     echo, noecho,
     curs_set, CURSOR_VISIBILITY,
+    KEY_DOWN, KEY_RIGHT, KEY_DC, KEY_BACKSPACE,
 };
 use rand::{
     thread_rng,
@@ -323,7 +326,7 @@ impl Sudoku {
     /**
      * 
      */
-    fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
+    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
@@ -370,14 +373,35 @@ impl Sudoku {
                 self.refresh();
                 self.cursor_pos = saved_pos;
                 self.reset_cursor();
-                //TODO
             }
             else if input == 's' && !USE_IN_GAME_MENU {
                 self.save_game_prompt(DELAY);
+                self.reset_cursor();
+            }
+            else if (input as i32 >= KEY_DOWN && input as i32 <= KEY_RIGHT) ||
+                    input == 'a' || input == 's' || input == 'd' || input == 'w' {
+                //TODO                        
+            }
+            else if input >= '1' && input <= '9' {
                 //TODO
             }
+            else if input as i32 == KEY_DC || input as i32 == KEY_BACKSPACE {
+                //TODO
+            }
+            else if input as i32 == KEY_ENTER {
+                //TODO
+            }
+            else {
+                if invalid_window_size_handler() {
+                    let curr_pos: Cell = self.cursor_pos;
+                    self.printw();
+                    self.cursor_pos = curr_pos;
+                    self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
+                    self.reset_cursor();
+                }
+            }
         }
-        //TODO
+        nodelay(stdscr(), false);
     }
 
     /**

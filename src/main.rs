@@ -109,14 +109,16 @@ fn main() -> Result<(), &'static str> {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => {
-                    let puzzle: Sudoku = Sudoku::new();
+                    let mut puzzle: Sudoku = Sudoku::new(None);
+                    puzzle.start_game(use_in_game_menu, None);
+                    //TODO
                 },
                 MainMenuOption::RESUME_GAME => {
-                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
+                    /*let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                         //TODO: Finish this block after converting over NEW_GAME
-                    }
+                    }*/
                 },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,

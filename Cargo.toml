@@ -1,7 +1,15 @@
 [package]
 name = "tsudoku"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2021"
+authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
+description = "A terminal-friendly version of sudoku"
+readme = "README.md"
+repository = "https://github.com/TheOGChips/tsudoku"
+license = "GPL-3.0-or-later"
+keywords = ["sudoku", "TUI", "games", "puzzle"]
+categories = ["command-line-utilities", "games"]
+exclude = ["include/*.hpp", "src/*.cpp", "Makefile"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

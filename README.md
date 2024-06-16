@@ -1,5 +1,9 @@
 # tsudoku
 
+## Status Update: 16 June 2024
+
+`tsudoku` is currently in the transition process of converted from C++ to Rust. For a fully playable version, the latest C++ version can be built from the `main` branch of the `tsudoku` Github repository mentioned later in this README. Once the Rust port has been completed, the C++ version will no longer be maintained.. This README will be updated once the Rust version is fully playable.
+
 ## Description
 
 tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
