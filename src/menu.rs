@@ -612,7 +612,7 @@ impl Menu for DifficultyMenu {
             if *opt == variant {
                 attron(COLOR_PAIR(MENU_SELECTION));
             }
-            mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
+            mvprintw((EDGE.y() + i + 2) as i32, EDGE.x() as i32, match variant {
                 DifficultyMenuOption::EASY => "Easy",
                 DifficultyMenuOption::MEDIUM => "Medium",
                 DifficultyMenuOption::HARD => "Hard",
