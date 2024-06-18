@@ -60,7 +60,8 @@ use std::{
 
 //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
 /// The COLOR_PAIR associated with the current highlighted selection in the menu.
-pub const MENU_SELECTION: i16 = 1;
+pub const MAIN_MENU_SELECTION: i16 = 1;
+const DIFFICULTY_MENU_SELECTION: i16 = 2;
 
 /// A wrapper enum to enforce a certain type of MenuOption be used
 pub enum MenuOption {
@@ -219,7 +220,8 @@ impl Menu for MainMenu {
         mvprintw(Y_CENTER as i32 - 2, X_CENTER as i32, TITLE);
         for (i, variant) in MainMenuOption::enumerate() {
             if *opt == variant {
-                attron(COLOR_PAIR(MENU_SELECTION));
+                let status = attron(COLOR_PAIR(MAIN_MENU_SELECTION));
+                mvprintw(2, 2, format!("status: {}", status).as_str());
             }
             mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
                 MainMenuOption::NEW_GAME => "New Game",
@@ -228,7 +230,7 @@ impl Menu for MainMenu {
                 MainMenuOption::EXIT => "Exit",
             });
             if *opt == variant {
-                attroff(COLOR_PAIR(MENU_SELECTION));
+                attroff(COLOR_PAIR(MAIN_MENU_SELECTION));
             }
         }
         refresh();
@@ -255,6 +257,9 @@ impl Menu for MainMenu {
         //invalid_window_size_handler();
         //clear();
 
+        //TODO: For some reason, the menu selection highlighting is getting turned off
+        //      for the main menu completely after returning from the difficulty menu.
+        //      Highlighting in the difficulty menu is not affected.
         let max: Cell = Cell::new(y_max as u8, x_max as u8);
         let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
         //self.display_menu(&max, &opt);
@@ -311,7 +316,7 @@ impl MainMenu {
         keypad(stdscr(), true);
 
         start_color();
-        init_pair(MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
+        init_pair(MAIN_MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
 
         Self {
             BOTTOM_PADDING: TOP_PADDING,
@@ -525,7 +530,7 @@ impl Menu for SavedGameMenu {
         display_line += 2;
         for game in &self.saved_games {
             if self.selection.borrow().to_string() == *game {
-                attron(COLOR_PAIR(MENU_SELECTION));
+                //attron(COLOR_PAIR(MENU_SELECTION));
             }
             mvprintw(
                 display_line as i32,
@@ -534,7 +539,7 @@ impl Menu for SavedGameMenu {
                     .as_str()
             );
             if self.selection.borrow().to_string() == *game {
-                attroff(COLOR_PAIR(MENU_SELECTION));
+                //attroff(COLOR_PAIR(MENU_SELECTION));
             }
             display_line += 1;
         }
@@ -565,6 +570,7 @@ impl DifficultyMenu {
      * Returns the difficulty level the user has chosen to start the new game.
      */
     pub fn new () -> Self {
+        init_pair(DIFFICULTY_MENU_SELECTION, COLOR_BLACK, COLOR_WHITE);
         Self {
             difficulty_level: DifficultyMenuOption::EASY,
         }
@@ -610,7 +616,7 @@ impl Menu for DifficultyMenu {
         mvprintw(EDGE.y() as i32, EDGE.x() as i32, "CHOOSE DIFFICULTY SETTING");
         for (i, variant) in DifficultyMenuOption::enumerate() {
             if *opt == variant {
-                attron(COLOR_PAIR(MENU_SELECTION));
+                attron(COLOR_PAIR(DIFFICULTY_MENU_SELECTION));
             }
             mvprintw((EDGE.y() + i + 2) as i32, EDGE.x() as i32, match variant {
                 DifficultyMenuOption::EASY => "Easy",
@@ -619,7 +625,7 @@ impl Menu for DifficultyMenu {
                 DifficultyMenuOption::EXPERT => "Expert",
             });
             if *opt == variant {
-                attroff(COLOR_PAIR(MENU_SELECTION));
+                attroff(COLOR_PAIR(DIFFICULTY_MENU_SELECTION));
             }
         }
         refresh();
@@ -638,14 +644,14 @@ impl Menu for DifficultyMenu {
             self.display_menu(&Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::DIFFICULTY_MENU(diff));
             input = getch();
             diff = 
-                if input == KEY_DOWN || input == 's' as i32 {
+                if input == KEY_UP || input == 'w' as i32 {
                     match diff {
                         DifficultyMenuOption::EXPERT => DifficultyMenuOption::HARD,
                         DifficultyMenuOption::HARD => DifficultyMenuOption::MEDIUM,
                         _ => DifficultyMenuOption::EASY,
                     }
                 }
-                else if input == KEY_UP || input == 'w' as i32 {
+                else if input == KEY_DOWN || input == 's' as i32 {
                     match diff {
                         DifficultyMenuOption::EASY => DifficultyMenuOption::MEDIUM,
                         DifficultyMenuOption::MEDIUM => DifficultyMenuOption::HARD,
@@ -902,7 +908,7 @@ impl Menu for InGameMenu {
         mvprintw(EDGE.y() as i32, EDGE.x() as i32, "IN-GAME MENU");
         for (i, variant) in InGameMenuOption::enumerate() {
             if *opt == variant {
-                attron(COLOR_PAIR(MENU_SELECTION));
+                //attron(COLOR_PAIR(MENU_SELECTION));
             }
             mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
                 InGameMenuOption::RULES => "View the rules of sudoku",
@@ -911,7 +917,7 @@ impl Menu for InGameMenu {
                 InGameMenuOption::NONE => "",
             });
             if *opt == variant {
-                attroff(COLOR_PAIR(MENU_SELECTION));
+                //attroff(COLOR_PAIR(MENU_SELECTION));
             }
         }
         refresh();
