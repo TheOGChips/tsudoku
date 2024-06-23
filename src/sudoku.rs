@@ -563,7 +563,7 @@ impl Sudoku {
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
         //NOTE: Turn off cursor while displaying
-        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        display::curs_set(CURSOR_VISIBILITY::NONE);
         display::addstr(format!("{} saved!", name).as_str());
         display::refresh();
 
@@ -571,7 +571,7 @@ impl Sudoku {
         sleep(Duration::new(DELAY.into(), 0));
         display::mv(DISPLAY_LINE, 0);
         display::clrtoeol();
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
     }
 
     /**

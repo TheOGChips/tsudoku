@@ -209,8 +209,8 @@ pub mod display {
      * 
      */
     pub fn tui_end () {
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
-        pc::echo();
+        curs_set(CURSOR_VISIBILITY::BLOCK);
+        echo();
         pc::nocbreak();
         pc::endwin();
     }
@@ -253,17 +253,19 @@ pub mod display {
     /**
      * 
      */
-    //TODO: Change this to an enum and use with display::curs_set
-    pub mod CURSOR_VISIBILITY {
-        pub const NONE: i32 = 0;
-        pub const BLOCK: i32 = 2;
+    pub enum CURSOR_VISIBILITY {
+        NONE,
+        BLOCK,
     }
 
     /**
      * 
      */
-    pub fn curs_set (visibility: i32) {
-        pc::curs_set(visibility);
+    pub fn curs_set (visibility: CURSOR_VISIBILITY) {
+        pc::curs_set(match visibility {
+            CURSOR_VISIBILITY::NONE => 0,
+            CURSOR_VISIBILITY::BLOCK => 2,
+        });
     }
 
     /**
