@@ -399,11 +399,11 @@ impl Sudoku {
                     COLOR_PAIR::DEFAULT
                 };
 
+                display::color_set(&color_pair);
                 self.color_codes[i][j] = color_pair;
-                display::color_set(color_pair);
                 display::addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
                 if let Some(_) = SAVED_PUZZLE {
-                    display::color_set(COLOR_PAIR::DEFAULT);
+                    display::color_set(&COLOR_PAIR::DEFAULT);
                     display::bold_set(false);
                 }
 
@@ -433,10 +433,10 @@ impl Sudoku {
                 else {
                     COLOR_PAIR::UNKNOWN
                 };
+                display::color_set(&color_pair);
                 self.color_codes[row_index][column_index] = color_pair;
-                display::color_set(color_pair);
                 display::addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
-                display::color_set(COLOR_PAIR::DEFAULT);
+                display::color_set(&COLOR_PAIR::DEFAULT);
             }
         }
     }
@@ -514,9 +514,9 @@ impl Sudoku {
                     self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B) {
                         display::bold_set(true);
                     }
-                display::color_set(self.color_codes[i][j]);
+                display::color_set(&self.color_codes[i][j]);
                 display::addstr(format!("{}", self.display_matrix[i][j]).as_str());
-                display::color_set(COLOR_PAIR::DEFAULT);
+                display::color_set(&COLOR_PAIR::DEFAULT);
                 display::bold_set(false);
 
                 if (j == 8 || j == 17) {

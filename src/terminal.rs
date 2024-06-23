@@ -444,7 +444,7 @@ pub mod display {
     /**
      * 
      */
-    #[derive(Copy, Clone, PartialEq)]
+    #[derive(PartialEq)]
     pub enum COLOR_PAIR {
         DEFAULT,
         MAIN_MENU_SELECTION,
@@ -459,7 +459,7 @@ pub mod display {
     /**
      * 
      */
-    pub fn color_set (pair: COLOR_PAIR) {
+    pub fn color_set (pair: &COLOR_PAIR) {
         window.color_set(
             match pair {
                 COLOR_PAIR::DEFAULT => pair_code::DEFAULT,
