@@ -6,7 +6,8 @@ pub const KEY_ENTER: i32 = '\n' as i32;
 pub struct Cell (u8, u8);
 impl Cell {
     /**
-     * Returns a new Cell representing a cell in the terminal display. The terminal origin is at (0, 0).
+     * Returns a new Cell representing a cell in the terminal display. The terminal origin is at
+     * (0, 0).
      *
      *      row -> the row number of the Cell
      *      column -> the column number of the Cell
@@ -74,8 +75,8 @@ pub mod display {
     pub const LEFT_PADDING: u8 = ORIGIN.col_no();
 
     /**
-     * Minimum number of lines and columns required to properly display the terminal (27 for all cells
-     * of the display matrix, 2 for border lines/columns between boxes).
+     * Minimum number of lines and columns required to properly display the terminal (27 for all
+     * cells of the display matrix, 2 for border lines/columns between boxes).
      */
     pub const PUZZLE_SPACE: u8 = 29;
 
@@ -83,8 +84,8 @@ pub mod display {
     pub static mut WINDOW_REQ: Cell = Cell(0, 0);
 
     /**
-     * Empty space between puzzle and the in-game menu. Disabling the in-game menu changes the default
-     * value.
+     * Empty space between puzzle and the in-game menu. Disabling the in-game menu changes the
+     * default value.
      */
     pub static mut VERTICAL_DIVIDER: u8 = 4;
 
@@ -97,23 +98,12 @@ pub mod display {
     pub const DISPLAY_MATRIX_ROWS: usize = 27;
     pub const DISPLAY_MATRIX_COLUMNS: usize = DISPLAY_MATRIX_ROWS;
 
+    /**
+     * Global pancurses::Window object that controls the curses display. All wrapper functions in
+     * the `display` module use this object.
+     */ 
     const window: Lazy<pc::Window> = Lazy::new(|| pc::initscr());
-    //const window: pc::Window = pc::initscr());
-    /*struct Window {
-        window: pc::Window,
-    }
-    impl Window {
-        const fn new () -> Self {
-            let window = pc::initscr();
-            Self {
-                window: window,
-            }
-        }
-    }
-    unsafe impl Sync for Window {
-
-    }
-    static window: Window = Window::new();*/
+    
     /**
      * Sets the value of the vertical divider between the display puzzle and the in-game menu.
      *
@@ -127,20 +117,25 @@ pub mod display {
     /**
      * Sets the number of columns used to display the in-game menu.
      *
-     *      n -> The number of columns to be used to display the in-game menu. If the in-game menu is
-     *           disabled, the number of columns is set to 0.
+     *      n -> The number of columns to be used to display the in-game menu. If the in-game
+     *           menu is disabled, the number of columns is set to 0.
      */
     pub unsafe fn set_IN_GAME_MENU_DISPLAY_SPACING (n: u8) {
         IN_GAME_MENU_DISPLAY_SPACING = n;
     }
 
     /**
-     * Enforce window size on initial startup if terminal window is not already compliant. The user will
-     * be updated as to whether the window is the correct size or not after pressing the Enter key
-     * twice. The reason the Enter key must be hit twice is actually a bug I decided to make a feature.
-     * For some reason, it's required to hit twice only in this section. Since it doesn't affect
-     * anything else, I just left it alone. I now suspect it has something to do with how NCurses
-     * handles window resizing, and might not be fixable anyway.
+     * Enforce window size on initial startup if terminal window is not already compliant. The
+     * user will be updated as to whether the window is the correct size or not after pressing
+     * the Enter key twice. The reason the Enter key must be hit twice is actually a bug I
+     * decided to make a feature. For some reason, it's required to hit twice only in this
+     * section. Since it doesn't affect anything else, I just left it alone. I now suspect it
+     * has something to do with how NCurses handles window resizing, and might not be fixable
+     * anyway.
+     */
+    /* TODO: This doesn't appear to work inside the difficulty menu or when displaying the number
+             of completed games. In the difficulty menu, nothing displays until you select an
+             option. When displaying the number of completed games, the program "crashes".
      */
     pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
@@ -185,29 +180,22 @@ pub mod display {
     }
 
     /**
-     * Resets the terminal settings to their previous state from before the NCurses environment was
-     * initialized.
+     * Resets the terminal settings to their previous state from before the pancurses environment
+     * was initialized, then terminates the program.
      */
     fn SIGINT_handler () {
         tui_end();
         std::process::exit(0);
     }
 
-    //TODO: Change all values that are moveable to references if it makes sense
-    /**
-     * 
-     */
-    pub fn tui_init () /*-> pc::Window*/ {
-        //let window: pc::Window = pc::initscr();
+    /// Initializes the pancurses environment and the global pancurses::Window object.
+    pub fn tui_init () {
         pc::cbreak();
         pc::noecho();
         window.keypad(true);
-        //window
     }
 
-    /**
-     * 
-     */
+    /// Resets the terminal settings to the default before destroying pancurses environment.
     pub fn tui_end () {
         curs_set(CURSOR_VISIBILITY::BLOCK);
         echo();
@@ -216,50 +204,67 @@ pub mod display {
     }
 
     /**
-     * 
+     * Returns the highest (y, x) coordinates of the terminal window. These should correspond to
+     * the cell in the bottom right corner. This function is a wrapper around
+     * `pancurses::get_max_yx`.
      */
     pub fn get_max_yx () -> (i32, i32) {
         window.get_max_yx()
     }
 
     /**
-     * 
+     * Returns the highest y coordinate of the terminal window. This should correspond to the
+     * bottom row of the terminal. This function is a wrapper around `pancurses::get_max_y`.
      */
     pub fn get_max_y () -> i32 {
         window.get_max_y()
     }
 
     /**
-     * 
+     * Returns the current position of the cursor in (y, x) coordinate format. This is a wrapper
+     * around `pancurses::get_cur_yx`.
      */
     pub fn get_cur_yx () -> (i32, i32) {
         window.get_cur_yx()
     }
 
     /**
-     * 
+     * Clears the terminal window of all content. This is a wrapper around `pancurses::clear`.
      */
     pub fn clear () {
         window.clear();
     }
 
     /**
-     * 
+     * Clears all content from the cursor's current position to the end of the line the cursor
+     * is currently on. This is a wrapper around `pancurses::clrtoeol`.
      */
     pub fn clrtoeol () {
         window.clrtoeol();
     }
 
     /**
-     * 
+     * Variants of cursor visibility that can be toggled between. This partially emulates the
+     * `ncurses::CURSOR_VISIBILITY` enum.
      */
     pub enum CURSOR_VISIBILITY {
+        /** 
+         * Do not display the cursor at all. This is similar to
+         * `ncurses::CURSOR_VISIBILITY::CURSOR_INVISIBLE`.
+         */
         NONE,
+        /**
+         * Displays the cursor as a block (usually). This is similar to 
+         * `ncurses::CURSORY_VISIBILITY::VERY_VISIBLE`.
+         */
         BLOCK,
     }
 
     /**
+     * Toggles the visibility of the cursor. This is a wrapper around `pancurses::curs_set`,
+     * although the function signature intentionally looks exactly like `ncurses::curs_set`.
      * 
+     *      visibility -> Level of visibility of the cursor. See `display::CURSOR_VISIBILITY`.
      */
     pub fn curs_set (visibility: CURSOR_VISIBILITY) {
         pc::curs_set(match visibility {
@@ -269,21 +274,32 @@ pub mod display {
     }
 
     /**
+     * Prints a string starting from the cursor's current position. This is a wrapper around
+     * `pancurses::addstr`.
      * 
+     *      string -> The string to be printed. A string reference.
      */
     pub fn addstr (string: &str) {
         window.addstr(string);
     }
 
     /**
+     * Moves the cursor to a (y, x)-coordinate position and starts printing at that location.
      * 
+     *      y -> The row to start printing on.
+     *      x -> The column to start printing at.
+     *      string -> The string to be printed. A string reference.
      */
     pub fn mvprintw (y: i32, x: i32, string: &str) {
         window.mvprintw(y, x, string);
     }
 
     /**
+     * Clears the screen, moves to the (10, 10)-coordinates, prints a string, and blocks for
+     * user input before continuing on. This is used only for debugging purposes during
+     * development.
      * 
+     *      msg -> The string to be printed.
      */
     pub fn dbgprint (msg: &str) {
         clear();
@@ -293,28 +309,40 @@ pub mod display {
     }
 
     /**
-     * Updates the terminal display with any changes. This is a wrapper around the pancurses
-     * function of the same name.
+     * Updates the terminal display with any changes. This is a wrapper around
+     * `pancurses::refresh`.
      */
     pub fn refresh () {
         window.refresh();
     }
 
     /**
-     * 
+     * Possible inputs that can be received via `display::getch`. This partially imitates
+     * `pancurses::Input` and is not a full re-implementation. Only relevant values to this
+     * program are re-implemented.
      */
     #[derive(PartialEq)]
     pub enum Input {
+        /// A letter (e.g. 'a') or control (e.g. '\n') character
         Character(char),
+        /// The Enter key, although on Linux systems Character('\n') is returned instead.
         KeyEnter,
-        //TODO: Consider changing these to MoveUp, etc. and do a similar thing as with KeyEnter
+        /// The four arrow keys
         KeyUp, KeyDown, KeyLeft, KeyRight,
-        KeyBackspace, KeyDC,
+        /// The Backspace key
+        KeyBackspace,
+        /// The Delete key
+         KeyDC,
     }
 
     /**
-     * Returns the character at the current cursor position. This is a wrapper around the panurses
-     * function of the same name.
+     * Returns the next character entered by the user. This is a wrapper around 
+     * `pancurses::getch`. Returns an `Option<display::Input>` that is converted from an
+     * `Option<pancurses::Input>` with 2 special cases:
+     * 
+     *      1. Any key not represented in `display::Input` returns `None`.
+     *      2. Any character that could by identified by the Enter key returns
+     *         `Some(Input::KeyEnter)`.
      */
     pub fn getch () -> Option<Input> {
         //TODO: Return KeyEnter on \r, too
@@ -332,7 +360,18 @@ pub mod display {
     }
 
     /**
+     * Returns a string entered by the user up to a certain number of characters. Since
+     * `pancurses` does not currently implement this function, this is actually a partial (i.e.
+     * not perfect) reimplementation of `ncurses::getnstr`. This should account for the user's
+     * input properly, to include the use of the Backspace key, although the display might not
+     * properly represent it. Notably, only bare minimum functionality has been implemented, so
+     * conveniences like the use of the arrow keys and the Delete key are not handled and thus
+     * do nothing.
      * 
+     *      target -> The string that the user's input will be copied to. A `&mut String`.
+     *      max_len -> The maximum number of characters to copy from the user's input. After the
+     *                 user hits Enter, their input will be truncated down to this many
+     *                 characters.
      */
     pub fn getnstr (target: &mut String, max_len: usize) {
         let mut string: String = String::new();
@@ -363,28 +402,38 @@ pub mod display {
         *target = string;
     }
 
+    /**
+     * Numeric codes associated with `display::COLOR_PAIR`s. These are the codes used internally
+     * for initializing and toggling `display::COLOR_PAIR`s on the screen. Color pairs of
+     * candidate cells alternate depending on which guess or given cell they are adjacent to.
+     */
     pub mod pair_code {
-        //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
-        /// The COLOR_PAIR associated with the current highlighted selection in the menu.
+        /* NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no
+                 attribute on.
+         */
+        /// The uninteresting default of white text on black background.
         pub const DEFAULT: i16 = 1;
+        /// The currently highlighted option in the main menu.
         pub const MAIN_MENU_SELECTION: i16 = 2;
+        /// The currently highlighted option in the difficulty menu.
         pub const DIFFICULTY_MENU_SELECTION: i16 = 3;
-
-        /// Display matrix color codes
+        /// The default coloring of a `Sudoku` terminal `Cell`.
         pub const UNKNOWN: i16 = 11;
+        /// The color of a given clue (aka "hint") in a `Sudoku` puzzle.
         pub const GIVEN: i16 = 12;
+        /// One possible color option of a candidate cell.
         pub const CANDIDATES_Y: i16 = 13;
+        /// The other possible color option of a candidate cell.
         pub const CANDIDATES_B: i16 = 14;
+        /// The color of a guess cell.
         pub const GUESS: i16 = 15;
     }
 
-    //TODO: Update this doc comment since moving from menu.rs to here
     /**
-     * Establishes the color pairs used while printing anywhere in the display matrix.
-     * The color pair MENU_SELECTION is defined inside MainMenu.cpp, and its value is
-     * carried over throughout the rest of the program. In the case coloring is not
-     * available (in the event this somehow finds its way onto some old machine), a
-     * monochrome mode is also provided where everything but guesses are the same color.
+     * Establishes the color pairs used while printing anywhere in the display matrix. In the
+     * case coloring is not available (in the event this somehow finds its way onto some old
+     * machine), a monochrome mode is also provided where everything but guesses are the same
+     * color.
      */
     pub fn init_color_pairs () {
         pc::start_color();
@@ -409,35 +458,49 @@ pub mod display {
     }
 
     /**
+     * Moves the cursor the given (y, x)-coordinates. This is wrapper around `pancurses::mv`.
      * 
+     *      y -> The row to move to.
+     *      x -> The column to move to.
      */
     pub fn mv (y: i32, x: i32) {
         window.mv(y, x);
     }
 
     /**
+     * Sets a time to wait for user input before returning a default value from getter functions
+     * (e.g. `display::getch`). This is a wrapper around `pancurses::timeout`.
      * 
+     *      wait_time -> Time to wait for input in milliseconds.
      */
     pub fn timeout (wait_time: i32) {
         window.timeout(wait_time);
     }
 
     /**
+     * Controls whether to block on calls to `display::getch`. This is a wrapper around
+     * `pancurses::nodelay`.
      * 
+     *      no_delay -> Whether to delay or not (false or true, respectively).
      */
-    pub fn nodelay (to_delay: bool) {
-        window.nodelay(to_delay);
+    pub fn nodelay (no_delay: bool) {
+        window.nodelay(no_delay);
     }
 
     /**
+     * Amount of time to temporarily halt the program. This is a wrapper around
+     * `pancurses::napms`.
      * 
+     *      nap_time -> Amount of time to halt in milliseconds.
      */
     pub fn napms (nap_time: i32) {
         pc::napms(nap_time);
     }
 
     /**
+     * Toggles bold text on or off.
      * 
+     *      bold_on -> Whether to toggle bold text on or off (true or false, respectively).
      */
     pub fn bold_set (bold_on: bool) {
         if bold_on {
@@ -449,22 +512,37 @@ pub mod display {
     }
 
     /**
-     * 
+     * Options used by outside functions to request a change in color output in the terminal
+     * display.
      */
     #[derive(PartialEq)]
     pub enum COLOR_PAIR {
+        /// The uninteresting default of white text on black background.
         DEFAULT,
+        /// The currently highlighted option in the main menu.
         MAIN_MENU_SELECTION,
+        /// The currently highlighted option in the difficulty menu.
         DIFFICULTY_MENU_SELECTION,
+        /// The default coloring of a `Sudoku` terminal `Cell`.
         UNKNOWN,
+        /// The color of a given clue (aka "hint") in a `Sudoku` puzzle.
         GIVEN,
+        /// One possible color option of a candidate cell.
         CANDIDATES_Y,
+        /// The other possible color option of a candidate cell.
         CANDIDATES_B,
+        /// The color of a guess cell.
         GUESS,
     }
 
     /**
+     * Toggles the foreground and background color pair used when printing in the terminal
+     * display. The `display::COLOR_PAIR` variant requested is converted to a numeric code
+     * internally for use in actually setting the color pair. This is a wrapper around
+     * `pancurses::color_set`.
      * 
+     *      pair -> Foreground/background `display::COLOR_PAIR` variant used for requesting what
+     *              color pair to toggle on.
      */
     pub fn color_set (pair: &COLOR_PAIR) {
         window.color_set(
@@ -482,14 +560,16 @@ pub mod display {
     }
 
     /**
-     * 
+     * Toggles on the display of the characters the user types. This is a wrapper around
+     * `pancurses::echo`.
      */
     pub fn echo () {
         pc::echo();
     }
 
     /**
-     * 
+     * Toggles off the display of the characters the user types. This is a wrapper around
+     * `pancurses::noecho`.
      */
     pub fn noecho () {
         pc::noecho();
