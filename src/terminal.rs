@@ -413,10 +413,8 @@ pub mod display {
          */
         /// The uninteresting default of white text on black background.
         pub const DEFAULT: i16 = 1;
-        /// The currently highlighted option in the main menu.
-        pub const MAIN_MENU_SELECTION: i16 = 2;
-        /// The currently highlighted option in the difficulty menu.
-        pub const DIFFICULTY_MENU_SELECTION: i16 = 3;
+        /// The currently highlighted option in the current menu.
+        pub const MENU_SELECTION: i16 = 2;
         /// The default coloring of a `Sudoku` terminal `Cell`.
         pub const UNKNOWN: i16 = 11;
         /// The color of a given clue (aka "hint") in a `Sudoku` puzzle.
@@ -438,9 +436,7 @@ pub mod display {
     pub fn init_color_pairs () {
         pc::start_color();
         pc::init_pair(pair_code::DEFAULT, pc::COLOR_WHITE, pc::COLOR_BLACK);
-        pc::init_pair(pair_code::MAIN_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
-        //TODO: Test without this to see if it still works like originally
-        pc::init_pair(pair_code::DIFFICULTY_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+        pc::init_pair(pair_code::MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
         if pc::has_colors() {
             pc::init_pair(pair_code::UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
             pc::init_pair(pair_code::GIVEN, pc::COLOR_RED, pc::COLOR_BLACK);
@@ -519,10 +515,8 @@ pub mod display {
     pub enum COLOR_PAIR {
         /// The uninteresting default of white text on black background.
         DEFAULT,
-        /// The currently highlighted option in the main menu.
-        MAIN_MENU_SELECTION,
-        /// The currently highlighted option in the difficulty menu.
-        DIFFICULTY_MENU_SELECTION,
+        /// The currently highlighted option in the current menu.
+        MENU_SELECTION,
         /// The default coloring of a `Sudoku` terminal `Cell`.
         UNKNOWN,
         /// The color of a given clue (aka "hint") in a `Sudoku` puzzle.
@@ -548,8 +542,7 @@ pub mod display {
         window.color_set(
             match pair {
                 COLOR_PAIR::DEFAULT => pair_code::DEFAULT,
-                COLOR_PAIR::MAIN_MENU_SELECTION => pair_code::MAIN_MENU_SELECTION,
-                COLOR_PAIR::DIFFICULTY_MENU_SELECTION => pair_code::DIFFICULTY_MENU_SELECTION,
+                COLOR_PAIR::MENU_SELECTION => pair_code::MENU_SELECTION,
                 COLOR_PAIR::UNKNOWN => pair_code::UNKNOWN,
                 COLOR_PAIR::GIVEN => pair_code::GIVEN,
                 COLOR_PAIR::CANDIDATES_Y => pair_code::CANDIDATES_Y,

@@ -194,7 +194,7 @@ impl Menu for MainMenu {
         display::mvprintw(Y_CENTER as i32 - 2, X_CENTER as i32, TITLE);
         for (i, variant) in MainMenuOption::enumerate() {
             if *opt == variant {
-                display::color_set(&COLOR_PAIR::MAIN_MENU_SELECTION);
+                display::color_set(&COLOR_PAIR::MENU_SELECTION);
                 //mvprintw(2, 2, format!("status: {}", COLOR_PAIR(MAIN_MENU_SELECTION)).as_str());
             }
             display::mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
@@ -591,7 +591,7 @@ impl Menu for DifficultyMenu {
         display::mvprintw(EDGE.y() as i32, EDGE.x() as i32, "CHOOSE DIFFICULTY SETTING");
         for (i, variant) in DifficultyMenuOption::enumerate() {
             if *opt == variant {
-                display::color_set(&COLOR_PAIR::DIFFICULTY_MENU_SELECTION);
+                display::color_set(&COLOR_PAIR::MENU_SELECTION);
             }
             display::mvprintw((EDGE.y() + i + 2) as i32, EDGE.x() as i32, match variant {
                 DifficultyMenuOption::EASY => "Easy",
