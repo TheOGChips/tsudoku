@@ -12,15 +12,7 @@ use std::{
     path::PathBuf,
     ptr::null,
 };
-use ncurses::{
-    clear,
-    stdscr,
-    getmaxyx,
-    curs_set, CURSOR_VISIBILITY,
-    mvprintw,
-    refresh,
-    getch,
-};
+use pancurses as pc;
 use menu::{
     Menu,
     MenuOption,
@@ -33,6 +25,10 @@ use common::DIR;
 use sudoku::{
     Sudoku,
     SavedPuzzle,
+};
+use terminal::display::{
+    self,
+    CURSOR_VISIBILITY,
 };
 
 pub mod menu;
@@ -77,7 +73,7 @@ fn main() -> Result<(), &'static str> {
     }
     println!("use_in_game_menu: {}", use_in_game_menu);
     println!("delete_saved_games: {}", delete_saved_games);
-    println!("ncurses::KEY_ENTER: {}", ncurses::KEY_ENTER);
+    //println!("ncurses::KEY_ENTER: {}", ncurses::KEY_ENTER);
     //println!("KEY_ENTER: {}", KEY_ENTER);
 
     if delete_saved_games {
@@ -103,14 +99,15 @@ fn main() -> Result<(), &'static str> {
      */
     let _ = fs::create_dir(DIR());
 
-    let main_menu = MainMenu::new(use_in_game_menu);
+    let window: pc::Window = display::tui_init();
+    let main_menu = MainMenu::new(use_in_game_menu, &window);
     loop {
         if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => {
-                    let mut puzzle: Sudoku = Sudoku::new(None);
-                    puzzle.start_game(use_in_game_menu, None);
+                    /*let mut puzzle: Sudoku =*/ Sudoku::new(&window, None);
+                    //puzzle.start_game(use_in_game_menu, None);
                     //TODO
                 },
                 MainMenuOption::RESUME_GAME => {
@@ -120,7 +117,7 @@ fn main() -> Result<(), &'static str> {
                         //TODO: Finish this block after converting over NEW_GAME
                     }*/
                 },
-                MainMenuOption::SHOW_STATS => display_completed_puzzles(),
+                MainMenuOption::SHOW_STATS => display_completed_puzzles(&window),
                 MainMenuOption::EXIT => break,
             }
         }
@@ -154,7 +151,8 @@ fn main() -> Result<(), &'static str> {
         clear();
     }*/
 
-    clear();
+    window.clear();
+    pc::endwin();
     Ok(())
 }
 
@@ -162,7 +160,7 @@ fn main() -> Result<(), &'static str> {
  * Reads in the current number of games the player has successfully completed and then displays that
  * information to the screen in the terminal window.
  */
-fn display_completed_puzzles () {
+fn display_completed_puzzles (window: &pc::Window) {
     let num_completed = fs::read_to_string(DIR().join("completed_puzzles.txt"))
         .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
@@ -172,16 +170,22 @@ fn display_completed_puzzles () {
     let prompt1: String = format!("Completed Sudoku puzzles: {}", num_completed);
     let prompt2: &str = "Press Enter to continue";
 
-    let mut y_max: i32 = 0;
+    /*let mut y_max: i32 = 0;
     let mut x_max: i32 = 0;
-    getmaxyx(stdscr(), &mut y_max, &mut x_max);
+    getmaxyx(stdscr(), &mut y_max, &mut x_max);*/
+    let (y_max, x_max): (i32, i32) = window.get_max_yx();
 
-    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
-    clear();
-    mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, prompt1.as_str());
-    mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
-    refresh();
+    pc::curs_set(CURSOR_VISIBILITY::NONE);
+    window.clear();
+    window.mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, prompt1);
+    window.mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
+    window.refresh();
 
-    while getch() != terminal::KEY_ENTER {}
-    curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+    loop {
+        match window.getch().unwrap() {
+            pc::Input::Character('\n') | pc::Input::KeyEnter => break,
+            _ => (),
+        }
+    }
+    pc::curs_set(CURSOR_VISIBILITY::BLOCK);
 }

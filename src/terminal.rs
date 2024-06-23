@@ -57,21 +57,10 @@ pub mod display {
         consts::SIGINT,
         low_level::register,
     };
-    use ncurses::{
-        curs_set,
-        CURSOR_VISIBILITY,
-        echo,
-        nocbreak,
-        endwin,
-        getmaxyx,
-        stdscr,
-        clear,
-        mvprintw,
-        refresh,
-    };
+    use pancurses as pc;
     use std::{
-        thread::sleep,
-        time::Duration,
+        thread,
+        time,
     };
 
     /// Sudoku puzzle display origin coordinates (top left cell)
@@ -135,46 +124,44 @@ pub mod display {
      * anything else, I just left it alone. I now suspect it has something to do with how NCurses
      * handles window resizing, and might not be fixable anyway.
      */
-    pub fn invalid_window_size_handler () -> bool {
+    pub fn invalid_window_size_handler (window: &pc::Window) -> bool {
         let _ = unsafe {
             register(SIGINT, || SIGINT_handler())
         }.expect("Error: Signal not found");
 
-        let mut y_max: i32 = 0;
-        let mut x_max: i32 = 0;
-        getmaxyx(stdscr(), &mut y_max, &mut x_max);
+        let (mut y_max, mut x_max): (i32, i32) = window.get_max_yx();
         
         unsafe {
             if (y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32) {
                 return false
             }
             while y_max != WINDOW_REQ.y() as i32 || x_max != WINDOW_REQ.x() as i32 {
-                clear();
+                window.clear();
                 let msg1: &str = "The current window size is incorrect.";
                 let msg2: String = format!("Required dimensions: {} x {}",
                                             WINDOW_REQ.x(), WINDOW_REQ.y());
                 let msg3: String = format!("Current dimensions:  {} x {}", x_max, y_max);
                 let msg4: &str = "Resize the terminal window to the required dimensions to continue.";
-                mvprintw((y_max/2).into(),     x_max/2 - msg1.len() as i32/2, msg1);
-                mvprintw((y_max/2 + 2).into(), x_max/2 - msg2.len() as i32/2, msg2.as_str());
-                mvprintw((y_max/2 + 3).into(), x_max/2 - msg3.len() as i32/2, msg3.as_str());
+                window.mvprintw((y_max/2).into(),     x_max/2 - msg1.len() as i32/2, msg1);
+                window.mvprintw((y_max/2 + 2).into(), x_max/2 - msg2.len() as i32/2, msg2.as_str());
+                window.mvprintw((y_max/2 + 3).into(), x_max/2 - msg3.len() as i32/2, msg3.as_str());
 
                 if msg4.len() as i32 > x_max {
                     let PARTITION: usize = 30;
-                    mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32/2,
+                    window.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32/2,
                                 msg4.get(..PARTITION).unwrap());
-                    mvprintw((y_max/2 + 6).into(), x_max/2 - msg4.len() as i32/2,
+                    window.mvprintw((y_max/2 + 6).into(), x_max/2 - msg4.len() as i32/2,
                                 msg4.get(PARTITION..).unwrap());
                 }
                 else {
-                    mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32 / 2, msg4);
+                    window.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32 / 2, msg4);
                 }
 
-                refresh();
-                sleep(Duration::from_millis(100));
-                getmaxyx(stdscr(), &mut y_max, &mut x_max);
+                window.refresh();
+                thread::sleep(time::Duration::from_millis(100));
+                (y_max, x_max) = window.get_max_yx();
             }
-            clear();
+            window.clear();
             true
         }
     }
@@ -184,10 +171,108 @@ pub mod display {
      * initialized.
      */
     fn SIGINT_handler () {
-        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
-        echo();
-        nocbreak();
-        endwin();
+        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        pc::echo();
+        pc::nocbreak();
+        pc::endwin();
         std::process::exit(0);
+    }
+
+    /**
+     * 
+     */
+    pub fn tui_init () -> pc::Window {
+        let window: pc::Window = pc::initscr();
+        pc::cbreak();
+        pc::noecho();
+        window.keypad(true);
+        window
+    }
+
+    /**
+     * 
+     */
+    pub mod CURSOR_VISIBILITY {
+        pub const NONE: i32 = 0;
+        pub const BLOCK: i32 = 2;
+    }
+
+    /**
+     * 
+     */
+    pub fn getnstr (window: &pc::Window, target: &mut String, max_len: usize) {
+        let mut string: String = String::new();
+        let mut count: usize = 0;
+        loop {
+            match window.getch() {
+                Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,
+                Some(pc::Input::KeyBackspace) => {
+                    string.pop();
+                    count -= if count > 0 {
+                        1
+                    } else {
+                        0
+                    };
+                    window.addstr(" ");
+                    let (y, x): (i32, i32) = window.get_cur_yx();
+                    window.mv(y, x - 1);
+                },
+                Some(pc::Input::Character(c)) => {
+                    if count < max_len {
+                        string.push(c);
+                        count += 1;
+                    }
+                },
+                _ => (),
+            }
+        }
+        *target = string;
+    }
+
+    pub mod pair {
+        //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
+        /// The COLOR_PAIR associated with the current highlighted selection in the menu.
+        pub const DEFAULT: i16 = 1;
+        pub const MAIN_MENU_SELECTION: i16 = 2;
+        pub const DIFFICULTY_MENU_SELECTION: i16 = 3;
+    }
+
+    /**
+     * 
+     */
+    pub fn init_color_pairs () {
+        pc::start_color();
+        pc::init_pair(pair::DEFAULT, pc::COLOR_WHITE, pc::COLOR_BLACK);
+        pc::init_pair(pair::MAIN_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+        pc::init_pair(pair::DIFFICULTY_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+    }
+
+    /**
+     * 
+     */
+    pub enum COLOR_ATTR {
+        DEFAULT,
+        MAIN_MENU_SELECTION,
+        DIFFICULTY_MENU_SELECTION,
+    }
+
+    /**
+     * 
+     */
+    pub fn attron (window: &pc::Window, attr: COLOR_ATTR) {
+        window.color_set(
+            match attr {
+                COLOR_ATTR::DEFAULT => pair::DEFAULT,
+                COLOR_ATTR::MAIN_MENU_SELECTION => pair::MAIN_MENU_SELECTION,
+                COLOR_ATTR::DIFFICULTY_MENU_SELECTION => pair::DIFFICULTY_MENU_SELECTION,
+            }
+        );
+    }
+
+    /**
+     * 
+     */
+    pub fn attroff (window: &pc::Window, attr: COLOR_ATTR) {
+        window.color_set(pair::DEFAULT);
     }
 }

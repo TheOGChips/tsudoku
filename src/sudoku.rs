@@ -1,6 +1,8 @@
 use crate::{
     terminal::{
         display::{
+            self,
+            CURSOR_VISIBILITY,
             DISPLAY_MATRIX_ROWS,
             DISPLAY_MATRIX_COLUMNS,
             ORIGIN,
@@ -14,44 +16,17 @@ use crate::{
         Menu,
         DifficultyMenuOption,
         MenuOption,
-        MENU_SELECTION,
+        //MENU_SELECTION,
         InGameMenu,
     },
 };
+use pancurses as pc;
 use std::{
     collections::HashMap,
     array::from_fn,
     cell::RefCell,
     thread::sleep,
     time::Duration,
-};
-use ncurses::{
-    has_colors,
-    init_pair,
-    COLOR_WHITE,
-    COLOR_BLACK,
-    COLOR_RED,
-    COLOR_YELLOW,
-    COLOR_BLUE,
-    COLOR_GREEN,
-    mv,
-    stdscr,
-    getyx,
-    attron,
-    attroff,
-    A_BOLD,
-    COLOR_PAIR,
-    addstr,
-    mvprintw,
-    getmaxy,
-    refresh,
-    nodelay,
-    timeout,
-    wgetch, getnstr,
-    clrtoeol,
-    echo, noecho,
-    curs_set, CURSOR_VISIBILITY,
-    KEY_DOWN, KEY_RIGHT, KEY_DC, KEY_BACKSPACE,
 };
 use rand::{
     thread_rng,
@@ -165,7 +140,7 @@ impl SavedPuzzle {
  *                          surrounding (i.e. border) cells along with a constant for the number of
  *                          border positions.
  */
-pub struct Sudoku {
+pub struct Sudoku<'a> {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     color_codes: [[i16; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     grid: Grid,
@@ -175,19 +150,20 @@ pub struct Sudoku {
     cursor_pos: Cell,
     display_matrix_offset: HashMap<Cell, Cell>,
     save_file_name: RefCell<String>,
+    window: &'a pc::Window,
 }
 
-impl Sudoku {
+impl<'a> Sudoku<'a> {
     /**
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (saved_puzzle: Option<&SavedPuzzle>) -> Self {
+    pub fn new (window: &pc::Window, saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
         let (grid2display, display2grid) = Self::create_maps();
         Self::set_color_pairs();
-        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
+        let (display_matrix, grid) = Self::init_display_matrix(window, saved_puzzle, &grid2display);
         //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
-        Self {
+        /*Self {
             display_matrix: display_matrix,
             color_codes: todo!()/*[[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]*/,
             grid: grid,
@@ -197,7 +173,7 @@ impl Sudoku {
             cursor_pos: ORIGIN,
             display_matrix_offset: todo!()/*HashMap::new()*/,
             save_file_name: todo!() /* String::new() */,
-        }
+        }*/
     }
 
     /**
@@ -240,19 +216,19 @@ impl Sudoku {
      * monochrome mode is also provided where everything but guesses are the same color.
      */
     fn set_color_pairs () {
-        if has_colors() {
-            init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-            init_pair(GIVEN, COLOR_RED, COLOR_BLACK);
-            init_pair(CANDIDATES_Y, COLOR_YELLOW, COLOR_BLACK);
-            init_pair(CANDIDATES_B, COLOR_BLUE, COLOR_BLACK);
-            init_pair(GUESS, COLOR_GREEN, COLOR_BLACK);
+        if pc::has_colors() {
+            pc::init_pair(UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(GIVEN, pc::COLOR_RED, pc::COLOR_BLACK);
+            pc::init_pair(CANDIDATES_Y, pc::COLOR_YELLOW, pc::COLOR_BLACK);
+            pc::init_pair(CANDIDATES_B, pc::COLOR_BLUE, pc::COLOR_BLACK);
+            pc::init_pair(GUESS, pc::COLOR_GREEN, pc::COLOR_BLACK);
         }
         else {  //Monochrome mode
-            init_pair(UNKNOWN, COLOR_WHITE, COLOR_BLACK);
-            init_pair(GIVEN, COLOR_BLACK, COLOR_WHITE); //Reversed to better stand out
-            init_pair(CANDIDATES_Y, COLOR_WHITE, COLOR_BLACK);
-            init_pair(CANDIDATES_B, COLOR_WHITE, COLOR_BLACK);
-            init_pair(GUESS, COLOR_WHITE, COLOR_BLACK);
+            pc::init_pair(UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE); //Reversed to better stand out
+            pc::init_pair(CANDIDATES_Y, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(CANDIDATES_B, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(GUESS, pc::COLOR_WHITE, pc::COLOR_BLACK);
         }
     }
 
@@ -265,7 +241,7 @@ impl Sudoku {
      *                      this will be a nullptr. If the user has selected to resume a
      *                      saved game, this object will be read in beforehand.
      */
-    fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
+    fn init_display_matrix (window: &pc::Window, saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
         -> ([[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS], Grid) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
@@ -307,7 +283,7 @@ impl Sudoku {
                 let mut mat: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
                     [[' ' as u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
 
-                let mut diff_menu: DifficultyMenu = DifficultyMenu::new();
+                let mut diff_menu: DifficultyMenu = DifficultyMenu::new(&window);
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
                     diff_menu.set_difficulty_level(diff);
                 }
@@ -332,76 +308,83 @@ impl Sudoku {
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
-        mv(ORIGIN.y().into(), ORIGIN.x().into());
+        self.window.mv(ORIGIN.y().into(), ORIGIN.x().into());
         self.cursor_pos.set(ORIGIN.y(), ORIGIN.x());
         self.refresh();
 
         let mut quit_game: bool = false;
         //nodelay(stdscr, true);
-        timeout(250);
+        self.window.timeout(250);
         while !quit_game {
-            let input: char = (self.getch() as u8 as char).to_ascii_lowercase();
-            if input == 'q' {
-                quit_game = true;
-            }
-            else if input == 'm' && USE_IN_GAME_MENU {
-                //TODO: Make this reusable somehow like in the C++ version...
-                let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
+            let input: Option<pc::Input> = self.window.getch();
+            match input {
+                Some(pc::Input::Character('q')) |
+                Some(pc::Input::Character('Q')) => quit_game = true,
+                Some(pc::Input::Character('m')) |
+                Some(pc::Input::Character('M')) => if USE_IN_GAME_MENU {
+                    //TODO: Make this reusable somehow like in the C++ version...
+                    let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix, &self.window);
 
-                attron(COLOR_PAIR(MENU_SELECTION));
-                mvprintw(getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
-                attroff(COLOR_PAIR(MENU_SELECTION));
-                clrtoeol();
+                    //attron(COLOR_PAIR(MENU_SELECTION));
+                    self.window.mvprintw(self.window.get_max_y() - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
+                    //attroff(COLOR_PAIR(MENU_SELECTION));
+                    self.window.clrtoeol();
 
-                in_game_menu.menu();
-                //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
-                let saved_pos: Cell = self.cursor_pos;
-                if (in_game_menu.get_window_resized()) {
-                    self.printw();
+                    in_game_menu.menu();
+                    //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
+                    let saved_pos: Cell = self.cursor_pos;
+                    if (in_game_menu.get_window_resized()) {
+                        self.printw();
+                    }
+
+                    //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
+                    //attron(COLOR_PAIR(MENU_SELECTION));
+                    self.window.mvprintw(
+                        self.window.get_max_y() - LINE_OFFSET_TWEAK as i32,
+                        ORIGIN.x().into(),
+                        "m -> in-game menu"
+                    );
+                    //attroff(COLOR_PAIR(MENU_SELECTION));
+                    self.window.clrtoeol();
+
+                    self.refresh();
+                    self.cursor_pos = saved_pos;
+                    self.reset_cursor();
+                },
+                Some(pc::Input::Character('s')) |
+                Some(pc::Input::Character('S')) => if !USE_IN_GAME_MENU {
+                    self.save_game_prompt(DELAY);
+                    self.reset_cursor();
+                },
+                Some(pc::Input::KeyUp)    | Some(pc::Input::Character('w')) |
+                Some(pc::Input::KeyDown)  | Some(pc::Input::Character('s')) |
+                Some(pc::Input::KeyLeft)  | Some(pc::Input::Character('a')) |
+                Some(pc::Input::KeyRight) | Some(pc::Input::Character('d')) => {
+                    //TODO
+                },
+                Some(pc::Input::Character('1')) | Some(pc::Input::Character('2')) |
+                Some(pc::Input::Character('3')) | Some(pc::Input::Character('4')) |
+                Some(pc::Input::Character('5')) | Some(pc::Input::Character('6')) |
+                Some(pc::Input::Character('7')) | Some(pc::Input::Character('8')) |
+                Some(pc::Input::Character('9')) => {
+                    //TODO
+                },
+                Some(pc::Input::KeyBackspace) | Some(pc::Input::KeyDC) => {
+                    //TODO
                 }
-
-                //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
-                attron(COLOR_PAIR(MENU_SELECTION));
-                mvprintw(
-                    getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32,
-                    ORIGIN.x().into(),
-                    "m -> in-game menu"
-                );
-                attroff(COLOR_PAIR(MENU_SELECTION));
-                clrtoeol();
-
-                self.refresh();
-                self.cursor_pos = saved_pos;
-                self.reset_cursor();
-            }
-            else if input == 's' && !USE_IN_GAME_MENU {
-                self.save_game_prompt(DELAY);
-                self.reset_cursor();
-            }
-            else if (input as i32 >= KEY_DOWN && input as i32 <= KEY_RIGHT) ||
-                    input == 'a' || input == 's' || input == 'd' || input == 'w' {
-                //TODO                        
-            }
-            else if input >= '1' && input <= '9' {
-                //TODO
-            }
-            else if input as i32 == KEY_DC || input as i32 == KEY_BACKSPACE {
-                //TODO
-            }
-            else if input as i32 == KEY_ENTER {
-                //TODO
-            }
-            else {
-                if invalid_window_size_handler() {
+                Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => {
+                    //TODO
+                }
+                _ => if invalid_window_size_handler(self.window) {
                     let curr_pos: Cell = self.cursor_pos;
                     self.printw();
                     self.cursor_pos = curr_pos;
                     self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
                     self.reset_cursor();
                 }
-            }
+            };
         }
-        nodelay(stdscr(), false);
+        self.window.nodelay(false);
     }
 
     /**
@@ -430,11 +413,12 @@ impl Sudoku {
                         'u' => UNKNOWN,
                         'r' => GIVEN,
                         'y' => {
-                            attron(A_BOLD());
+                            //nc::attron(nc::A_BOLD);
+                            self.window.attron(pc::A_BOLD);
                             CANDIDATES_Y
                         },
                         'b' => {
-                            attron(A_BOLD());
+                            self.window.attron(pc::A_BOLD);
                             CANDIDATES_B
                         },
                         'g' => GUESS,
@@ -446,19 +430,19 @@ impl Sudoku {
                 };
 
                 self.color_codes[i][j] = color_pair;
-                attron(COLOR_PAIR(color_pair));
-                addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
+                self.window.color_set(color_pair);
+                self.window.addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
                 if let Some(_) = SAVED_PUZZLE {
-                    attroff(COLOR_PAIR(color_pair));
-                    attroff(A_BOLD());
+                    self.window.color_set(display::pair::DEFAULT);
+                    self.window.attroff(pc::A_BOLD);
                 }
 
                 if j == 8 || j == 17 {
-                    addstr("|");
+                    self.window.addstr("|");
                 }
             }
             if i == 8 || i == 17 {
-                mvprintw(
+                self.window.mvprintw(
                     (i as u8 + ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
                     ORIGIN.x() as i32,
                     "---------|---------|---------"
@@ -480,9 +464,9 @@ impl Sudoku {
                     UNKNOWN
                 };
                 self.color_codes[row_index][column_index] = color_pair;
-                attron(COLOR_PAIR(color_pair));
-                addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
-                attroff(COLOR_PAIR(color_pair));
+                self.window.color_set(color_pair);
+                self.window.addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
+                self.window.color_set(display::pair::DEFAULT);
             }
         }
     }
@@ -497,12 +481,10 @@ impl Sudoku {
     fn mv (&mut self, COORDS: Cell) {
         let TOTAL_OFFSETY: i32 = (COORDS.y() + ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
         let TOTAL_OFFSETX: i32 = (COORDS.x() + ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
-        mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
+        self.window.mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
 
         //NOTE: Update cursor_pos after moving
-        let mut new_cursor_y: i32 = 0;
-        let mut new_cursor_x: i32 = 0;
-        getyx(stdscr(), &mut new_cursor_y, &mut new_cursor_x);
+        let (new_cursor_y, new_cursor_x): (i32, i32) = self.window.get_cur_yx();
         self.cursor_pos.set(new_cursor_y as u8, new_cursor_x as u8);
     }
 
@@ -518,9 +500,7 @@ impl Sudoku {
      *       called.
      */
     fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
-        let mut y: i32 = 0;
-        let mut x: i32 = 0;
-        getyx(stdscr(), &mut y, &mut x);
+        let (y, x): (i32, i32) = self.window.get_cur_yx();
         self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
     }
 
@@ -542,13 +522,13 @@ impl Sudoku {
         else {
             "m -> in-game menu"
         };
-        attron(COLOR_PAIR(MENU_SELECTION));
-        mvprintw(
-            getmaxy(stdscr()) - LINE_OFFSET_TWEAK as i32,
+        //attron(COLOR_PAIR(MENU_SELECTION));
+        self.window.mvprintw(
+            self.window.get_max_y() - LINE_OFFSET_TWEAK as i32,
             ORIGIN.x().into(),
             hotkey_string,
         );
-        attroff(COLOR_PAIR(MENU_SELECTION));
+        //attroff(COLOR_PAIR(MENU_SELECTION));
     }
 
     /**
@@ -556,7 +536,7 @@ impl Sudoku {
      * function of the same name.
      */
     fn refresh (&self) {
-        refresh();
+        self.window.refresh();
     }
 
     /**
@@ -564,8 +544,8 @@ impl Sudoku {
      * macro function of the same name. The underlying call to NCurses wgetch(stdscr) seen here
      * is the same functionality as the original NCurses getch.
      */
-    fn getch (&self) -> i32 {
-        wgetch(stdscr())
+    fn getch (&self) -> Option<pc::Input> {
+        self.window.getch()
     }
 
     /**
@@ -579,19 +559,19 @@ impl Sudoku {
             for j in 0..DISPLAY_MATRIX_COLUMNS {
                 if (self.color_codes[i][j] == CANDIDATES_Y ||
                     self.color_codes[i][j] == CANDIDATES_B) {
-                        attron(A_BOLD());
+                        self.window.attron(pc::A_BOLD);
                     }
-                attron(COLOR_PAIR(self.color_codes[i][j]));
-                addstr(format!("{}", self.display_matrix[i][j]).as_str());
-                attroff(COLOR_PAIR(self.color_codes[i][j]));
-                attroff(A_BOLD());
+                self.window.color_set(self.color_codes[i][j]);
+                self.window.addstr(format!("{}", self.display_matrix[i][j]).as_str());
+                self.window.color_set(display::pair::DEFAULT);
+                self.window.attroff(pc::A_BOLD);
 
                 if (j == 8 || j == 17) {
-                    addstr("|");
+                    self.window.addstr("|");
                 }
             }
             if (i == 8 || i == 17) {
-                mvprintw(
+                self.window.mvprintw(
                     i as i32 + ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
                     ORIGIN.x().into(),
                     "---------|---------|---------"
@@ -606,7 +586,7 @@ impl Sudoku {
      * appearance that the cursor never moved at all.
      */
     fn reset_cursor (&self) {
-        mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
+        self.window.mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
     }
 
     /**
@@ -619,39 +599,39 @@ impl Sudoku {
      */
     fn save_game_prompt (&self, DELAY: u8) {
         let DISPLAY_LINE: i32 = ORIGIN.y() as i32 + DISPLAY_MATRIX_ROWS as i32 + 3;
-        mv(DISPLAY_LINE, 1);
-        clrtoeol();
-        addstr("Enter save file name: ");
+        self.window.mv(DISPLAY_LINE, 1);
+        self.window.clrtoeol();
+        self.window.addstr("Enter save file name: ");
 
         /* NOTE: Copy the display matrix int oa pointer in order to pass along to
          *       InGameMenu::save_game
          */
         let name = self.save_game();
-        mv(DISPLAY_LINE, 1);
-        clrtoeol();
+        self.window.mv(DISPLAY_LINE, 1);
+        self.window.clrtoeol();
         //NOTE: Turn off cursor while displaying
-        curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
-        addstr(format!("{} saved!", name).as_str());
+        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        self.window.addstr(format!("{} saved!", name).as_str());
         self.refresh();
 
         //NOTE: Clear output after a delay
         sleep(Duration::new(DELAY.into(), 0));
-        mv(DISPLAY_LINE, 0);
-        clrtoeol();
-        curs_set(CURSOR_VISIBILITY::CURSOR_VISIBLE);
+        self.window.mv(DISPLAY_LINE, 0);
+        self.window.clrtoeol();
+        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
     }
 
     /**
      * 
      */
     fn save_game (&self) -> String {
-        let NAME_SIZE: i32 = 18;                //NOTE: NAME_SIZE limited by window width
+        let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
         let mut name: String = String::new();   //      requirements of no in-game menu mode
-        nodelay(stdscr(), false);
-        echo();
-        getnstr(&mut name, NAME_SIZE - 1);
-        noecho();
-        nodelay(stdscr(), true);
+        self.window.nodelay(false);
+        pc::echo();
+        display::getnstr(&self.window, &mut name, NAME_SIZE - 1);
+        pc::noecho();
+        self.window.nodelay(true);
 
         /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
          *       message will be handled by the calling function.

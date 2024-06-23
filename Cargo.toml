@@ -1,6 +1,6 @@
 [package]
 name = "tsudoku"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"
@@ -15,7 +15,7 @@ exclude = ["include/*.hpp", "src/*.cpp", "Makefile"]
 
 [dependencies]
 clap = { version = "4.4.4", features = ["cargo"] }
-ncurses = "5.101.0"
+pancurses = "0.17.0"
 queues = "1.1.0"
 rand = "0.8.5"
 signal-hook = "0.3.17"
