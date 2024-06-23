@@ -9,7 +9,6 @@ use crate::{
             ORIGIN,
         },
         Cell,
-        KEY_ENTER,
     },
     menu::{
         DifficultyMenu,
@@ -25,14 +24,10 @@ use std::{
     collections::HashMap,
     array::from_fn,
     cell::RefCell,
-    time::Duration,
 };
 use rand::{
     thread_rng,
-    distributions::{
-        Distribution,
-        Uniform,
-    },
+    distributions::Uniform,
     seq::SliceRandom,
 };
 use queues::{
@@ -48,7 +43,7 @@ const GRID_SIZE: u8 = 81;
 const NUM_CONTAINERS: u8 = 9;
 const CONTAINER_SIZE: u8 = 9;
 
-enum neighbor_cells {
+enum _neighbor_cells {
     TL,
     T,
     TR,
@@ -59,8 +54,8 @@ enum neighbor_cells {
     BR,
 }
 
-impl neighbor_cells {
-    const fn NUM_BORDER_POSITIONS () -> u8 {
+impl _neighbor_cells {
+    const fn _NUM_BORDER_POSITIONS () -> u8 {
         8
     }
 }
@@ -151,8 +146,8 @@ impl Sudoku {
      */
     pub fn new (saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
         display::init_color_pairs();
-        let (grid2display, display2grid) = Self::create_maps();
-        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
+        let (grid2display, _display2grid) = Self::create_maps();
+        let (_display_matrix, _grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
         //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
         /*Self {
             display_matrix: display_matrix,
@@ -245,7 +240,7 @@ impl Sudoku {
          *  26,0                                         |                                                      |
          */
         match saved_puzzle {
-            Some(puzzle) => todo!(),
+            Some(_puzzle) => todo!(),
             None => {
                 let mut mat: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
                     [[' ' as u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
@@ -300,7 +295,7 @@ impl Sudoku {
                     in_game_menu.menu();
                     //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
                     let saved_pos: Cell = self.cursor_pos;
-                    if (in_game_menu.get_window_resized()) {
+                    if in_game_menu.get_window_resized() {
                         self.printw();
                     }
 
@@ -509,8 +504,8 @@ impl Sudoku {
         for i in 0..DISPLAY_MATRIX_ROWS {
             self.mv(Cell::new(i as u8, 0));
             for j in 0..DISPLAY_MATRIX_COLUMNS {
-                if (self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_Y ||
-                    self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B) {
+                if self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_Y ||
+                   self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B {
                         display::bold_set(true);
                     }
                 display::color_set(&self.color_codes[i][j]);
@@ -518,11 +513,11 @@ impl Sudoku {
                 display::color_set(&COLOR_PAIR::DEFAULT);
                 display::bold_set(false);
 
-                if (j == 8 || j == 17) {
+                if j == 8 || j == 17 {
                     display::addstr("|");
                 }
             }
-            if (i == 8 || i == 17) {
+            if i == 8 || i == 17 {
                 display::mvprintw(
                     i as i32 + ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
                     ORIGIN.x().into(),
@@ -612,9 +607,9 @@ impl Grid {
      * Creates an empty Sudoku grid. This helps facilitate some of the later setup functions in
      * `Grid::new`.
      * 
-     *      diff -> Enum value of difficulty level chosen by the user from the main menu.
+     *      unused DifficultyMenuOption -> Enum value of difficulty level chosen by the user from the main menu.
      */
-    fn init (diff: DifficultyMenuOption) -> Self {
+    fn init (_: DifficultyMenuOption) -> Self {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
@@ -705,9 +700,9 @@ impl Grid {
      * Generates and returns a solved sudoku puzzle. This puzzle is later used to created a
      * solvable puzzle. The puzzle is generated randomly using a Mersenne-Twister engine.
      * 
-     *      SEED -> Seed for the pseudo-random number sequence
+     *      unused `&i32` -> Seed for the pseudo-random number sequence
      */
-    fn generate_solved_puzzle (&mut self, seed: &i32) -> [u8; GRID_SIZE as usize] {
+    fn generate_solved_puzzle (&mut self, _: &i32) -> [u8; GRID_SIZE as usize] {
         //TODO: Is there an easy way to "flatten" a matrix into an array (2D -> 1D)?
         let mut soln: [u8; GRID_SIZE as usize] = [0; GRID_SIZE as usize];
 
@@ -720,7 +715,7 @@ impl Grid {
                                                         *       created by rand.
                                                         */
         //NOTE: Random numbers with values of 1-81 will be uniformly generated.
-        let dist = Uniform::new_inclusive(1, CONTAINER_SIZE + 1);
+        let _ = Uniform::new_inclusive(1, CONTAINER_SIZE + 1);
         let mut values: [u8; CONTAINER_SIZE as usize] = from_fn(|i| i as u8 + 1);
 
         /* NOTE: Fill in boxes along the diagonal first.On an empty puzzle, boxes 1, 5, and 9 are
@@ -774,7 +769,7 @@ impl Grid {
             }
         );
 
-        let soln_found: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
+        let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
         
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
@@ -870,7 +865,7 @@ impl Grid {
             if !rows[ROW_NUMBER].value_exists(VALUE) &&
                !columns[COLUMN_NUMBER].value_exists(VALUE) &&
                self.is_known(positions[i] as usize) {
-                available_pos.add(positions[i]);
+                let _ =available_pos.add(positions[i]);
             }
         }
 
@@ -924,7 +919,7 @@ impl Grid {
                 columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, '?' as u8);
                 boxes[BOX_NUMBER].set_value(BOX_INDEX, '?' as u8);
                 self.known_positions[next_available_pos as usize] = false;
-                available_pos.remove();
+                let _ = available_pos.remove();
             }            
         }
         
@@ -1085,7 +1080,7 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Column array.
      */
-    fn get_column (&self, INDEX: usize) -> &Column {
+    fn _get_column (&self, INDEX: usize) -> &Column {
         &self.columns[INDEX]
     }
 
@@ -1096,7 +1091,7 @@ impl Grid {
      * 
      *      INDEX -> The index to return from the Grid's internal Box array.
      */
-    fn get_box (&self, INDEX: usize) -> &Box {
+    fn _get_box (&self, INDEX: usize) -> &Box {
         &self.boxes[INDEX]
     }
 
@@ -1179,7 +1174,7 @@ enum CONTAINER {
     BOX,
 }
 
-use Container as House;
+//use Container as House;
 use Container as Row;
 use Container as Column;
 use Container as Box;

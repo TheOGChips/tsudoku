@@ -9,21 +9,16 @@ use clap::{
 };
 use std::{
     fs,
-    path::PathBuf,
-    ptr::null,
 };
 use menu::{
     Menu,
     MenuOption,
     MainMenu,
     MainMenuOption,
-    SavedGameMenu,
-    SavedGameMenuOption,
 };
 use common::DIR;
 use sudoku::{
     Sudoku,
-    SavedPuzzle,
 };
 use terminal::display::{
     self,

@@ -1,6 +1,3 @@
-/// Redefines the value of the Enter key because the pre-defined NCurses value doesn't seem to work.
-pub const KEY_ENTER: i32 = '\n' as i32;
-
 /// A cell in the terminal display.
 #[derive(Eq, Hash, PartialEq, Copy, Clone)]
 pub struct Cell (u8, u8);
@@ -59,10 +56,6 @@ pub mod display {
         low_level::register,
     };
     use pancurses as pc;
-    use std::{
-        thread,
-        time,
-    };
     use once_cell::unsync::Lazy;
 
     /// Sudoku puzzle display origin coordinates (top left cell)
@@ -145,7 +138,7 @@ pub mod display {
         let (mut y_max, mut x_max): (i32, i32) = window.get_max_yx();
         
         unsafe {
-            if (y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32) {
+            if y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32 {
                 return false
             }
             while y_max != WINDOW_REQ.y() as i32 || x_max != WINDOW_REQ.x() as i32 {

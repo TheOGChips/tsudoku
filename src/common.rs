@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use pancurses as pc;
 
 pub fn DIR () -> PathBuf {
     PathBuf::from(env!("HOME")).join(".tsudoku")//.to_str().unwrap().to_string()
@@ -12,6 +11,6 @@ pub mod csv {
         Ok(data)
     }
 
-    pub fn write (data: Vec<u8>) {}
+    pub fn write (_data: Vec<u8>) {}
 }
 

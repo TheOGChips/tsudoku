@@ -10,7 +10,6 @@ use strum::{
 };
 use crate::{
     terminal::{
-        KEY_ENTER,
         Cell,
         display::{
             self,
@@ -677,7 +676,7 @@ impl InGameMenu {
      *                        window_resized to its value.
      */
     fn set_window_resized (&self, WINDOW_RESIZED: bool) {
-        &self.window_resized.replace(WINDOW_RESIZED);
+        let _ = &self.window_resized.replace(WINDOW_RESIZED);
     }
 
     /**
@@ -936,7 +935,7 @@ impl Menu for InGameMenu {
                         InGameMenuOption::NONE => (),
                     }
                 },
-                _ => if (display::invalid_window_size_handler()) {
+                _ => if display::invalid_window_size_handler() {
                     self.set_window_resized(true);
                     display::mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32,
                              "Press 'm' to restore the game");
