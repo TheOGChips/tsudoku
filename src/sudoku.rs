@@ -50,11 +50,12 @@ const NUM_CONTAINERS: u8 = 9;
 const CONTAINER_SIZE: u8 = 9;
 
 /// Display matrix color codes
-const UNKNOWN: i16 = 1;
-const GIVEN: i16 = 2;
-const CANDIDATES_Y: i16 = 3;
-const CANDIDATES_B: i16 = 4;
-const GUESS: i16 = 5;
+//TODO: Move these to display module
+const UNKNOWN: i16 = 11;
+const GIVEN: i16 = 12;
+const CANDIDATES_Y: i16 = 13;
+const CANDIDATES_B: i16 = 14;
+const GUESS: i16 = 15;
 
 enum neighbor_cells {
     TL,
