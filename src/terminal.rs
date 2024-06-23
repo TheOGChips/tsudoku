@@ -176,7 +176,7 @@ pub mod display {
                 }
 
                 window.refresh();
-                thread::sleep(time::Duration::from_millis(100));
+                napms(100);
                 (y_max, x_max) = window.get_max_yx();
             }
             window.clear();
@@ -427,6 +427,13 @@ pub mod display {
      */
     pub fn nodelay (to_delay: bool) {
         window.nodelay(to_delay);
+    }
+
+    /**
+     * 
+     */
+    pub fn napms (nap_time: i32) {
+        pc::napms(nap_time);
     }
 
     /**

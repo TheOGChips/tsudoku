@@ -25,7 +25,6 @@ use std::{
     collections::HashMap,
     array::from_fn,
     cell::RefCell,
-    thread::sleep,
     time::Duration,
 };
 use rand::{
@@ -568,7 +567,7 @@ impl Sudoku {
         display::refresh();
 
         //NOTE: Clear output after a delay
-        sleep(Duration::new(DELAY.into(), 0));
+        display::napms(DELAY.into());
         display::mv(DISPLAY_LINE, 0);
         display::clrtoeol();
         display::curs_set(CURSOR_VISIBILITY::BLOCK);
