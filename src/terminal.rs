@@ -62,6 +62,7 @@ pub mod display {
         thread,
         time,
     };
+    use once_cell::unsync::Lazy;
 
     /// Sudoku puzzle display origin coordinates (top left cell)
     pub const ORIGIN: Cell = Cell::new(3, 6);
@@ -96,6 +97,23 @@ pub mod display {
     pub const DISPLAY_MATRIX_ROWS: usize = 27;
     pub const DISPLAY_MATRIX_COLUMNS: usize = DISPLAY_MATRIX_ROWS;
 
+    const window: Lazy<pc::Window> = Lazy::new(|| pc::initscr());
+    //const window: pc::Window = pc::initscr());
+    /*struct Window {
+        window: pc::Window,
+    }
+    impl Window {
+        const fn new () -> Self {
+            let window = pc::initscr();
+            Self {
+                window: window,
+            }
+        }
+    }
+    unsafe impl Sync for Window {
+
+    }
+    static window: Window = Window::new();*/
     /**
      * Sets the value of the vertical divider between the display puzzle and the in-game menu.
      *
@@ -124,7 +142,7 @@ pub mod display {
      * anything else, I just left it alone. I now suspect it has something to do with how NCurses
      * handles window resizing, and might not be fixable anyway.
      */
-    pub fn invalid_window_size_handler (window: &pc::Window) -> bool {
+    pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
             register(SIGINT, || SIGINT_handler())
         }.expect("Error: Signal not found");
@@ -171,27 +189,71 @@ pub mod display {
      * initialized.
      */
     fn SIGINT_handler () {
+        tui_end();
+        std::process::exit(0);
+    }
+
+    //TODO: Change all values that are moveable to references if it makes sense
+    /**
+     * 
+     */
+    pub fn tui_init () /*-> pc::Window*/ {
+        //let window: pc::Window = pc::initscr();
+        pc::cbreak();
+        pc::noecho();
+        window.keypad(true);
+        //window
+    }
+
+    /**
+     * 
+     */
+    pub fn tui_end () {
         pc::curs_set(CURSOR_VISIBILITY::BLOCK);
         pc::echo();
         pc::nocbreak();
         pc::endwin();
-        std::process::exit(0);
     }
 
     /**
      * 
      */
-    pub fn tui_init () -> pc::Window {
-        let window: pc::Window = pc::initscr();
-        pc::cbreak();
-        pc::noecho();
-        window.keypad(true);
-        window
+    pub fn get_max_yx () -> (i32, i32) {
+        window.get_max_yx()
     }
 
     /**
      * 
      */
+    pub fn get_max_y () -> i32 {
+        window.get_max_y()
+    }
+
+    /**
+     * 
+     */
+    pub fn get_cur_yx () -> (i32, i32) {
+        window.get_cur_yx()
+    }
+
+    /**
+     * 
+     */
+    pub fn clear () {
+        window.clear();
+    }
+
+    /**
+     * 
+     */
+    pub fn clrtoeol () {
+        window.clrtoeol();
+    }
+
+    /**
+     * 
+     */
+    //TODO: Change this to an enum and use with display::curs_set
     pub mod CURSOR_VISIBILITY {
         pub const NONE: i32 = 0;
         pub const BLOCK: i32 = 2;
@@ -200,7 +262,77 @@ pub mod display {
     /**
      * 
      */
-    pub fn getnstr (window: &pc::Window, target: &mut String, max_len: usize) {
+    pub fn curs_set (visibility: i32) {
+        pc::curs_set(visibility);
+    }
+
+    /**
+     * 
+     */
+    pub fn addstr (string: &str) {
+        window.addstr(string);
+    }
+
+    /**
+     * 
+     */
+    pub fn mvprintw (y: i32, x: i32, string: &str) {
+        window.mvprintw(y, x, string);
+    }
+
+    /**
+     * 
+     */
+    pub fn dbgprint (msg: &str) {
+        clear();
+        mvprintw(10, 10, msg);
+        refresh();
+        getch();
+    }
+
+    /**
+     * Updates the terminal display with any changes. This is a wrapper around the pancurses
+     * function of the same name.
+     */
+    pub fn refresh () {
+        window.refresh();
+    }
+
+    /**
+     * 
+     */
+    #[derive(PartialEq)]
+    pub enum Input {
+        Character(char),
+        KeyEnter,
+        //TODO: Consider changing these to MoveUp, etc. and do a similar thing as with KeyEnter
+        KeyUp, KeyDown, KeyLeft, KeyRight,
+        KeyBackspace, KeyDC,
+    }
+
+    /**
+     * Returns the character at the current cursor position. This is a wrapper around the panurses
+     * function of the same name.
+     */
+    pub fn getch () -> Option<Input> {
+        //TODO: Return KeyEnter on \r, too
+        match window.getch() {
+            Some(pc::Input::Character('\n')) | Some(pc::Input::KeyEnter) => Some(Input::KeyEnter),
+            Some(pc::Input::Character(ch)) => Some(Input::Character(ch)),
+            Some(pc::Input::KeyUp) => Some(Input::KeyUp),
+            Some(pc::Input::KeyDown) => Some(Input::KeyDown),
+            Some(pc::Input::KeyLeft) => Some(Input::KeyLeft),
+            Some(pc::Input::KeyRight) => Some(Input::KeyRight),
+            Some(pc::Input::KeyBackspace) => Some(Input::KeyBackspace),
+            Some(pc::Input::KeyDC) => Some(Input::KeyDC),
+            _ => None,
+        }
+    }
+
+    /**
+     * 
+     */
+    pub fn getnstr (target: &mut String, max_len: usize) {
         let mut string: String = String::new();
         let mut count: usize = 0;
         loop {
@@ -229,42 +361,113 @@ pub mod display {
         *target = string;
     }
 
-    pub mod pair {
+    pub mod pair_code {
         //NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no attribute on.
         /// The COLOR_PAIR associated with the current highlighted selection in the menu.
         pub const DEFAULT: i16 = 1;
         pub const MAIN_MENU_SELECTION: i16 = 2;
         pub const DIFFICULTY_MENU_SELECTION: i16 = 3;
+
+        /// Display matrix color codes
+        pub const UNKNOWN: i16 = 11;
+        pub const GIVEN: i16 = 12;
+        pub const CANDIDATES_Y: i16 = 13;
+        pub const CANDIDATES_B: i16 = 14;
+        pub const GUESS: i16 = 15;
     }
 
+    //TODO: Update this doc comment since moving from menu.rs to here
     /**
-     * 
+     * Establishes the color pairs used while printing anywhere in the display matrix.
+     * The color pair MENU_SELECTION is defined inside MainMenu.cpp, and its value is
+     * carried over throughout the rest of the program. In the case coloring is not
+     * available (in the event this somehow finds its way onto some old machine), a
+     * monochrome mode is also provided where everything but guesses are the same color.
      */
     pub fn init_color_pairs () {
         pc::start_color();
-        pc::init_pair(pair::DEFAULT, pc::COLOR_WHITE, pc::COLOR_BLACK);
-        pc::init_pair(pair::MAIN_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
-        pc::init_pair(pair::DIFFICULTY_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+        pc::init_pair(pair_code::DEFAULT, pc::COLOR_WHITE, pc::COLOR_BLACK);
+        pc::init_pair(pair_code::MAIN_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+        //TODO: Test without this to see if it still works like originally
+        pc::init_pair(pair_code::DIFFICULTY_MENU_SELECTION, pc::COLOR_BLACK, pc::COLOR_WHITE);
+        if pc::has_colors() {
+            pc::init_pair(pair_code::UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::GIVEN, pc::COLOR_RED, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::CANDIDATES_Y, pc::COLOR_YELLOW, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::CANDIDATES_B, pc::COLOR_BLUE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::GUESS, pc::COLOR_GREEN, pc::COLOR_BLACK);
+        }
+        else {  //Monochrome mode
+            pc::init_pair(pair_code::UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE); //Reversed to better stand out
+            pc::init_pair(pair_code::CANDIDATES_Y, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::CANDIDATES_B, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::GUESS, pc::COLOR_WHITE, pc::COLOR_BLACK);
+        }
     }
 
     /**
      * 
      */
-    pub enum COLOR_ATTR {
+    pub fn mv (y: i32, x: i32) {
+        window.mv(y, x);
+    }
+
+    /**
+     * 
+     */
+    pub fn timeout (wait_time: i32) {
+        window.timeout(wait_time);
+    }
+
+    /**
+     * 
+     */
+    pub fn nodelay (to_delay: bool) {
+        window.nodelay(to_delay);
+    }
+
+    /**
+     * 
+     */
+    pub fn bold_set (bold_on: bool) {
+        if bold_on {
+            window.attron(pc::A_BOLD);
+        }
+        else {
+            window.attroff(pc::A_BOLD);
+        }
+    }
+
+    /**
+     * 
+     */
+    #[derive(Copy, Clone, PartialEq)]
+    pub enum COLOR_PAIR {
         DEFAULT,
         MAIN_MENU_SELECTION,
         DIFFICULTY_MENU_SELECTION,
+        UNKNOWN,
+        GIVEN,
+        CANDIDATES_Y,
+        CANDIDATES_B,
+        GUESS,
     }
 
     /**
      * 
      */
-    pub fn attron (window: &pc::Window, attr: COLOR_ATTR) {
+    pub fn color_set (pair: COLOR_PAIR) {
         window.color_set(
-            match attr {
-                COLOR_ATTR::DEFAULT => pair::DEFAULT,
-                COLOR_ATTR::MAIN_MENU_SELECTION => pair::MAIN_MENU_SELECTION,
-                COLOR_ATTR::DIFFICULTY_MENU_SELECTION => pair::DIFFICULTY_MENU_SELECTION,
+            match pair {
+                COLOR_PAIR::DEFAULT => pair_code::DEFAULT,
+                COLOR_PAIR::MAIN_MENU_SELECTION => pair_code::MAIN_MENU_SELECTION,
+                COLOR_PAIR::DIFFICULTY_MENU_SELECTION => pair_code::DIFFICULTY_MENU_SELECTION,
+                COLOR_PAIR::UNKNOWN => pair_code::UNKNOWN,
+                COLOR_PAIR::GIVEN => pair_code::GIVEN,
+                COLOR_PAIR::CANDIDATES_Y => pair_code::CANDIDATES_Y,
+                COLOR_PAIR::CANDIDATES_B => pair_code::CANDIDATES_B,
+                COLOR_PAIR::GUESS => pair_code::GUESS,
             }
         );
     }
@@ -272,7 +475,14 @@ pub mod display {
     /**
      * 
      */
-    pub fn attroff (window: &pc::Window, attr: COLOR_ATTR) {
-        window.color_set(pair::DEFAULT);
+    pub fn echo () {
+        pc::echo();
+    }
+
+    /**
+     * 
+     */
+    pub fn noecho () {
+        pc::noecho();
     }
 }

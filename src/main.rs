@@ -12,7 +12,6 @@ use std::{
     path::PathBuf,
     ptr::null,
 };
-use pancurses as pc;
 use menu::{
     Menu,
     MenuOption,
@@ -99,14 +98,13 @@ fn main() -> Result<(), &'static str> {
      */
     let _ = fs::create_dir(DIR());
 
-    let window: pc::Window = display::tui_init();
-    let main_menu = MainMenu::new(use_in_game_menu, &window);
+    let main_menu = MainMenu::new(use_in_game_menu);
     loop {
         if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => {
-                    /*let mut puzzle: Sudoku =*/ Sudoku::new(&window, None);
+                    /*let mut puzzle: Sudoku =*/ Sudoku::new(None);
                     //puzzle.start_game(use_in_game_menu, None);
                     //TODO
                 },
@@ -117,7 +115,7 @@ fn main() -> Result<(), &'static str> {
                         //TODO: Finish this block after converting over NEW_GAME
                     }*/
                 },
-                MainMenuOption::SHOW_STATS => display_completed_puzzles(&window),
+                MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,
             }
         }
@@ -151,8 +149,8 @@ fn main() -> Result<(), &'static str> {
         clear();
     }*/
 
-    window.clear();
-    pc::endwin();
+    display::clear();
+    display::tui_end();
     Ok(())
 }
 
@@ -160,7 +158,7 @@ fn main() -> Result<(), &'static str> {
  * Reads in the current number of games the player has successfully completed and then displays that
  * information to the screen in the terminal window.
  */
-fn display_completed_puzzles (window: &pc::Window) {
+fn display_completed_puzzles () {
     let num_completed = fs::read_to_string(DIR().join("completed_puzzles.txt"))
         .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
@@ -173,19 +171,19 @@ fn display_completed_puzzles (window: &pc::Window) {
     /*let mut y_max: i32 = 0;
     let mut x_max: i32 = 0;
     getmaxyx(stdscr(), &mut y_max, &mut x_max);*/
-    let (y_max, x_max): (i32, i32) = window.get_max_yx();
+    let (y_max, x_max): (i32, i32) = display::get_max_yx();
 
-    pc::curs_set(CURSOR_VISIBILITY::NONE);
-    window.clear();
-    window.mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, prompt1);
-    window.mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
-    window.refresh();
+    display::curs_set(CURSOR_VISIBILITY::NONE);
+    display::clear();
+    display::mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, &prompt1);
+    display::mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
+    display::refresh();
 
     loop {
-        match window.getch().unwrap() {
-            pc::Input::Character('\n') | pc::Input::KeyEnter => break,
+        match display::getch().unwrap() {
+            display::Input::KeyEnter => break,
             _ => (),
         }
     }
-    pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+    display::curs_set(CURSOR_VISIBILITY::BLOCK);
 }

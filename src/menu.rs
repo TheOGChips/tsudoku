@@ -1,4 +1,3 @@
-use pancurses as pc;
 use signal_hook::{
     consts::SIGINT,
     low_level::register,
@@ -15,7 +14,7 @@ use crate::{
         Cell,
         display::{
             self,
-            COLOR_ATTR,
+            COLOR_PAIR,
             TOP_PADDING,
             LEFT_PADDING,
             PUZZLE_SPACE,
@@ -33,7 +32,6 @@ use crate::{
     common::{
         DIR,
         csv,
-        dbgprint,
     },
     sudoku::SavedPuzzle,
 };
@@ -149,10 +147,7 @@ pub trait Menu {
      * initialized.
      */
     fn SIGINT_handler () {
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
-        pc::echo();
-        pc::nocbreak();
-        pc::endwin();
+        display::tui_end();
         std::process::exit(0);
         /* TODO: Look into a cleaner way to do this. This might not be needed, but no destructors
          *       will get called for any objects still on the stack. This works for now, though.
@@ -161,7 +156,7 @@ pub trait Menu {
 }
 
 /// Displays and controls the main menu the user sees before and after every game.
-pub struct MainMenu<'a> {
+pub struct MainMenu {
     /// Empty space between the bottom of the terminal window and the in-terminal display.
     BOTTOM_PADDING: u8,
 
@@ -173,12 +168,9 @@ pub struct MainMenu<'a> {
 
     /// Whether the in-game menu is able to be displayed.
     in_game_menu_enabled: bool,
-
-    /// The curses window
-    window: &'a pc::Window,
 }
 
-impl<'a> Menu for MainMenu<'a> {
+impl Menu for MainMenu {
     /**
      * Displays the main menu. The currently selected option is always highlighted. The main menu is
      * re-rendered each time the user uses the Up/Down keys to highlight a different option.
@@ -199,25 +191,23 @@ impl<'a> Menu for MainMenu<'a> {
                 std::process::exit(1);
             };
 
-        //TODO: Consider wrapping the attron/attroff functionality inside of terminal::display
-        //TODO: This should also allow to use an enum for toggling attrs on
-        self.window.mvprintw(Y_CENTER as i32 - 2, X_CENTER as i32, TITLE);
+        display::mvprintw(Y_CENTER as i32 - 2, X_CENTER as i32, TITLE);
         for (i, variant) in MainMenuOption::enumerate() {
             if *opt == variant {
-                display::attron(self.window, COLOR_ATTR::MAIN_MENU_SELECTION);
+                display::color_set(COLOR_PAIR::MAIN_MENU_SELECTION);
                 //mvprintw(2, 2, format!("status: {}", COLOR_PAIR(MAIN_MENU_SELECTION)).as_str());
             }
-            self.window.mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
+            display::mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
                 MainMenuOption::NEW_GAME => "New Game",
                 MainMenuOption::RESUME_GAME => "Resume Game",
                 MainMenuOption::SHOW_STATS => "Show # Finished Games",
                 MainMenuOption::EXIT => "Exit",
             });
             if *opt == variant {
-                display::attroff(self.window, COLOR_ATTR::MAIN_MENU_SELECTION);
+                display::color_set(COLOR_PAIR::DEFAULT);
             }
         }
-        self.window.refresh();
+        display::refresh();
     }
 
     /**
@@ -233,8 +223,8 @@ impl<'a> Menu for MainMenu<'a> {
             self.set_WINDOW_REQ();
         }
 
-        let (y_max, x_max): (i32, i32) = self.window.get_max_yx();
-        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        let (y_max, x_max): (i32, i32) = display::get_max_yx();
+        display::curs_set(CURSOR_VISIBILITY::NONE);
 
         //invalid_window_size_handler();
         //clear();
@@ -245,41 +235,40 @@ impl<'a> Menu for MainMenu<'a> {
         let max: Cell = Cell::new(y_max as u8, x_max as u8);
         let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
         //self.display_menu(&max, &opt);
-        let mut input: Option<pc::Input> = None;
-        self.window.timeout(250);
-        while input != Some(pc::Input::KeyEnter) {
-            invalid_window_size_handler(self.window);
-            self.window.clear();
+        let mut input: Option<display::Input> = None;
+        display::timeout(250);
+        while input != Some(display::Input::KeyEnter) {
+            invalid_window_size_handler();
+            display::clear();
             self.display_menu(&max, &MenuOption::MAIN_MENU(opt));
-            input = self.window.getch();
+            input = display::getch();
             opt =
                 match input {
-                    Some(pc::Input::KeyUp) | Some(pc::Input::Character('w')) => match opt {
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => match opt {
                         MainMenuOption::EXIT => MainMenuOption::SHOW_STATS,
                         MainMenuOption::SHOW_STATS => MainMenuOption::RESUME_GAME,
                         _ => MainMenuOption::NEW_GAME,
                     },
-                    Some(pc::Input::KeyDown) | Some(pc::Input::Character('s')) => match opt {
+                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => match opt {
                         MainMenuOption::NEW_GAME => MainMenuOption::RESUME_GAME,
                         MainMenuOption::RESUME_GAME => MainMenuOption::SHOW_STATS,
                         _ => MainMenuOption::EXIT,
                     },
-                    Some(pc::Input::Character('\n')) => {
-                        input = Some(pc::Input::KeyEnter);
+                    Some(display::Input::KeyEnter) => {
                         opt
                     },
                     _ => opt
                 };
         }
 
-        self.window.clear();
-        self.window.nodelay(false);
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::clear();
+        display::nodelay(false);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
         MenuOption::MAIN_MENU(opt)
     }
 }
 
-impl<'a> MainMenu<'a> {
+impl MainMenu {
     /**
      * Initializes the NCurses environment and global NCurses settings. Returns a MainMenu object with
      * the remainder of the padding space set for the terminal window display.
@@ -287,7 +276,7 @@ impl<'a> MainMenu<'a> {
      *      use_in_game_menu -> Indicating whether the in-game menu is disabled or not. This affects
      *                          the enforced size of the terminal window.
      */
-    pub fn new (use_in_game_menu: bool, window: &'a pc::Window) -> MainMenu {
+    pub fn new (use_in_game_menu: bool) -> MainMenu {
         let _ = unsafe {
             register(SIGINT, || Self::SIGINT_handler())
         }.expect("Error: Signal not found");
@@ -300,7 +289,6 @@ impl<'a> MainMenu<'a> {
             RIGHT_PADDING: LEFT_PADDING,
             RESULT_MSG_SPACE: 3,
             in_game_menu_enabled: use_in_game_menu,
-            window: window,
         }
     }
 
@@ -316,13 +304,10 @@ impl<'a> MainMenu<'a> {
     }
 }
 
-impl<'a> Drop for MainMenu<'a> {
+impl Drop for MainMenu {
     /// Unsets the NCurses environment once the user chooses to exit the program.
     fn drop (&mut self) {
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
-        pc::echo();
-        pc::nocbreak();
-        pc::endwin();
+        display::tui_end();
         //TODO: Probably unnecessary, but consider unregistering the SIGINT handler function.
     }
 }
@@ -333,7 +318,7 @@ impl<'a> Drop for MainMenu<'a> {
  * point.
  */
 /// Provides the functionality to allow a player to load and resume a saved game.
-pub struct SavedGameMenu<'a> {
+pub struct SavedGameMenu {
     /**
      * The list of saved games to be displayed to the screen. Each will appear as an
      * option the user can choose from.
@@ -346,25 +331,22 @@ pub struct SavedGameMenu<'a> {
      * this becomes the game loaded.
      */
     selection: RefCell<String>,
-    ///
-    window: &'a pc::Window,
 }
 
-impl<'a> SavedGameMenu<'a> {
+impl SavedGameMenu {
     /**
      * Returns an instance of a SavedGameMenu containing a list of the current saved
      * games. The saved game to be used will be initially be set to a "blank" 
      * SavedPuzzle object. The current selection from the `saved_games` list will be
      * preset to the first file in the list.
      */
-    pub fn new (window: &'a pc::Window) -> Self {
+    pub fn new () -> Self {
         let saved_games: Vec<String> = Self::generate_saved_games_list();
         let selection: String = String::clone(&saved_games[0]);
         Self {
             saved_games: saved_games,
             saved_game: RefCell::new(SavedPuzzle::new()),
             selection: RefCell::new(selection), //NOTE: This contains the CSV extension
-            window: window,
         }
     }
 
@@ -398,23 +380,23 @@ impl<'a> SavedGameMenu<'a> {
      * to continue.
      */
     fn select_saved_game (&self) -> bool {
-        let mut input: Option<pc::Input> = None;
-        pc::curs_set(CURSOR_VISIBILITY::NONE);  //Turn off cursor while in menu
-        self.window.timeout(250);
+        let mut input: Option<display::Input> = None;
+        display::curs_set(CURSOR_VISIBILITY::NONE);  //Turn off cursor while in menu
+        display::timeout(250);
         if self.saved_games.is_empty() {
             loop {
                 match input {
-                    Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,
+                    Some(display::Input::KeyEnter) => break,
                     _ => {
-                        self.window.mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32, "You have no saved games.");
-                        self.window.mvprintw(
+                        display::mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32, "You have no saved games.");
+                        display::mvprintw(
                             TOP_PADDING as i32 + self.saved_games.len() as i32 + 3,
                             LEFT_PADDING as i32,
                             "Press ENTER to continue..."
                         );
-                        self.window.refresh();
-                        input = self.window.getch();    //This needs to be here for the display to work correctly
-                        invalid_window_size_handler(self.window);
+                        display::refresh();
+                        input = display::getch();    //This needs to be here for the display to work correctly
+                        display::invalid_window_size_handler();
                     }
                 }
             }
@@ -422,26 +404,26 @@ impl<'a> SavedGameMenu<'a> {
         else {
             loop {
                 match input {
-                    Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,
+                    Some(display::Input::KeyEnter) => break,
                     _ => {
                         self.display_menu(
                             &Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
                         );
 
-                        input = self.window.getch();
+                        input = display::getch();
                         let selection: String = self.selection.borrow().to_string();
                         let i: usize = self.saved_games.binary_search(&selection.to_string()).unwrap();
                         match input {
-                            Some(pc::Input::KeyUp) | Some(pc::Input::Character('w'))
+                            Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
                                 => if selection.as_str() != self.saved_games.first().unwrap() {
                                     *self.selection.borrow_mut() = self.saved_games.get(i - 1).unwrap().to_string();
                             },
-                            Some(pc::Input::KeyDown) | Some(pc::Input::Character('s'))
+                            Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
                                 => if selection.as_str() != self.saved_games.last().unwrap() {
                                     *self.selection.borrow_mut() = self.saved_games.get(i + 1).unwrap().to_string();
                                 },
                             _ => {
-                                invalid_window_size_handler(self.window);
+                                display::invalid_window_size_handler();
                             },
                         }
                     }
@@ -449,9 +431,9 @@ impl<'a> SavedGameMenu<'a> {
             }
         }
 
-        self.window.refresh();
-        self.window.nodelay(false);
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::refresh();
+        display::nodelay(false);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
 
         !self.saved_games.is_empty()
     }
@@ -483,7 +465,7 @@ impl<'a> SavedGameMenu<'a> {
             }
         }
 
-        dbgprint(self.window, self.selection.borrow().as_str());
+        display::dbgprint(self.selection.borrow().as_str());
         let mut puzzle: SavedPuzzle = SavedPuzzle::new();
         puzzle.set_puzzle(saved_game);
         puzzle.set_color_codes(saved_color_codes);
@@ -504,7 +486,7 @@ impl<'a> SavedGameMenu<'a> {
     }
 }
 
-impl<'a> Menu for SavedGameMenu<'a> {
+impl Menu for SavedGameMenu {
     /**
      * Displays the saved games menu. The options listed are saved games in CSV files 
      * from the ~/.tsudoku directory. The currently selected option is always 
@@ -519,14 +501,14 @@ impl<'a> Menu for SavedGameMenu<'a> {
      */
     fn display_menu (&self, EDGE: &Cell, _: &MenuOption) {
         let mut display_line: u8 = EDGE.y();
-        self.window.clear();
-        self.window.mvprintw(display_line as i32, EDGE.x() as i32, "Saved Games:");
+        display::clear();
+        display::mvprintw(display_line as i32, EDGE.x() as i32, "Saved Games:");
         display_line += 2;
         for game in &self.saved_games {
             if self.selection.borrow().to_string() == *game {
                 //attron(COLOR_PAIR(MENU_SELECTION));
             }
-            self.window.mvprintw(
+            display::mvprintw(
                 display_line as i32,
                 EDGE.x() as i32,
                 format!("{}", game.strip_suffix(".csv").unwrap())
@@ -555,19 +537,17 @@ impl<'a> Menu for SavedGameMenu<'a> {
 }
 
 /// Allows the user to choose a difficulty level before starting a new game.
-pub struct DifficultyMenu<'a> {
+pub struct DifficultyMenu {
     difficulty_level: DifficultyMenuOption,
-    window: &'a pc::Window
 }
 
-impl<'a> DifficultyMenu<'a> {
+impl DifficultyMenu {
     /**
      * Returns the difficulty level the user has chosen to start the new game.
      */
-    pub fn new (window: &'a pc::Window) -> Self {
+    pub fn new () -> Self {
         Self {
             difficulty_level: DifficultyMenuOption::EASY,
-            window: window,
         }
     }
     
@@ -588,7 +568,7 @@ impl<'a> DifficultyMenu<'a> {
     }
 }
 
-impl<'a> Menu for DifficultyMenu<'a> {
+impl Menu for DifficultyMenu {
     /**
      * Displays the difficulty menu. The currently selected option is always highlighted. The
      * difficulty menu is re-rendered each time the user uses the Up/Down keys to highlight a
@@ -607,80 +587,78 @@ impl<'a> Menu for DifficultyMenu<'a> {
             std::process::exit(1);
         };
 
-        self.window.clear();
-        self.window.mvprintw(EDGE.y() as i32, EDGE.x() as i32, "CHOOSE DIFFICULTY SETTING");
+        display::clear();
+        display::mvprintw(EDGE.y() as i32, EDGE.x() as i32, "CHOOSE DIFFICULTY SETTING");
         for (i, variant) in DifficultyMenuOption::enumerate() {
             if *opt == variant {
-                display::attron(self.window,  COLOR_ATTR::DIFFICULTY_MENU_SELECTION);
+                display::color_set(COLOR_PAIR::DIFFICULTY_MENU_SELECTION);
             }
-            self.window.mvprintw((EDGE.y() + i + 2) as i32, EDGE.x() as i32, match variant {
+            display::mvprintw((EDGE.y() + i + 2) as i32, EDGE.x() as i32, match variant {
                 DifficultyMenuOption::EASY => "Easy",
                 DifficultyMenuOption::MEDIUM => "Medium",
                 DifficultyMenuOption::HARD => "Hard",
                 DifficultyMenuOption::EXPERT => "Expert",
             });
             if *opt == variant {
-                display::attroff(self.window, COLOR_ATTR::DIFFICULTY_MENU_SELECTION);
+                display::color_set(COLOR_PAIR::DIFFICULTY_MENU_SELECTION);
             }
         }
-        self.window.refresh();
+        display::refresh();
     }
     
     /**
      * Controls the menu display and difficulty level recording.
      */
     fn menu (&self) -> MenuOption {
-        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        display::curs_set(CURSOR_VISIBILITY::NONE);
         let mut diff: DifficultyMenuOption = DifficultyMenuOption::EASY;
-        let mut input: Option<pc::Input> = None;
-        self.window.timeout(250);
-        while input != Some(pc::Input::KeyEnter) {
-            self.window.refresh();
+        let mut input: Option<display::Input> = None;
+        display::timeout(250);
+        while input != Some(display::Input::KeyEnter) {
+            display::refresh();
             self.display_menu(&Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::DIFFICULTY_MENU(diff));
-            input = self.window.getch();
+            input = display::getch();
             diff = 
                 match input {
-                    Some(pc::Input::KeyUp) | Some(pc::Input::Character('w')) => match diff {
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => match diff {
                         DifficultyMenuOption::EXPERT => DifficultyMenuOption::HARD,
                         DifficultyMenuOption::HARD => DifficultyMenuOption::MEDIUM,
                         _ => DifficultyMenuOption::EASY,
                     },
-                    Some(pc::Input::KeyDown) | Some(pc::Input::Character('s')) => match diff {
+                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => match diff {
                         DifficultyMenuOption::EASY => DifficultyMenuOption::MEDIUM,
                         DifficultyMenuOption::MEDIUM => DifficultyMenuOption::HARD,
                         _ => DifficultyMenuOption::EXPERT,
                     },
-                    Some(pc::Input::Character('\n')) => {
-                        input = Some(pc::Input::KeyEnter);
+                    Some(display::Input::KeyEnter) => {
                         diff
                     },
                     _ => diff,
                 };
         }
-        self.window.nodelay(false);
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::nodelay(false);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
 
         MenuOption::DIFFICULTY_MENU(diff)
     }
 }
 
-pub struct InGameMenu<'a> {
+pub struct InGameMenu {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     window_resized: RefCell<bool>,
     IN_GAME_MENU_LEFT_EDGE: u8,
     IN_GAME_MENU_TITLE_SPACING: u8,
     save_file_name: RefCell<String>,
-    window: &'a pc::Window,
 }
 
-impl<'a> InGameMenu<'a> {
+impl InGameMenu {
     /**
      * Initializes the display matrix, so the in-game menu can track any changes made during
      * gameplay.
      * 
      *      display_matrix -> The display matrix from the main gameplay loop in Sudoku.
      */
-    pub fn new (display_matrix: &[[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS], window: &'a pc::Window) -> Self {
+    pub fn new (display_matrix: &[[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) -> Self {
         Self {
             //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
             display_matrix: *display_matrix,
@@ -688,7 +666,6 @@ impl<'a> InGameMenu<'a> {
             IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
             IN_GAME_MENU_TITLE_SPACING: 1,
             save_file_name: RefCell::new(String::new()),
-            window: window,
         }
     }
 
@@ -721,9 +698,9 @@ impl<'a> InGameMenu<'a> {
             unsafe { IN_GAME_MENU_DISPLAY_SPACING as i32 } +
             InGameMenuOption::COUNT as i32 +
             2;
-        for y in in_game_menu_top_left..self.window.get_max_y() {
-            self.window.mv(y, EDGE.x().into());
-            self.window.clrtoeol();
+        for y in in_game_menu_top_left..display::get_max_y() {
+            display::mv(y, EDGE.x().into());
+            display::clrtoeol();
         }
     }
 
@@ -746,7 +723,7 @@ impl<'a> InGameMenu<'a> {
         let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        self.window.mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+        display::mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
             EDGE.x() as i32,
             TITLE);
         display_offset += 1;
@@ -776,7 +753,7 @@ impl<'a> InGameMenu<'a> {
             }
             else {
                 display_str.pop();  // NOTE: Pop the unnecessary extra space
-                self.window.mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
+                display::mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
                     EDGE.x().into(),
                     &display_str);
                 *display_offset += 1;
@@ -821,7 +798,7 @@ impl<'a> InGameMenu<'a> {
         let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        self.window.mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+        display::mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
             EDGE.x() as i32,
             TITLE);
         display_offset += 1;
@@ -841,22 +818,22 @@ impl<'a> InGameMenu<'a> {
     fn save_game_prompt (&self, EDGE: Cell) {
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        self.window.mvprintw(
+        display::mvprintw(
             (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
             EDGE.x().into(),
             "Enter save file name: ");
         display_offset += 2;
 
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
         /* NOTE: This message will not be seen if there is a window resize, so no error handling
          *       required.
          */
-        self.window.mvprintw(
+        display::mvprintw(
             (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
             EDGE.x().into(),
             format!("{} saved!", self.save_game()).as_str()
         );
-        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        display::curs_set(CURSOR_VISIBILITY::NONE);
     }
 
     /**
@@ -865,11 +842,11 @@ impl<'a> InGameMenu<'a> {
     fn save_game (&self) -> String {
         let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
         let mut name: String = String::new();   //      requirements of no in-game menu mode
-        self.window.nodelay(false);
-        pc::echo();
-        display::getnstr(&self.window, &mut name, NAME_SIZE - 1);
-        pc::noecho();
-        self.window.nodelay(true);
+        display::nodelay(false);
+        display::echo();
+        display::getnstr(&mut name, NAME_SIZE - 1);
+        display::noecho();
+        display::nodelay(true);
 
         /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
          *       message will be handled by the calling function.
@@ -885,7 +862,7 @@ impl<'a> InGameMenu<'a> {
     }
 }
 
-impl<'a> Menu for InGameMenu<'a> {
+impl Menu for InGameMenu {
     /**
      * Displays the in-game menu. The currently selected option is always highlighted. The
      * in-game menu is re-rendered each time the user uses the Up/Down keys to highlight a 
@@ -904,12 +881,12 @@ impl<'a> Menu for InGameMenu<'a> {
             std::process::exit(1);
         };
 
-        self.window.mvprintw(EDGE.y() as i32, EDGE.x() as i32, "IN-GAME MENU");
+        display::mvprintw(EDGE.y() as i32, EDGE.x() as i32, "IN-GAME MENU");
         for (i, variant) in InGameMenuOption::enumerate() {
             if *opt == variant {
                 //attron(COLOR_PAIR(MENU_SELECTION));
             }
-            self.window.mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
+            display::mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
                 InGameMenuOption::RULES => "View the rules of sudoku",
                 InGameMenuOption::MANUAL => "See game manual",
                 InGameMenuOption::SAVE_GAME => "Save current game",
@@ -919,35 +896,35 @@ impl<'a> Menu for InGameMenu<'a> {
                 //attroff(COLOR_PAIR(MENU_SELECTION));
             }
         }
-        self.window.refresh();
+        display::refresh();
     }
 
     /**
      * Controls the menu display based on the option chosen by the user.
      */
     fn menu (&self) -> MenuOption {
-        pc::curs_set(CURSOR_VISIBILITY::NONE);
+        display::curs_set(CURSOR_VISIBILITY::NONE);
         self.set_window_resized(false);
         let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
         let mut opt: InGameMenuOption = InGameMenuOption::RULES;
 
         loop {
-            self.window.refresh();
+            display::refresh();
             self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(opt));
-            let input: Option<pc::Input> = self.window.getch();
+            let input: Option<display::Input> = display::getch();
             match input {
-                Some(pc::Input::Character('m')) | Some(pc::Input::Character('M')) => break,
-                Some(pc::Input::Character('w')) | Some(pc::Input::Character('W')) |
-                Some(pc::Input::KeyUp) => opt = match opt {
+                Some(display::Input::Character('m')) | Some(display::Input::Character('M')) => break,
+                Some(display::Input::Character('w')) | Some(display::Input::Character('W')) |
+                Some(display::Input::KeyUp) => opt = match opt {
                     InGameMenuOption::SAVE_GAME => InGameMenuOption::MANUAL,
                     _ => InGameMenuOption::RULES,
                 },
-                Some(pc::Input::Character('s')) | Some(pc::Input::Character('S')) |
-                Some(pc::Input::KeyDown) => opt = match opt {
+                Some(display::Input::Character('s')) | Some(display::Input::Character('S')) |
+                Some(display::Input::KeyDown) => opt = match opt {
                     InGameMenuOption::RULES => InGameMenuOption::MANUAL,
                     _ => InGameMenuOption::SAVE_GAME,
                 },
-                Some(pc::Input::Character('\n')) | Some(pc::Input::KeyEnter) => {
+                Some(display::Input::KeyEnter) => {
                     self.clear(in_game_menu_left_edge);
                     match opt {
                         InGameMenuOption::RULES => self.display_rules(in_game_menu_left_edge),
@@ -959,9 +936,9 @@ impl<'a> Menu for InGameMenu<'a> {
                         InGameMenuOption::NONE => (),
                     }
                 },
-                _ => if (invalid_window_size_handler(self.window)) {
+                _ => if (display::invalid_window_size_handler()) {
                     self.set_window_resized(true);
-                    self.window.mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32,
+                    display::mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32,
                              "Press 'm' to restore the game");
                 },
             }
@@ -969,7 +946,7 @@ impl<'a> Menu for InGameMenu<'a> {
 
         opt = InGameMenuOption::NONE;
         self.display_menu(&in_game_menu_left_edge, &MenuOption::IN_GAME_MENU(opt));
-        pc::curs_set(CURSOR_VISIBILITY::BLOCK);
+        display::curs_set(CURSOR_VISIBILITY::BLOCK);
 
         MenuOption::IN_GAME_MENU(opt)
     }

@@ -15,9 +15,3 @@ pub mod csv {
     pub fn write (data: Vec<u8>) {}
 }
 
-pub fn dbgprint (window: &pc::Window, msg: &str) {
-    window.clear();
-    window.mvprintw(10, 10, msg);
-    window.refresh();
-    window.getch();
-}

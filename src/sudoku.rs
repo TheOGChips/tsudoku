@@ -3,10 +3,10 @@ use crate::{
         display::{
             self,
             CURSOR_VISIBILITY,
+            COLOR_PAIR,
             DISPLAY_MATRIX_ROWS,
             DISPLAY_MATRIX_COLUMNS,
             ORIGIN,
-            invalid_window_size_handler,
         },
         Cell,
         KEY_ENTER,
@@ -48,14 +48,6 @@ extern "C" {
 const GRID_SIZE: u8 = 81;
 const NUM_CONTAINERS: u8 = 9;
 const CONTAINER_SIZE: u8 = 9;
-
-/// Display matrix color codes
-//TODO: Move these to display module
-const UNKNOWN: i16 = 11;
-const GIVEN: i16 = 12;
-const CANDIDATES_Y: i16 = 13;
-const CANDIDATES_B: i16 = 14;
-const GUESS: i16 = 15;
 
 enum neighbor_cells {
     TL,
@@ -141,9 +133,9 @@ impl SavedPuzzle {
  *                          surrounding (i.e. border) cells along with a constant for the number of
  *                          border positions.
  */
-pub struct Sudoku<'a> {
+pub struct Sudoku {
     display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-    color_codes: [[i16; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    color_codes: [[COLOR_PAIR; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
     grid: Grid,
     grid2display_map: HashMap<u8, Cell>,
     display2grip_map: HashMap<Cell, u8>,
@@ -151,18 +143,17 @@ pub struct Sudoku<'a> {
     cursor_pos: Cell,
     display_matrix_offset: HashMap<Cell, Cell>,
     save_file_name: RefCell<String>,
-    window: &'a pc::Window,
 }
 
-impl<'a> Sudoku<'a> {
+impl Sudoku {
     /**
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (window: &pc::Window, saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
+    pub fn new (saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
+        display::init_color_pairs();
         let (grid2display, display2grid) = Self::create_maps();
-        Self::set_color_pairs();
-        let (display_matrix, grid) = Self::init_display_matrix(window, saved_puzzle, &grid2display);
+        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
         //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
         /*Self {
             display_matrix: display_matrix,
@@ -210,30 +201,6 @@ impl<'a> Sudoku<'a> {
     }
 
     /**
-     * Establishes the color pairs used while printing anywhere in the display matrix.
-     * The color pair MENU_SELECTION is defined inside MainMenu.cpp, and its value is
-     * carried over throughout the rest of the program. In the case coloring is not
-     * available (in the event this somehow finds its way onto some old machine), a
-     * monochrome mode is also provided where everything but guesses are the same color.
-     */
-    fn set_color_pairs () {
-        if pc::has_colors() {
-            pc::init_pair(UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(GIVEN, pc::COLOR_RED, pc::COLOR_BLACK);
-            pc::init_pair(CANDIDATES_Y, pc::COLOR_YELLOW, pc::COLOR_BLACK);
-            pc::init_pair(CANDIDATES_B, pc::COLOR_BLUE, pc::COLOR_BLACK);
-            pc::init_pair(GUESS, pc::COLOR_GREEN, pc::COLOR_BLACK);
-        }
-        else {  //Monochrome mode
-            pc::init_pair(UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE); //Reversed to better stand out
-            pc::init_pair(CANDIDATES_Y, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(CANDIDATES_B, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(GUESS, pc::COLOR_WHITE, pc::COLOR_BLACK);
-        }
-    }
-
-    /**
      * Initialiizes the display matrix with either a newly generated puzzle or a saved
      * game.
      * 
@@ -242,7 +209,7 @@ impl<'a> Sudoku<'a> {
      *                      this will be a nullptr. If the user has selected to resume a
      *                      saved game, this object will be read in beforehand.
      */
-    fn init_display_matrix (window: &pc::Window, saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
+    fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
         -> ([[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS], Grid) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
@@ -284,7 +251,7 @@ impl<'a> Sudoku<'a> {
                 let mut mat: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
                     [[' ' as u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
 
-                let mut diff_menu: DifficultyMenu = DifficultyMenu::new(&window);
+                let mut diff_menu: DifficultyMenu = DifficultyMenu::new();
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
                     diff_menu.set_difficulty_level(diff);
                 }
@@ -309,27 +276,27 @@ impl<'a> Sudoku<'a> {
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
-        self.window.mv(ORIGIN.y().into(), ORIGIN.x().into());
+        display::mv(ORIGIN.y().into(), ORIGIN.x().into());
         self.cursor_pos.set(ORIGIN.y(), ORIGIN.x());
-        self.refresh();
+        display::refresh();
 
         let mut quit_game: bool = false;
         //nodelay(stdscr, true);
-        self.window.timeout(250);
+        display::timeout(250);
         while !quit_game {
-            let input: Option<pc::Input> = self.window.getch();
+            let input: Option<display::Input> = display::getch();
             match input {
-                Some(pc::Input::Character('q')) |
-                Some(pc::Input::Character('Q')) => quit_game = true,
-                Some(pc::Input::Character('m')) |
-                Some(pc::Input::Character('M')) => if USE_IN_GAME_MENU {
+                Some(display::Input::Character('q')) |
+                Some(display::Input::Character('Q')) => quit_game = true,
+                Some(display::Input::Character('m')) |
+                Some(display::Input::Character('M')) => if USE_IN_GAME_MENU {
                     //TODO: Make this reusable somehow like in the C++ version...
-                    let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix, &self.window);
+                    let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
 
                     //attron(COLOR_PAIR(MENU_SELECTION));
-                    self.window.mvprintw(self.window.get_max_y() - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
+                    display::mvprintw(display::get_max_y() - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
                     //attroff(COLOR_PAIR(MENU_SELECTION));
-                    self.window.clrtoeol();
+                    display::clrtoeol();
 
                     in_game_menu.menu();
                     //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
@@ -340,43 +307,43 @@ impl<'a> Sudoku<'a> {
 
                     //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
                     //attron(COLOR_PAIR(MENU_SELECTION));
-                    self.window.mvprintw(
-                        self.window.get_max_y() - LINE_OFFSET_TWEAK as i32,
+                    display::mvprintw(
+                        display::get_max_y() - LINE_OFFSET_TWEAK as i32,
                         ORIGIN.x().into(),
                         "m -> in-game menu"
                     );
                     //attroff(COLOR_PAIR(MENU_SELECTION));
-                    self.window.clrtoeol();
+                    display::clrtoeol();
 
-                    self.refresh();
+                    display::refresh();
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
                 },
-                Some(pc::Input::Character('s')) |
-                Some(pc::Input::Character('S')) => if !USE_IN_GAME_MENU {
+                Some(display::Input::Character('s')) |
+                Some(display::Input::Character('S')) => if !USE_IN_GAME_MENU {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();
                 },
-                Some(pc::Input::KeyUp)    | Some(pc::Input::Character('w')) |
-                Some(pc::Input::KeyDown)  | Some(pc::Input::Character('s')) |
-                Some(pc::Input::KeyLeft)  | Some(pc::Input::Character('a')) |
-                Some(pc::Input::KeyRight) | Some(pc::Input::Character('d')) => {
+                Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
+                Some(display::Input::KeyDown)  | Some(display::Input::Character('s')) |
+                Some(display::Input::KeyLeft)  | Some(display::Input::Character('a')) |
+                Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
                     //TODO
                 },
-                Some(pc::Input::Character('1')) | Some(pc::Input::Character('2')) |
-                Some(pc::Input::Character('3')) | Some(pc::Input::Character('4')) |
-                Some(pc::Input::Character('5')) | Some(pc::Input::Character('6')) |
-                Some(pc::Input::Character('7')) | Some(pc::Input::Character('8')) |
-                Some(pc::Input::Character('9')) => {
+                Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
+                Some(display::Input::Character('3')) | Some(display::Input::Character('4')) |
+                Some(display::Input::Character('5')) | Some(display::Input::Character('6')) |
+                Some(display::Input::Character('7')) | Some(display::Input::Character('8')) |
+                Some(display::Input::Character('9')) => {
                     //TODO
                 },
-                Some(pc::Input::KeyBackspace) | Some(pc::Input::KeyDC) => {
+                Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
                     //TODO
                 }
-                Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => {
+                Some(display::Input::KeyEnter) => {
                     //TODO
                 }
-                _ => if invalid_window_size_handler(self.window) {
+                _ => if display::invalid_window_size_handler() {
                     let curr_pos: Cell = self.cursor_pos;
                     self.printw();
                     self.cursor_pos = curr_pos;
@@ -385,7 +352,7 @@ impl<'a> Sudoku<'a> {
                 }
             };
         }
-        self.window.nodelay(false);
+        display::nodelay(false);
     }
 
     /**
@@ -409,41 +376,43 @@ impl<'a> Sudoku<'a> {
                     }
                     //TODO
                 }*/
-                let color_pair: i16 = if let Some(saved_puzzle) = SAVED_PUZZLE {
+                let color_pair: COLOR_PAIR = if let Some(saved_puzzle) = SAVED_PUZZLE {
                     match saved_puzzle.color_codes[i][j] {
-                        'u' => UNKNOWN,
-                        'r' => GIVEN,
+                        'u' => COLOR_PAIR::UNKNOWN,
+                        'r' => COLOR_PAIR::GIVEN,
                         'y' => {
                             //nc::attron(nc::A_BOLD);
-                            self.window.attron(pc::A_BOLD);
-                            CANDIDATES_Y
+                            //self.window.attron(pc::A_BOLD);
+                            display::bold_set(true);
+                            COLOR_PAIR::CANDIDATES_Y
                         },
                         'b' => {
-                            self.window.attron(pc::A_BOLD);
-                            CANDIDATES_B
+                            //self.window.attron(pc::A_BOLD);
+                            display::bold_set(true);
+                            COLOR_PAIR::CANDIDATES_B
                         },
-                        'g' => GUESS,
-                        _ => 0, // NOTE: Also case 'n'
+                        'g' => COLOR_PAIR::GUESS,
+                        _ => COLOR_PAIR::DEFAULT, // NOTE: Also case 'n'
                     }
                 }
                 else {
-                    0
+                    COLOR_PAIR::DEFAULT
                 };
 
                 self.color_codes[i][j] = color_pair;
-                self.window.color_set(color_pair);
-                self.window.addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
+                display::color_set(color_pair);
+                display::addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
                 if let Some(_) = SAVED_PUZZLE {
-                    self.window.color_set(display::pair::DEFAULT);
-                    self.window.attroff(pc::A_BOLD);
+                    display::color_set(COLOR_PAIR::DEFAULT);
+                    display::bold_set(false);
                 }
 
                 if j == 8 || j == 17 {
-                    self.window.addstr("|");
+                    display::addstr("|");
                 }
             }
             if i == 8 || i == 17 {
-                self.window.mvprintw(
+                display::mvprintw(
                     (i as u8 + ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
                     ORIGIN.x() as i32,
                     "---------|---------|---------"
@@ -458,16 +427,16 @@ impl<'a> Sudoku<'a> {
 
                 let row_index: usize = coords.y().into();
                 let column_index: usize = coords.x().into();
-                let color_pair: i16 = if self.grid.is_known(i) {
-                    GIVEN
+                let color_pair: COLOR_PAIR = if self.grid.is_known(i) {
+                    COLOR_PAIR::GIVEN
                 }
                 else {
-                    UNKNOWN
+                    COLOR_PAIR::UNKNOWN
                 };
                 self.color_codes[row_index][column_index] = color_pair;
-                self.window.color_set(color_pair);
-                self.window.addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
-                self.window.color_set(display::pair::DEFAULT);
+                display::color_set(color_pair);
+                display::addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
+                display::color_set(COLOR_PAIR::DEFAULT);
             }
         }
     }
@@ -482,10 +451,10 @@ impl<'a> Sudoku<'a> {
     fn mv (&mut self, COORDS: Cell) {
         let TOTAL_OFFSETY: i32 = (COORDS.y() + ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
         let TOTAL_OFFSETX: i32 = (COORDS.x() + ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
-        self.window.mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
+        display::mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
 
         //NOTE: Update cursor_pos after moving
-        let (new_cursor_y, new_cursor_x): (i32, i32) = self.window.get_cur_yx();
+        let (new_cursor_y, new_cursor_x): (i32, i32) = display::get_cur_yx();
         self.cursor_pos.set(new_cursor_y as u8, new_cursor_x as u8);
     }
 
@@ -501,7 +470,7 @@ impl<'a> Sudoku<'a> {
      *       called.
      */
     fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
-        let (y, x): (i32, i32) = self.window.get_cur_yx();
+        let (y, x): (i32, i32) = display::get_cur_yx();
         self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
     }
 
@@ -524,29 +493,12 @@ impl<'a> Sudoku<'a> {
             "m -> in-game menu"
         };
         //attron(COLOR_PAIR(MENU_SELECTION));
-        self.window.mvprintw(
-            self.window.get_max_y() - LINE_OFFSET_TWEAK as i32,
+        display::mvprintw(
+            display::get_max_y() - LINE_OFFSET_TWEAK as i32,
             ORIGIN.x().into(),
             hotkey_string,
         );
         //attroff(COLOR_PAIR(MENU_SELECTION));
-    }
-
-    /**
-     * Updates the terminal display with any changes. This is a wrapper around the NCurses
-     * function of the same name.
-     */
-    fn refresh (&self) {
-        self.window.refresh();
-    }
-
-    /**
-     * Returns the character at the current cursor position. This is a wrapper around the NCurses
-     * macro function of the same name. The underlying call to NCurses wgetch(stdscr) seen here
-     * is the same functionality as the original NCurses getch.
-     */
-    fn getch (&self) -> Option<pc::Input> {
-        self.window.getch()
     }
 
     /**
@@ -558,21 +510,21 @@ impl<'a> Sudoku<'a> {
         for i in 0..DISPLAY_MATRIX_ROWS {
             self.mv(Cell::new(i as u8, 0));
             for j in 0..DISPLAY_MATRIX_COLUMNS {
-                if (self.color_codes[i][j] == CANDIDATES_Y ||
-                    self.color_codes[i][j] == CANDIDATES_B) {
-                        self.window.attron(pc::A_BOLD);
+                if (self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_Y ||
+                    self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B) {
+                        display::bold_set(true);
                     }
-                self.window.color_set(self.color_codes[i][j]);
-                self.window.addstr(format!("{}", self.display_matrix[i][j]).as_str());
-                self.window.color_set(display::pair::DEFAULT);
-                self.window.attroff(pc::A_BOLD);
+                display::color_set(self.color_codes[i][j]);
+                display::addstr(format!("{}", self.display_matrix[i][j]).as_str());
+                display::color_set(COLOR_PAIR::DEFAULT);
+                display::bold_set(false);
 
                 if (j == 8 || j == 17) {
-                    self.window.addstr("|");
+                    display::addstr("|");
                 }
             }
             if (i == 8 || i == 17) {
-                self.window.mvprintw(
+                display::mvprintw(
                     i as i32 + ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
                     ORIGIN.x().into(),
                     "---------|---------|---------"
@@ -587,7 +539,7 @@ impl<'a> Sudoku<'a> {
      * appearance that the cursor never moved at all.
      */
     fn reset_cursor (&self) {
-        self.window.mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
+        display::mv(self.cursor_pos.y().into(), self.cursor_pos.x().into());
     }
 
     /**
@@ -600,25 +552,25 @@ impl<'a> Sudoku<'a> {
      */
     fn save_game_prompt (&self, DELAY: u8) {
         let DISPLAY_LINE: i32 = ORIGIN.y() as i32 + DISPLAY_MATRIX_ROWS as i32 + 3;
-        self.window.mv(DISPLAY_LINE, 1);
-        self.window.clrtoeol();
-        self.window.addstr("Enter save file name: ");
+        display::mv(DISPLAY_LINE, 1);
+        display::clrtoeol();
+        display::addstr("Enter save file name: ");
 
         /* NOTE: Copy the display matrix int oa pointer in order to pass along to
          *       InGameMenu::save_game
          */
         let name = self.save_game();
-        self.window.mv(DISPLAY_LINE, 1);
-        self.window.clrtoeol();
+        display::mv(DISPLAY_LINE, 1);
+        display::clrtoeol();
         //NOTE: Turn off cursor while displaying
         pc::curs_set(CURSOR_VISIBILITY::NONE);
-        self.window.addstr(format!("{} saved!", name).as_str());
-        self.refresh();
+        display::addstr(format!("{} saved!", name).as_str());
+        display::refresh();
 
         //NOTE: Clear output after a delay
         sleep(Duration::new(DELAY.into(), 0));
-        self.window.mv(DISPLAY_LINE, 0);
-        self.window.clrtoeol();
+        display::mv(DISPLAY_LINE, 0);
+        display::clrtoeol();
         pc::curs_set(CURSOR_VISIBILITY::BLOCK);
     }
 
@@ -628,11 +580,11 @@ impl<'a> Sudoku<'a> {
     fn save_game (&self) -> String {
         let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
         let mut name: String = String::new();   //      requirements of no in-game menu mode
-        self.window.nodelay(false);
+        display::nodelay(false);
         pc::echo();
-        display::getnstr(&self.window, &mut name, NAME_SIZE - 1);
+        display::getnstr(&mut name, NAME_SIZE - 1);
         pc::noecho();
-        self.window.nodelay(true);
+        display::nodelay(true);
 
         /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
          *       message will be handled by the calling function.
