@@ -600,7 +600,7 @@ impl Menu for DifficultyMenu {
                 DifficultyMenuOption::EXPERT => "Expert",
             });
             if *opt == variant {
-                display::color_set(COLOR_PAIR::DIFFICULTY_MENU_SELECTION);
+                display::color_set(COLOR_PAIR::DEFAULT);
             }
         }
         display::refresh();
