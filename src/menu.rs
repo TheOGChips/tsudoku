@@ -1,6 +1,6 @@
 use signal_hook::{
-    consts::SIGINT,
-    low_level::register,
+    consts,
+    low_level,
 };
 use strum::{
     EnumIter,
@@ -14,22 +14,11 @@ use crate::{
         display::{
             self,
             COLOR_PAIR,
-            TOP_PADDING,
-            LEFT_PADDING,
-            PUZZLE_SPACE,
-            WINDOW_REQ,
-            VERTICAL_DIVIDER,
-            IN_GAME_MENU_DISPLAY_SPACING,
-            set_VERTICAL_DIVIDER,
-            set_IN_GAME_MENU_DISPLAY_SPACING,
-            invalid_window_size_handler,
-            DISPLAY_MATRIX_ROWS,
-            DISPLAY_MATRIX_COLUMNS,
             CURSOR_VISIBILITY,
         },
     },
     common::{
-        DIR,
+        self,
         csv,
     },
     sudoku::SavedPuzzle,
@@ -216,8 +205,8 @@ impl Menu for MainMenu {
     fn menu (&self) -> MenuOption {
         unsafe {
             if !self.in_game_menu_enabled {
-                set_VERTICAL_DIVIDER(0);
-                set_IN_GAME_MENU_DISPLAY_SPACING(0);
+                display::set_VERTICAL_DIVIDER(0);
+                display::set_IN_GAME_MENU_DISPLAY_SPACING(0);
             }
             self.set_WINDOW_REQ();
         }
@@ -237,7 +226,7 @@ impl Menu for MainMenu {
         let mut input: Option<display::Input> = None;
         display::timeout(250);
         while input != Some(display::Input::KeyEnter) {
-            invalid_window_size_handler();
+            display::invalid_window_size_handler();
             display::clear();
             self.display_menu(&max, &MenuOption::MAIN_MENU(opt));
             input = display::getch();
@@ -277,15 +266,15 @@ impl MainMenu {
      */
     pub fn new (use_in_game_menu: bool) -> MainMenu {
         let _ = unsafe {
-            register(SIGINT, || Self::SIGINT_handler())
+            low_level::register(consts::SIGINT, || Self::SIGINT_handler())
         }.expect("Error: Signal not found");
 
         display::tui_init();
         display::init_color_pairs();
 
         Self {
-            BOTTOM_PADDING: TOP_PADDING,
-            RIGHT_PADDING: LEFT_PADDING,
+            BOTTOM_PADDING: display::TOP_PADDING,
+            RIGHT_PADDING: display::LEFT_PADDING,
             RESULT_MSG_SPACE: 3,
             in_game_menu_enabled: use_in_game_menu,
         }
@@ -296,9 +285,9 @@ impl MainMenu {
      * dependent on whether the in-game menu is enabled.
      */
     unsafe fn set_WINDOW_REQ (&self) {
-        WINDOW_REQ = Cell::new(
-            TOP_PADDING + PUZZLE_SPACE + self.RESULT_MSG_SPACE + self.BOTTOM_PADDING,
-            LEFT_PADDING + PUZZLE_SPACE + VERTICAL_DIVIDER + IN_GAME_MENU_DISPLAY_SPACING + self.RIGHT_PADDING,
+        display::WINDOW_REQ = Cell::new(
+            display::TOP_PADDING + display::PUZZLE_SPACE + self.RESULT_MSG_SPACE + self.BOTTOM_PADDING,
+            display::LEFT_PADDING + display::PUZZLE_SPACE + display::VERTICAL_DIVIDER + display::IN_GAME_MENU_DISPLAY_SPACING + self.RIGHT_PADDING,
         )
     }
 }
@@ -357,7 +346,7 @@ impl SavedGameMenu {
      * the list.
      */
     fn generate_saved_games_list () -> Vec<String> {
-        let mut saved_games: Vec<String> = match fs::read_dir(DIR()) {
+        let mut saved_games: Vec<String> = match fs::read_dir(common::DIR()) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
             )
@@ -387,10 +376,14 @@ impl SavedGameMenu {
                 match input {
                     Some(display::Input::KeyEnter) => break,
                     _ => {
-                        display::mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32, "You have no saved games.");
                         display::mvprintw(
-                            TOP_PADDING as i32 + self.saved_games.len() as i32 + 3,
-                            LEFT_PADDING as i32,
+                            display::TOP_PADDING as i32,
+                            display::LEFT_PADDING as i32,
+                            "You have no saved games."
+                        );
+                        display::mvprintw(
+                            display::TOP_PADDING as i32 + self.saved_games.len() as i32 + 3,
+                            display::LEFT_PADDING as i32,
                             "Press ENTER to continue..."
                         );
                         display::refresh();
@@ -406,7 +399,11 @@ impl SavedGameMenu {
                     Some(display::Input::KeyEnter) => break,
                     _ => {
                         self.display_menu(
-                            &Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
+                            &Cell::new(
+                                display::TOP_PADDING,
+                                display::LEFT_PADDING
+                            ),
+                            &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
                         );
 
                         input = display::getch();
@@ -440,16 +437,16 @@ impl SavedGameMenu {
     /// Reads a saved game from it's CSV file to the saved game and color code matrices.
     fn read_saved_game (&self) {
         let game_data: Vec<u8> = csv::read(
-            DIR().join(self.selection.borrow().to_string()).to_str().unwrap()
+            common::DIR().join(self.selection.borrow().to_string()).to_str().unwrap()
             )
             .unwrap();
 
         let mut i: usize = 0;
         let mut j: usize = 0;
-        let mut saved_game: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
-            [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
-        let mut saved_color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
-            [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
+        let mut saved_game: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+            [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
+        let mut saved_color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+            [[' '; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
         for byte in game_data {
             if (byte as char).is_numeric() {
                 saved_game[i][j] = byte;
@@ -468,7 +465,7 @@ impl SavedGameMenu {
         let mut puzzle: SavedPuzzle = SavedPuzzle::new();
         puzzle.set_puzzle(saved_game);
         puzzle.set_color_codes(saved_color_codes);
-        puzzle.set_filename(DIR().join(self.selection.borrow().as_str())
+        puzzle.set_filename(common::DIR().join(self.selection.borrow().as_str())
             .to_str()
             .unwrap()
         );
@@ -615,7 +612,10 @@ impl Menu for DifficultyMenu {
         display::timeout(250);
         while input != Some(display::Input::KeyEnter) {
             display::refresh();
-            self.display_menu(&Cell::new(TOP_PADDING, LEFT_PADDING), &MenuOption::DIFFICULTY_MENU(diff));
+            self.display_menu(
+                &Cell::new(display::TOP_PADDING, display::LEFT_PADDING),
+                &MenuOption::DIFFICULTY_MENU(diff)
+            );
             input = display::getch();
             diff = 
                 match input {
@@ -643,7 +643,7 @@ impl Menu for DifficultyMenu {
 }
 
 pub struct InGameMenu {
-    display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    display_matrix: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     window_resized: RefCell<bool>,
     IN_GAME_MENU_LEFT_EDGE: u8,
     IN_GAME_MENU_TITLE_SPACING: u8,
@@ -657,12 +657,16 @@ impl InGameMenu {
      * 
      *      display_matrix -> The display matrix from the main gameplay loop in Sudoku.
      */
-    pub fn new (display_matrix: &[[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) -> Self {
+    pub fn new (
+        display_matrix: &[[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS])
+        -> Self {
         Self {
             //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
             display_matrix: *display_matrix,
             window_resized: RefCell::new(false),
-            IN_GAME_MENU_LEFT_EDGE: LEFT_PADDING + PUZZLE_SPACE + unsafe { VERTICAL_DIVIDER },
+            IN_GAME_MENU_LEFT_EDGE: display::LEFT_PADDING +
+                display::PUZZLE_SPACE +
+                unsafe { display::VERTICAL_DIVIDER },
             IN_GAME_MENU_TITLE_SPACING: 1,
             save_file_name: RefCell::new(String::new()),
         }
@@ -694,7 +698,7 @@ impl InGameMenu {
      */
     fn clear (&self, EDGE: Cell) {
         let in_game_menu_top_left: i32 = EDGE.y() as i32 +
-            unsafe { IN_GAME_MENU_DISPLAY_SPACING as i32 } +
+            unsafe { display::IN_GAME_MENU_DISPLAY_SPACING as i32 } +
             InGameMenuOption::COUNT as i32 +
             2;
         for y in in_game_menu_top_left..display::get_max_y() {
@@ -722,7 +726,9 @@ impl InGameMenu {
         let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        display::mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+        display::mvprintw(
+            (EDGE.y() + unsafe { display::IN_GAME_MENU_DISPLAY_SPACING }) as i32 +
+                display_offset,
             EDGE.x() as i32,
             TITLE);
         display_offset += 1;
@@ -746,7 +752,9 @@ impl InGameMenu {
     fn screen_reader (&self, EDGE: Cell, string: &str, display_offset: &mut i32) {
         let mut display_str: String = String::new();
         for word in string.split_whitespace() {
-            if display_str.len() + 1 + word.len() < unsafe { IN_GAME_MENU_DISPLAY_SPACING.into() } {
+            if display_str.len() + 1 + word.len() < unsafe {
+                display::IN_GAME_MENU_DISPLAY_SPACING.into()
+            } {
                 display_str.push_str(word);
                 display_str.push(' ');
             }
@@ -797,7 +805,9 @@ impl InGameMenu {
         let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        display::mvprintw((EDGE.y() + unsafe { IN_GAME_MENU_DISPLAY_SPACING }) as i32 + display_offset,
+        display::mvprintw(
+            (EDGE.y() + unsafe { display::IN_GAME_MENU_DISPLAY_SPACING }) as i32 +
+                display_offset,
             EDGE.x() as i32,
             TITLE);
         display_offset += 1;
@@ -904,7 +914,10 @@ impl Menu for InGameMenu {
     fn menu (&self) -> MenuOption {
         display::curs_set(CURSOR_VISIBILITY::NONE);
         self.set_window_resized(false);
-        let in_game_menu_left_edge: Cell = Cell::new(TOP_PADDING, self.IN_GAME_MENU_LEFT_EDGE);
+        let in_game_menu_left_edge: Cell = Cell::new(
+            display::TOP_PADDING,
+            self.IN_GAME_MENU_LEFT_EDGE
+        );
         let mut opt: InGameMenuOption = InGameMenuOption::RULES;
 
         loop {
@@ -937,8 +950,11 @@ impl Menu for InGameMenu {
                 },
                 _ => if display::invalid_window_size_handler() {
                     self.set_window_resized(true);
-                    display::mvprintw(TOP_PADDING as i32, LEFT_PADDING as i32,
-                             "Press 'm' to restore the game");
+                    display::mvprintw(
+                        display::TOP_PADDING as i32,
+                        display::LEFT_PADDING as i32,
+                        "Press 'm' to restore the game"
+                    );
                 },
             }
         }

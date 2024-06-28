@@ -4,9 +4,6 @@ use crate::{
             self,
             CURSOR_VISIBILITY,
             COLOR_PAIR,
-            DISPLAY_MATRIX_ROWS,
-            DISPLAY_MATRIX_COLUMNS,
-            ORIGIN,
         },
         Cell,
     },
@@ -22,7 +19,7 @@ use crate::{
 use pancurses as pc;
 use std::{
     collections::HashMap,
-    array::from_fn,
+    array,
     cell::RefCell,
 };
 use rand::{
@@ -64,9 +61,9 @@ impl _neighbor_cells {
 #[derive(Clone)]
 pub struct SavedPuzzle {
     /// A 9x9 matrix containing the values in the puzzle cells
-    puzzle: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    puzzle: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     /// A 9x9 matrix containing the current color codes of the puzzle cells
-    color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     /// The name of the file the puzzle is saved under
     filename: String,
 }
@@ -75,19 +72,21 @@ impl SavedPuzzle {
     /// Returns an "empty" SavedPuzzle (zeroed/spaced arrays and empty filename).
     pub fn new () -> Self {
         Self {
-            puzzle: [[0; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-            color_codes: [[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+            puzzle: [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+            color_codes: [[' '; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
             filename: String::new(),
         }
     }
 
     /// Stores the values of the saved puzzle into an array.
-    pub fn set_puzzle (&mut self, puzzle: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) {
+    pub fn set_puzzle (&mut self,
+        puzzle: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS]) {
         self.puzzle = puzzle;
     }
 
     /// Stores the color codes of the saved puzzle into an array.
-    pub fn set_color_codes (&mut self, color_codes: [[char; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]) {
+    pub fn set_color_codes (&mut self,
+        color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS]) {
         self.color_codes = color_codes;
     }
 
@@ -128,8 +127,8 @@ impl SavedPuzzle {
  *                          border positions.
  */
 pub struct Sudoku {
-    display_matrix: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
-    color_codes: [[COLOR_PAIR; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS],
+    display_matrix: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+    color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     grid: Grid,
     grid2display_map: HashMap<u8, Cell>,
     display2grip_map: HashMap<Cell, u8>,
@@ -145,6 +144,7 @@ impl Sudoku {
      * setup of color mappings and display matrix initialization.
      */
     pub fn new (saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
+        //TODO: Continue testing from here
         display::init_color_pairs();
         let (grid2display, _display2grid) = Self::create_maps();
         let (_display_matrix, _grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
@@ -176,8 +176,8 @@ impl Sudoku {
         for i in 0..GRID_SIZE {
             grid2display.insert(i, Cell::new(row, col));
             col += 3;
-            if col / DISPLAY_MATRIX_COLUMNS as u8 != 0 {
-                col %= DISPLAY_MATRIX_COLUMNS as u8;
+            if col / display::DISPLAY_MATRIX_COLUMNS as u8 != 0 {
+                col %= display::DISPLAY_MATRIX_COLUMNS as u8;
                 row += 3;
             }
         }
@@ -204,7 +204,7 @@ impl Sudoku {
      *                      saved game, this object will be read in beforehand.
      */
     fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
-        -> ([[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS], Grid) {
+        -> ([[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS], Grid) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
          * screen dimensions.
@@ -242,8 +242,12 @@ impl Sudoku {
         match saved_puzzle {
             Some(_puzzle) => todo!(),
             None => {
-                let mut mat: [[u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS] =
-                    [[' ' as u8; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS];
+                let mut mat:
+                    [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+                    [
+                        [' ' as u8; display::DISPLAY_MATRIX_COLUMNS]
+                        ; display::DISPLAY_MATRIX_ROWS
+                    ];
 
                 let mut diff_menu: DifficultyMenu = DifficultyMenu::new();
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
@@ -270,8 +274,8 @@ impl Sudoku {
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
-        display::mv(ORIGIN.y().into(), ORIGIN.x().into());
-        self.cursor_pos.set(ORIGIN.y(), ORIGIN.x());
+        display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
+        self.cursor_pos.set(display::ORIGIN.y(), display::ORIGIN.x());
         display::refresh();
 
         let mut quit_game: bool = false;
@@ -288,7 +292,11 @@ impl Sudoku {
                     let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
 
                     //attron(COLOR_PAIR(MENU_SELECTION));
-                    display::mvprintw(display::get_max_y() - LINE_OFFSET_TWEAK as i32, ORIGIN.x() as i32, "m -> return to game");
+                    display::mvprintw(
+                        display::get_max_y() - LINE_OFFSET_TWEAK as i32,
+                        display::ORIGIN.x() as i32,
+                         "m -> return to game"
+                    );
                     //attroff(COLOR_PAIR(MENU_SELECTION));
                     display::clrtoeol();
 
@@ -303,7 +311,7 @@ impl Sudoku {
                     //attron(COLOR_PAIR(MENU_SELECTION));
                     display::mvprintw(
                         display::get_max_y() - LINE_OFFSET_TWEAK as i32,
-                        ORIGIN.x().into(),
+                        display::ORIGIN.x().into(),
                         "m -> in-game menu"
                     );
                     //attroff(COLOR_PAIR(MENU_SELECTION));
@@ -359,9 +367,9 @@ impl Sudoku {
      *                      will be read in beforehand.
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
-        for i in 0..DISPLAY_MATRIX_ROWS{
+        for i in 0..display::DISPLAY_MATRIX_ROWS{
             self.mv(Cell::new(i as u8, 0));
-            for j in 0..DISPLAY_MATRIX_COLUMNS {
+            for j in 0..display::DISPLAY_MATRIX_COLUMNS {
                 self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
                 /*let mut color_pair: i16 = UNKNOWN;
                 if let Some(saved_puzzle) = SAVED_PUZZLE {
@@ -407,8 +415,8 @@ impl Sudoku {
             }
             if i == 8 || i == 17 {
                 display::mvprintw(
-                    (i as u8 + ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
-                    ORIGIN.x() as i32,
+                    (i as u8 + display::ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
+                    display::ORIGIN.x() as i32,
                     "---------|---------|---------"
                 );
             }
@@ -443,8 +451,10 @@ impl Sudoku {
      *      COORDS -> Pre-offset display line and column numbers.
      */
     fn mv (&mut self, COORDS: Cell) {
-        let TOTAL_OFFSETY: i32 = (COORDS.y() + ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
-        let TOTAL_OFFSETX: i32 = (COORDS.x() + ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
+        let TOTAL_OFFSETY: i32 =
+            (COORDS.y() + display::ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
+        let TOTAL_OFFSETX: i32 =
+            (COORDS.x() + display::ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
         display::mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
 
         //NOTE: Update cursor_pos after moving
@@ -489,7 +499,7 @@ impl Sudoku {
         //attron(COLOR_PAIR(MENU_SELECTION));
         display::mvprintw(
             display::get_max_y() - LINE_OFFSET_TWEAK as i32,
-            ORIGIN.x().into(),
+            display::ORIGIN.x().into(),
             hotkey_string,
         );
         //attroff(COLOR_PAIR(MENU_SELECTION));
@@ -501,9 +511,9 @@ impl Sudoku {
      * value).
      */
     fn printw (&mut self) {
-        for i in 0..DISPLAY_MATRIX_ROWS {
+        for i in 0..display::DISPLAY_MATRIX_ROWS {
             self.mv(Cell::new(i as u8, 0));
-            for j in 0..DISPLAY_MATRIX_COLUMNS {
+            for j in 0..display::DISPLAY_MATRIX_COLUMNS {
                 if self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_Y ||
                    self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B {
                         display::bold_set(true);
@@ -519,8 +529,8 @@ impl Sudoku {
             }
             if i == 8 || i == 17 {
                 display::mvprintw(
-                    i as i32 + ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
-                    ORIGIN.x().into(),
+                    i as i32 + display::ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
+                    display::ORIGIN.x().into(),
                     "---------|---------|---------"
                 );
             }
@@ -545,7 +555,8 @@ impl Sudoku {
      *               resuming play.
      */
     fn save_game_prompt (&self, DELAY: u8) {
-        let DISPLAY_LINE: i32 = ORIGIN.y() as i32 + DISPLAY_MATRIX_ROWS as i32 + 3;
+        let DISPLAY_LINE: i32 =
+            display::ORIGIN.y() as i32 + display::DISPLAY_MATRIX_ROWS as i32 + 3;
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
         display::addstr("Enter save file name: ");
@@ -613,9 +624,12 @@ impl Grid {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
-        let rows: [Row; NUM_CONTAINERS as usize] = from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
-        let columns: [Column; NUM_CONTAINERS as usize] = from_fn(|_| Column::new(CONTAINER::COLUMN, [0; CONTAINER_SIZE as usize]));
-        let boxes: [Box; NUM_CONTAINERS as usize] = from_fn(|_| Box::new(CONTAINER::BOX, [0; CONTAINER_SIZE as usize]));
+        let rows: [Row; NUM_CONTAINERS as usize] =
+            array::from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
+        let columns: [Column; NUM_CONTAINERS as usize] =
+            array::from_fn(|_| Column::new(CONTAINER::COLUMN, [0; CONTAINER_SIZE as usize]));
+        let boxes: [Box; NUM_CONTAINERS as usize] =
+            array::from_fn(|_| Box::new(CONTAINER::BOX, [0; CONTAINER_SIZE as usize]));
         
         Self {
             grid_map: grid_map,
@@ -675,7 +689,7 @@ impl Grid {
         //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
 
         let mut generator = thread_rng();
-        let mut positions: [u8; GRID_SIZE as usize] = from_fn(|i| i as u8);
+        let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
         positions.shuffle(&mut generator);
 
         let NUM_POSITIONS: usize = match diff {
@@ -716,7 +730,7 @@ impl Grid {
                                                         */
         //NOTE: Random numbers with values of 1-81 will be uniformly generated.
         let _ = Uniform::new_inclusive(1, CONTAINER_SIZE + 1);
-        let mut values: [u8; CONTAINER_SIZE as usize] = from_fn(|i| i as u8 + 1);
+        let mut values: [u8; CONTAINER_SIZE as usize] = array::from_fn(|i| i as u8 + 1);
 
         /* NOTE: Fill in boxes along the diagonal first.On an empty puzzle, boxes 1, 5, and 9 are
          *       independent of each other, and can be randomly filled in a more trivial manner.
@@ -738,18 +752,19 @@ impl Grid {
         /* NOTE: Create row, column, and box objects from partial solution matrix. These arrays
          *       will be used to finish solving the sudoku puzzle recursively.
          */
-        let mut soln_rows: [Row; NUM_CONTAINERS as usize] = from_fn(|i| Row::new(CONTAINER::ROW, soln_matrix[i]));
-        let mut soln_columns: [Column; NUM_CONTAINERS as usize] = from_fn(
+        let mut soln_rows: [Row; NUM_CONTAINERS as usize] =
+            array::from_fn(|i| Row::new(CONTAINER::ROW, soln_matrix[i]));
+        let mut soln_columns: [Column; NUM_CONTAINERS as usize] = array::from_fn(
             |i| {
                 /*let mut temp_col: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
                 for j in 0..NUM_CONTAINERS {
                     temp_col[j] = soln_matrix[j][i];
                 }
                 Column::new(CONTAINER::COLUMN, temp_col)*/
-                Column::new(CONTAINER::COLUMN, from_fn(|j| soln_matrix[j][i]))
+                Column::new(CONTAINER::COLUMN, array::from_fn(|j| soln_matrix[j][i]))
             }
         );
-        let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = from_fn(
+        let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = array::from_fn(
             |_| {
                 let mut arr: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
                 for j in [1, 4, 7] {

@@ -2,14 +2,8 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 //include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-use clap::{
-    command,
-    arg,
-};
-use std::{
-    fs,
-};
+use clap;
+use std::fs;
 use menu::{
     Menu,
     MenuOption,
@@ -17,9 +11,7 @@ use menu::{
     MainMenuOption,
 };
 use common::DIR;
-use sudoku::{
-    Sudoku,
-};
+use sudoku::Sudoku;
 use terminal::display::{
     self,
     CURSOR_VISIBILITY,
@@ -35,15 +27,15 @@ pub mod sudoku;
 }*/
 
 fn main() -> Result<(), &'static str> {
-    let matches = command!()
+    let matches = clap::command!()
         .arg(
-            arg!(-n --"no-in-game-menu"
-                 "Disables the in-game menu, allowing a smaller terminal window"
+            clap::arg!(-n --"no-in-game-menu"
+                "Disables the in-game menu, allowing a smaller terminal window"
             )
             .required(false)
         )
         .arg(
-            arg!(-d --"delete-saved-games" "Deletes all saved game data")
+            clap::arg!(-d --"delete-saved-games" "Deletes all saved game data")
             .required(false)
         )
         .get_matches();

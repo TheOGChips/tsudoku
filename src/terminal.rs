@@ -52,8 +52,8 @@ impl Cell {
 pub mod display {
     use super::Cell;
     use signal_hook::{
-        consts::SIGINT,
-        low_level::register,
+        consts,
+        low_level,
     };
     use pancurses as pc;
     use once_cell::unsync::Lazy;
@@ -126,13 +126,9 @@ pub mod display {
      * has something to do with how NCurses handles window resizing, and might not be fixable
      * anyway.
      */
-    /* TODO: This doesn't appear to work inside the difficulty menu or when displaying the number
-             of completed games. In the difficulty menu, nothing displays until you select an
-             option. When displaying the number of completed games, the program "crashes".
-     */
     pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
-            register(SIGINT, || SIGINT_handler())
+            low_level::register(consts::SIGINT, || SIGINT_handler())
         }.expect("Error: Signal not found");
 
         let (mut y_max, mut x_max): (i32, i32) = window.get_max_yx();
