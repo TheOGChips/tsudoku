@@ -1,5 +1,5 @@
 /// A cell in the terminal display.
-#[derive(Eq, Hash, PartialEq, Copy, Clone)]
+#[derive(Eq, Hash, PartialEq, Copy, Clone, Debug)]
 pub struct Cell (u8, u8);
 impl Cell {
     /**
@@ -500,7 +500,7 @@ pub mod display {
      * Options used by outside functions to request a change in color output in the terminal
      * display.
      */
-    #[derive(PartialEq)]
+    #[derive(PartialEq, Copy, Clone)]
     pub enum COLOR_PAIR {
         /// The uninteresting default of white text on black background.
         DEFAULT,

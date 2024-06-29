@@ -134,7 +134,7 @@ pub struct Sudoku {
     display2grip_map: HashMap<Cell, u8>,
     ORIGIN: Cell,
     cursor_pos: Cell,
-    display_matrix_offset: HashMap<Cell, Cell>,
+    offset2actual: HashMap<Cell, Cell>,
     save_file_name: RefCell<String>,
 }
 
@@ -143,23 +143,59 @@ impl Sudoku {
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (saved_puzzle: Option<&SavedPuzzle>) /*-> Self*/ {
-        //TODO: Continue testing from here
+    pub fn new (saved_puzzle: Option<&SavedPuzzle>) -> Self {
         display::init_color_pairs();
-        let (grid2display, _display2grid) = Self::create_maps();
-        let (_display_matrix, _grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
-        //TODO: Return display_matrix, color_codes?, and grid from init_display_matrix
-        /*Self {
+        let (grid2display, display2grid) = Self::create_maps();
+        //TODO: Continue testing from here
+        /*let color_codes: [
+            [display::COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
+            display::DISPLAY_MATRIX_ROWS
+        ] = Self::create_color_codes(&grid2display);*/
+        /*
+        println!("The maps {} the same size...",
+            if grid2display.len() == display2grid.len() {
+                "are"
+            }
+            else {
+                "are not"
+            }
+        );
+        for i in 0..grid2display.len() as u8 {
+            let (_, val) = grid2display.get_key_value(&i).unwrap();
+            println!("{:?} -> {:?}",
+                grid2display.get_key_value(&i).unwrap(),
+                display2grid.get_key_value(&val).unwrap()
+            );
+        }
+        println!("hello there...");
+        std::process::exit(0);*/
+        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
+        let offset2actual: HashMap<Cell, Cell> = Self::map_display_matrix_offset();
+        /*display::tui_end();
+        for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
+            for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
+                let (actual, offset): (&Cell, &Cell) = display_matrix_offset
+                    .get_key_value(&Cell::new(i, j))
+                    .unwrap();
+                println!("{:?}: {:?}", actual, offset);
+            }
+        }*/
+        Self {
             display_matrix: display_matrix,
-            color_codes: todo!()/*[[' '; DISPLAY_MATRIX_COLUMNS]; DISPLAY_MATRIX_ROWS]*/,
+            color_codes: [
+                [COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS];
+                display::DISPLAY_MATRIX_ROWS],
             grid: grid,
             grid2display_map: grid2display,
             display2grip_map: display2grid,
-            ORIGIN: ORIGIN,
-            cursor_pos: ORIGIN,
-            display_matrix_offset: todo!()/*HashMap::new()*/,
-            save_file_name: todo!() /* String::new() */,
-        }*/
+            ORIGIN: display::ORIGIN,
+            cursor_pos: display::ORIGIN,
+            offset2actual: offset2actual,
+            save_file_name: RefCell::new(match saved_puzzle {
+                Some(puzzle) => puzzle.filename.clone(),
+                None => String::new(),
+            }),
+        }
     }
 
     /**
@@ -193,6 +229,26 @@ impl Sudoku {
 
         (grid2display, display2grid)
     }
+
+    /**
+     * 
+     */
+    /*fn create_color_codes (grid2display: &HashMap<u8, Cell>) -> [
+        [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
+        display::DISPLAY_MATRIX_ROWS
+    ] {
+        let color_codes = [[COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
+        let mut cells = grid2display.values();
+        for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
+            for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
+                match cells.find(|&&cell| cell == Cell::new(i, j)) {
+                    Some(_) => color_codes[i][j] = COLOR_PAIR::GIVEN,
+                    None => todo!(),
+                }
+            }
+        }
+        color_codes
+    }*/
 
     /**
      * Initialiizes the display matrix with either a newly generated puzzle or a saved
@@ -262,7 +318,30 @@ impl Sudoku {
                 (mat, grid)
             },
         }
-        //TODO: Return the color codes?
+    }
+
+    /**
+     * Creates a mapping between a cell in the display matrix and it's actual location on the
+     * screen. Returns a `HashMap` containing a mapping of display offset coordinates to actual
+     * non-offset coordinates.
+     */
+    fn map_display_matrix_offset () -> HashMap<Cell, Cell> {
+        let mut offset2actual: HashMap<Cell, Cell> = HashMap::new();
+        for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
+            for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
+                let TOTAL_OFFSETY: u8 = i + display::ORIGIN.y() + (i / CONTAINER_SIZE);
+                let TOTAL_OFFSETX: u8 = j + display::ORIGIN.x() + (j / CONTAINER_SIZE);
+                let actual: Cell = Cell::new(i, j);
+                let offset: Cell = Cell::new(TOTAL_OFFSETY, TOTAL_OFFSETX);
+                /* TODO: These may need to be switched? I thought I had it the other way (where
+                 *       the actual gave you the offset), but the code makes it look like the
+                 *       offset gives you the actual.
+                 * TODO: Rename this to offset2actual? or actual2offset?
+                 */
+                offset2actual.insert(offset, actual);
+            }
+        }
+        offset2actual
     }
 
     /**
@@ -370,7 +449,7 @@ impl Sudoku {
         for i in 0..display::DISPLAY_MATRIX_ROWS{
             self.mv(Cell::new(i as u8, 0));
             for j in 0..display::DISPLAY_MATRIX_COLUMNS {
-                self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
+                //TODO: GET RID OF THIS self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
                 /*let mut color_pair: i16 = UNKNOWN;
                 if let Some(saved_puzzle) = SAVED_PUZZLE {
                     if saved_puzzle.color_codes[i][j] == 'u' {
@@ -473,10 +552,10 @@ impl Sudoku {
      *       Sudoku::move in printw takes care of applying the offset before this function is
      *       called.
      */
-    fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
+    /*fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
         let (y, x): (i32, i32) = display::get_cur_yx();
         self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
-    }
+    }*/
 
     /**
      * Displays the hotkey command available in the bottom left corner depending on whether the
