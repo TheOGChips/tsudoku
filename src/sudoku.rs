@@ -892,6 +892,8 @@ impl Grid {
         );
 
         display::tui_end();
+        let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
+
         //println!("soln:\n{:?}", soln_matrix);
         println!("soln:");
         for row in soln_matrix {
@@ -904,8 +906,6 @@ impl Grid {
             println!("b: {:?}\n", b.arr);
         }
         std::process::exit(1);
-        let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
-        
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
                 if soln_matrix[i][j] == '?' as u8 {
@@ -997,13 +997,19 @@ impl Grid {
         for i in 0..CONTAINER_SIZE as usize {
             let ROW_NUMBER: usize = Self::map_row(positions[i]);
             let COLUMN_NUMBER: usize = Self::map_column(positions[i]);
+            println!("y: {}, x: {}, val: {}, y_exists: {}, x_exists: {}, is_known: {}",
+                ROW_NUMBER, COLUMN_NUMBER, VALUE, rows[ROW_NUMBER].value_exists(VALUE),
+                columns[COLUMN_NUMBER].value_exists(VALUE), self.is_known(positions[i] as usize)
+            );
             if !rows[ROW_NUMBER].value_exists(VALUE) &&
                !columns[COLUMN_NUMBER].value_exists(VALUE) &&
                self.is_known(positions[i] as usize) {
+                println!("Trying to add to the queue...");
                 let _ =available_pos.add(positions[i]);
             }
         }
 
+        println!("testing before recursion...");
         /* NOTE: set_value cannot be used here because the rows, columns, and boxes being used
          *       are not the Grid's internal Containers. They belong to the solution matrix and
          *       are completely separate. Interesting things happened when I tested that out
@@ -1013,9 +1019,11 @@ impl Grid {
         let mut soln: bool = true;
         //while true {
         while !stop {
+            //TODO: This isn't being updated like it should
             if available_pos.size() == 0 {
                 return false
             }
+            println!("After available_pos.size() check...");
 
             let next_available_pos = available_pos.peek()
                 .expect("Error retrieving next position while solving...");
@@ -1055,9 +1063,14 @@ impl Grid {
                 boxes[BOX_NUMBER].set_value(BOX_INDEX, '?' as u8);
                 self.known_positions[next_available_pos as usize] = false;
                 let _ = available_pos.remove();
-            }            
+            }
+            println!("stop: {}", stop);
         }
         
+        for row in rows {
+            println!("row: {:?}", row.arr);
+        }
+        println!("");
         soln
     }
 
@@ -1348,18 +1361,22 @@ impl Container {
      *      VALUE -> Integer value that is searched for in the container's internal array.
      */
     fn value_exists (&self, VALUE: u8) -> bool {
-        let CONVERTED: u8 = match VALUE as char {
+        /*let CONVERTED: u8 = match VALUE as char {
             '?' => VALUE,
             _ => VALUE + '0' as u8,
-        };
-        
-        let mut exists: bool = false;
-        for i in 0..CONTAINER_SIZE as usize {
-            if self.at(i) == CONVERTED {
-                exists = true;
-            }
+        };*/
+        if VALUE == '?' as u8 {
+            false
         }
-        exists
+        else {
+            let mut exists: bool = false;
+            for i in 0..CONTAINER_SIZE as usize {
+                if self.at(i) == VALUE {
+                    exists = true;
+                }
+            }
+            exists
+        }
     }
 
     /**
