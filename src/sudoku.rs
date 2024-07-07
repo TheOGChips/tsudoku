@@ -784,10 +784,10 @@ impl Grid {
         let seed: i32 = unsafe {
             time(0x0)
         };
-        //TODO
         let solved_puzzle = self.generate_solved_puzzle(&seed);
         //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
 
+        //TODO
         let mut generator = thread_rng();
         let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
         positions.shuffle(&mut generator);
@@ -891,9 +891,17 @@ impl Grid {
             }
         );
 
-        display::tui_end();
         let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
 
+        for i in 0..NUM_CONTAINERS as usize {
+            for j in 0..NUM_CONTAINERS as usize {
+                if soln_matrix[i][j] == '?' as u8 {
+                    soln_matrix[i][j] = soln_rows[i].at(j);
+                }
+            }
+        }
+
+        /*display::tui_end();
         //println!("soln:\n{:?}", soln_matrix);
         println!("soln:");
         for row in soln_matrix {
@@ -905,15 +913,11 @@ impl Grid {
             println!("c: {:?}", c.arr);
             println!("b: {:?}\n", b.arr);
         }
-        std::process::exit(1);
-        for i in 0..NUM_CONTAINERS as usize {
-            for j in 0..NUM_CONTAINERS as usize {
-                if soln_matrix[i][j] == '?' as u8 {
-                    soln_matrix[i][i] = soln_rows[i].at(j);
-                }
-            }
+        println!("");
+        for row in soln_matrix {
+            println!("\t{:?}", row);
         }
-
+        std::process::exit(1);*/
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
                 soln[i * CONTAINER_SIZE as usize + j] = soln_matrix[i][j];
@@ -997,19 +1001,19 @@ impl Grid {
         for i in 0..CONTAINER_SIZE as usize {
             let ROW_NUMBER: usize = Self::map_row(positions[i]);
             let COLUMN_NUMBER: usize = Self::map_column(positions[i]);
-            println!("y: {}, x: {}, val: {}, y_exists: {}, x_exists: {}, is_known: {}",
+            /*println!("y: {}, x: {}, val: {}, y_exists: {}, x_exists: {}, is_known: {}",
                 ROW_NUMBER, COLUMN_NUMBER, VALUE, rows[ROW_NUMBER].value_exists(VALUE),
                 columns[COLUMN_NUMBER].value_exists(VALUE), self.is_known(positions[i] as usize)
-            );
+            );*/
             if !rows[ROW_NUMBER].value_exists(VALUE) &&
                !columns[COLUMN_NUMBER].value_exists(VALUE) &&
-               self.is_known(positions[i] as usize) {
-                println!("Trying to add to the queue...");
-                let _ =available_pos.add(positions[i]);
+               !self.is_known(positions[i] as usize) {
+                //println!("Trying to add to the queue...");
+                let _ = available_pos.add(positions[i]);
             }
         }
 
-        println!("testing before recursion...");
+        //println!("testing before recursion...");
         /* NOTE: set_value cannot be used here because the rows, columns, and boxes being used
          *       are not the Grid's internal Containers. They belong to the solution matrix and
          *       are completely separate. Interesting things happened when I tested that out
@@ -1019,11 +1023,10 @@ impl Grid {
         let mut soln: bool = true;
         //while true {
         while !stop {
-            //TODO: This isn't being updated like it should
             if available_pos.size() == 0 {
                 return false
             }
-            println!("After available_pos.size() check...");
+            //println!("After available_pos.size() check...");
 
             let next_available_pos = available_pos.peek()
                 .expect("Error retrieving next position while solving...");
@@ -1064,13 +1067,13 @@ impl Grid {
                 self.known_positions[next_available_pos as usize] = false;
                 let _ = available_pos.remove();
             }
-            println!("stop: {}", stop);
+            //println!("stop: {}", stop);
         }
         
-        for row in rows {
+        /*for row in rows {
             println!("row: {:?}", row.arr);
         }
-        println!("");
+        println!("");*/
         soln
     }
 
