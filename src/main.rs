@@ -91,8 +91,8 @@ fn main() -> Result<(), &'static str> {
             match main_menu_option {
                 //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => {
-                    /*let mut puzzle: Sudoku =*/ Sudoku::new(None);
-                    //puzzle.start_game(use_in_game_menu, None);
+                    let mut puzzle: Sudoku = Sudoku::new(None);
+                    puzzle.start_game(use_in_game_menu, None);
                     //TODO
                 },
                 MainMenuOption::RESUME_GAME => {

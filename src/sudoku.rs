@@ -169,10 +169,16 @@ impl Sudoku {
         }
         println!("hello there...");
         std::process::exit(0);*/
+        //TODO: The display matrix isn't looking right
         let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
         let offset2actual: HashMap<Cell, Cell> = Self::map_display_matrix_offset();
         /*display::tui_end();
-        for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
+        println!("display_matrix:\n");
+        for row in display_matrix {
+            println!("{:?}", row);
+        }
+        std::process::exit(0);*/
+        /*for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
             for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
                 let (actual, offset): (&Cell, &Cell) = display_matrix_offset
                     .get_key_value(&Cell::new(i, j))
@@ -309,7 +315,7 @@ impl Sudoku {
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
                     diff_menu.set_difficulty_level(diff);
                 }
-                
+                //TODO: The display matrix isn't looking quite right
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
                 for (i, cell) in grid2display {
                     mat[cell.y() as usize ][cell.x() as usize] = grid.at(*i);
@@ -694,21 +700,47 @@ struct Grid {
 
 impl Grid {
     /**
+     * Begins initialization of internal Container data structures based on the difficulty level
+     * chosen by the user.
+     * 
+     *      diff -> Enum value of difficulty level chosen by the user from the main menu.
+     */
+    pub fn new (diff: DifficultyMenuOption) -> Self {
+        let mut grid: Grid = Self::init(diff);
+        //TODO: Test from here
+        grid.set_starting_positions(diff);
+        grid
+    }
+
+    /**
      * Creates an empty Sudoku grid. This helps facilitate some of the later setup functions in
      * `Grid::new`.
      * 
      *      unused DifficultyMenuOption -> Enum value of difficulty level chosen by the user from the main menu.
      */
+    //TODO: Get rid of the DifficultyMenuOption parameter if not needed
     fn init (_: DifficultyMenuOption) -> Self {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
+        let space: u8 = ' ' as u8;
         let rows: [Row; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Row::new(CONTAINER::ROW, [space; CONTAINER_SIZE as usize]));
         let columns: [Column; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Column::new(CONTAINER::COLUMN, [0; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Column::new(CONTAINER::COLUMN, [space; CONTAINER_SIZE as usize]));
         let boxes: [Box; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Box::new(CONTAINER::BOX, [0; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Box::new(CONTAINER::BOX, [space; CONTAINER_SIZE as usize]));
+        
+        /*display::tui_end();
+        println!("grid_map:\n{:?}", grid_map);
+        println!("known_positions:\n{:?}", known_positions);
+        println!("rows, columns, and boxes:");
+        for (r, c, b) in itertools::izip!(rows, columns, boxes) {
+            println!("r: {:?}", r.arr);
+            println!("c: {:?}", c.arr);
+            println!("b: {:?}\n", b.arr);
+        }
+        std::process::exit(1);*/
         
         Self {
             grid_map: grid_map,
@@ -719,18 +751,6 @@ impl Grid {
         }
     }
     
-    /**
-     * Begins initialization of internal Container data structures based on the difficulty level
-     * chosen by the user.
-     * 
-     *      diff -> Enum value of difficulty level chosen by the user from the main menu.
-     */
-    pub fn new (diff: DifficultyMenuOption) -> Self {
-        let mut grid: Grid = Self::init(diff);
-        grid.set_starting_positions(diff);
-        grid
-    }
-
     //TODO: use from_save for the name in place of the third constructor
 
     /**
@@ -764,6 +784,7 @@ impl Grid {
         let seed: i32 = unsafe {
             time(0x0)
         };
+        //TODO
         let solved_puzzle = self.generate_solved_puzzle(&seed);
         //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
 
@@ -844,25 +865,45 @@ impl Grid {
             }
         );
         let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = array::from_fn(
-            |_| {
-                let mut arr: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
-                for j in [1, 4, 7] {
-                    for k in [1, 4, 7] {
-                        arr[0] = soln_matrix[j-1][k-1];
-                        arr[1] = soln_matrix[j-1][k];
-                        arr[2] = soln_matrix[j-1][k+1];
-                        arr[3] = soln_matrix[j][k-1];
-                        arr[4] = soln_matrix[j][k];
-                        arr[5] = soln_matrix[j][k+1];
-                        arr[6] = soln_matrix[j+1][k-1];
-                        arr[7] = soln_matrix[j+1][k];
-                        arr[8] = soln_matrix[j+1][k+1];
-                    }
-                }
+            |i| {
+                let (j, k): (usize, usize) = if i == 0 { (1, 1) }
+                    else if i == 1 { (1, 4) }
+                    else if i == 2 { (1, 7) }
+                    else if i == 3 { (4, 1) }
+                    else if i == 4 { (4, 4) }
+                    else if i == 5 { (4, 7) }
+                    else if i == 6 { (7, 1) }
+                    else if i == 7 { (7, 4) }
+                    else /*if i == 8*/ { (7, 7) };
+                
+                let arr: [u8; NUM_CONTAINERS as usize] = [
+                    soln_matrix[j-1][k-1],
+                    soln_matrix[j-1][k],
+                    soln_matrix[j-1][k+1],
+                    soln_matrix[j][k-1],
+                    soln_matrix[j][k],
+                    soln_matrix[j][k+1],
+                    soln_matrix[j+1][k-1],
+                    soln_matrix[j+1][k],
+                    soln_matrix[j+1][k+1],
+                ];
                 Box::new(CONTAINER::BOX, arr)
             }
         );
 
+        display::tui_end();
+        //println!("soln:\n{:?}", soln_matrix);
+        println!("soln:");
+        for row in soln_matrix {
+            println!("\t{:?}", row);
+        }
+        println!("");
+        for (r, c, b) in itertools::izip!(soln_rows, soln_columns, soln_boxes) {
+            println!("r: {:?}", r.arr);
+            println!("c: {:?}", c.arr);
+            println!("b: {:?}\n", b.arr);
+        }
+        std::process::exit(1);
         let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
         
         for i in 0..NUM_CONTAINERS as usize {
