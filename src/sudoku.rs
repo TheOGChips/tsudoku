@@ -380,14 +380,13 @@ impl Sudoku {
      */
     pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         self.init_display(SAVED_PUZZLE);
-        display::getch();
-        display::tui_end();
-        //println!("color_codes:\n{:?}", self.color_codes);
-        std::process::exit(1);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
+        display::getch();
+        display::tui_end();
+        std::process::exit(1);
         display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
         self.cursor_pos.set(display::ORIGIN.y(), display::ORIGIN.x());
         display::refresh();
@@ -632,13 +631,14 @@ impl Sudoku {
         else {
             "m -> in-game menu"
         };
-        //attron(COLOR_PAIR(MENU_SELECTION));
+        
+        display::color_set(&COLOR_PAIR::MENU_SELECTION);
         display::mvprintw(
             display::get_max_y() - LINE_OFFSET_TWEAK as i32,
             display::ORIGIN.x().into(),
             hotkey_string,
         );
-        //attroff(COLOR_PAIR(MENU_SELECTION));
+        display::color_set(&COLOR_PAIR::DEFAULT);
     }
 
     /**
