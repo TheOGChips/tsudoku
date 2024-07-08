@@ -315,11 +315,17 @@ impl Sudoku {
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
                     diff_menu.set_difficulty_level(diff);
                 }
-                //TODO: The display matrix isn't looking quite right
+                
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
+                //TODO: Continue testing from here
                 for (i, cell) in grid2display {
                     mat[cell.y() as usize ][cell.x() as usize] = grid.at(*i);
                 }
+                /*display::tui_end();
+                for row in mat {
+                    println!("\t{:?}", row);
+                }
+                std::process::exit(1);*/
 
                 (mat, grid)
             },
@@ -707,7 +713,6 @@ impl Grid {
      */
     pub fn new (diff: DifficultyMenuOption) -> Self {
         let mut grid: Grid = Self::init(diff);
-        //TODO: Test from here
         grid.set_starting_positions(diff);
         grid
     }
@@ -723,13 +728,13 @@ impl Grid {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
-        let space: u8 = ' ' as u8;
+        let unk: u8 = '?' as u8;
         let rows: [Row; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Row::new(CONTAINER::ROW, [space; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Row::new(CONTAINER::ROW, [unk; CONTAINER_SIZE as usize]));
         let columns: [Column; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Column::new(CONTAINER::COLUMN, [space; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Column::new(CONTAINER::COLUMN, [unk; CONTAINER_SIZE as usize]));
         let boxes: [Box; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Box::new(CONTAINER::BOX, [space; CONTAINER_SIZE as usize]));
+            array::from_fn(|_| Box::new(CONTAINER::BOX, [unk; CONTAINER_SIZE as usize]));
         
         /*display::tui_end();
         println!("grid_map:\n{:?}", grid_map);
