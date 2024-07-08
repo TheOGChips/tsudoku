@@ -787,10 +787,12 @@ impl Grid {
         let solved_puzzle = self.generate_solved_puzzle(&seed);
         //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
 
-        //TODO
         let mut generator = thread_rng();
         let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
+        //display::tui_end();
+        //println!("positions: {:?}", positions);
         positions.shuffle(&mut generator);
+        //println!("positions: {:?}", positions);
 
         let NUM_POSITIONS: usize = match diff {
             DifficultyMenuOption::EASY => 60,
@@ -803,11 +805,43 @@ impl Grid {
             self.set_value(POS, solved_puzzle[POS as usize]);
             self.known_positions[POS as usize] = true;
         }
-
-        //TODO: Either uncomment this or get rid of it depending on if it's needed
-        /*for i in NUM_POSITIONS..GRID_SIZE as usize {
-            self.known_positions[positions[i] as usize] = false;
+        
+        /*for i in 0..9 {
+            print!("\t[");
+            for j in 0..9 {
+                if j < 8 {
+                    print!("{}, ", solved_puzzle[i*9 + j]);
+                }
+                else { print!("{}" , solved_puzzle[i*9 + j]);
+                };
+            }
+            println!("]");
+        }
+        println!("");
+        for row in &self.rows {
+            println!("\t{:?}", row.arr);
+        }
+        println!("");
+        for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
+            println!("r: {:?}", r.arr);
+            println!("c: {:?}", c.arr);
+            println!("b: {:?}", b.arr);
+            println!("");
+        }
+        for row in &self.rows {
+            println!("\t{:?}", row.arr);
         }*/
+
+        /* NOTE: It doesn't seem like this should be needed, but it is. There's probably a
+         *       "better" way to fix the way known_positions is updated, but I don't think it's
+         *       worth trying to figure out.
+         */
+        
+        for i in NUM_POSITIONS..GRID_SIZE as usize {
+            self.known_positions[positions[i] as usize] = false;
+        }
+        //println!("{:?}", self.known_positions);
+        //std::process::exit(1);
     }
 
     /**
