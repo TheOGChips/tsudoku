@@ -135,6 +135,7 @@ pub struct Sudoku {
     ORIGIN: Cell,
     cursor_pos: Cell,
     offset2actual: HashMap<Cell, Cell>,
+    actual2offset: HashMap<Cell, Cell>,
     save_file_name: RefCell<String>,
 }
 
@@ -170,7 +171,7 @@ impl Sudoku {
         std::process::exit(0);*/
         let (display_matrix, grid, color_codes) =
             Self::init_display_matrix(saved_puzzle, &grid2display);
-        let offset2actual: HashMap<Cell, Cell> = Self::map_display_matrix_offset();
+        let (offset2actual, actual2offset) = Self::map_display_matrix_offset();
         //display::tui_end();
         /*println!("display_matrix:\n");
         for row in display_matrix {
@@ -199,6 +200,7 @@ impl Sudoku {
             ORIGIN: display::ORIGIN,
             cursor_pos: display::ORIGIN,
             offset2actual: offset2actual,
+            actual2offset: actual2offset,
             save_file_name: RefCell::new(match saved_puzzle {
                 Some(puzzle) => puzzle.filename.clone(),
                 None => String::new(),
@@ -351,8 +353,9 @@ impl Sudoku {
      * screen. Returns a `HashMap` containing a mapping of display offset coordinates to actual
      * non-offset coordinates.
      */
-    fn map_display_matrix_offset () -> HashMap<Cell, Cell> {
+    fn map_display_matrix_offset () -> (HashMap<Cell, Cell>, HashMap<Cell, Cell>) {
         let mut offset2actual: HashMap<Cell, Cell> = HashMap::new();
+        let mut actual2offset: HashMap<Cell, Cell> = HashMap::new();
         for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
             for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
                 let TOTAL_OFFSETY: u8 = i + display::ORIGIN.y() + (i / CONTAINER_SIZE);
@@ -364,9 +367,10 @@ impl Sudoku {
                  *       offset gives you the actual.
                  */
                 offset2actual.insert(offset, actual);
+                actual2offset.insert(actual, offset);
             }
         }
-        offset2actual
+        (offset2actual, actual2offset)
     }
 
     /**
