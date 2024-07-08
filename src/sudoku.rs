@@ -146,7 +146,6 @@ impl Sudoku {
     pub fn new (saved_puzzle: Option<&SavedPuzzle>) -> Self {
         display::init_color_pairs();
         let (grid2display, display2grid) = Self::create_maps();
-        //TODO: Continue testing from here
         /*let color_codes: [
             [display::COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
             display::DISPLAY_MATRIX_ROWS
@@ -169,28 +168,31 @@ impl Sudoku {
         }
         println!("hello there...");
         std::process::exit(0);*/
-        //TODO: The display matrix isn't looking right
-        let (display_matrix, grid) = Self::init_display_matrix(saved_puzzle, &grid2display);
+        let (display_matrix, grid, color_codes) =
+            Self::init_display_matrix(saved_puzzle, &grid2display);
         let offset2actual: HashMap<Cell, Cell> = Self::map_display_matrix_offset();
-        /*display::tui_end();
-        println!("display_matrix:\n");
+        //display::tui_end();
+        /*println!("display_matrix:\n");
         for row in display_matrix {
             println!("{:?}", row);
         }
-        std::process::exit(0);*/
-        /*for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
-            for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
-                let (actual, offset): (&Cell, &Cell) = display_matrix_offset
-                    .get_key_value(&Cell::new(i, j))
-                    .unwrap();
-                println!("{:?}: {:?}", actual, offset);
+        //println!("offset2actual: {:?}", offset2actual);
+        for i in display::ORIGIN.y()..display::DISPLAY_MATRIX_ROWS as u8 + display::ORIGIN.y() {
+            for j in display::ORIGIN.x()..display::DISPLAY_MATRIX_COLUMNS as u8 + display::ORIGIN.x() {
+                let mapping = offset2actual.get_key_value(&Cell::new(i, j));
+                if mapping.is_some() {
+                    let (actual, offset): (&Cell, &Cell) = mapping.unwrap();
+                    println!("{:?}: {:?}", actual, offset);
+                }
+                else {
+                    println!("{}, {}: None", i, j);
+                }
             }
         }*/
+        //std::process::exit(0);
         Self {
             display_matrix: display_matrix,
-            color_codes: [
-                [COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS];
-                display::DISPLAY_MATRIX_ROWS],
+            color_codes: color_codes,
             grid: grid,
             grid2display_map: grid2display,
             display2grip_map: display2grid,
@@ -266,7 +268,11 @@ impl Sudoku {
      *                      saved game, this object will be read in beforehand.
      */
     fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
-        -> ([[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS], Grid) {
+        -> (
+            [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+            Grid,
+            [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        ) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
          * screen dimensions.
@@ -305,11 +311,17 @@ impl Sudoku {
             Some(_puzzle) => todo!(),
             None => {
                 let mut mat:
-                    [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
-                    [
+                    [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] = [
                         [' ' as u8; display::DISPLAY_MATRIX_COLUMNS]
                         ; display::DISPLAY_MATRIX_ROWS
                     ];
+                let mut color_codes: [
+                    [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
+                    display::DISPLAY_MATRIX_ROWS
+                ] = [
+                    [COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS];
+                    display::DISPLAY_MATRIX_ROWS
+                ];
 
                 let mut diff_menu: DifficultyMenu = DifficultyMenu::new();
                 if let MenuOption::DIFFICULTY_MENU(diff) = diff_menu.menu() {
@@ -317,9 +329,11 @@ impl Sudoku {
                 }
                 
                 let grid: Grid = Grid::new(diff_menu.get_difficulty_level());
-                //TODO: Continue testing from here
                 for (i, cell) in grid2display {
-                    mat[cell.y() as usize ][cell.x() as usize] = grid.at(*i);
+                    let y: usize = cell.y() as usize;
+                    let x: usize = cell.x() as usize;
+                    mat[y][x] = grid.at(*i);
+                    color_codes[y][x] = COLOR_PAIR::GIVEN;
                 }
                 /*display::tui_end();
                 for row in mat {
@@ -327,7 +341,7 @@ impl Sudoku {
                 }
                 std::process::exit(1);*/
 
-                (mat, grid)
+                (mat, grid, color_codes)
             },
         }
     }
@@ -348,7 +362,6 @@ impl Sudoku {
                 /* TODO: These may need to be switched? I thought I had it the other way (where
                  *       the actual gave you the offset), but the code makes it look like the
                  *       offset gives you the actual.
-                 * TODO: Rename this to offset2actual? or actual2offset?
                  */
                 offset2actual.insert(offset, actual);
             }
