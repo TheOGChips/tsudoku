@@ -500,7 +500,7 @@ pub mod display {
      * Options used by outside functions to request a change in color output in the terminal
      * display.
      */
-    #[derive(PartialEq, Copy, Clone)]
+    #[derive(PartialEq, Copy, Clone, Debug)]
     pub enum COLOR_PAIR {
         /// The uninteresting default of white text on black background.
         DEFAULT,

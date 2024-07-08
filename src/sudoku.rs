@@ -335,7 +335,9 @@ impl Sudoku {
                     let y: usize = cell.y() as usize;
                     let x: usize = cell.x() as usize;
                     mat[y][x] = grid.at(*i);
-                    color_codes[y][x] = COLOR_PAIR::GIVEN;
+                    if grid.at(*i) != '?' as u8 {
+                        color_codes[y][x] = COLOR_PAIR::GIVEN;
+                    }
                 }
                 /*display::tui_end();
                 for row in mat {
@@ -378,6 +380,10 @@ impl Sudoku {
      */
     pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         self.init_display(SAVED_PUZZLE);
+        display::getch();
+        display::tui_end();
+        //println!("color_codes:\n{:?}", self.color_codes);
+        std::process::exit(1);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
@@ -476,6 +482,7 @@ impl Sudoku {
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
         for i in 0..display::DISPLAY_MATRIX_ROWS{
+            //TODO: Continue testing from here
             self.mv(Cell::new(i as u8, 0));
             for j in 0..display::DISPLAY_MATRIX_COLUMNS {
                 //TODO: GET RID OF THIS self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
@@ -486,6 +493,7 @@ impl Sudoku {
                     }
                     //TODO
                 }*/
+                /* TODO: This could probably go into the Some case of Sudoku::init_display_matrix
                 let color_pair: COLOR_PAIR = if let Some(saved_puzzle) = SAVED_PUZZLE {
                     match saved_puzzle.color_codes[i][j] {
                         'u' => COLOR_PAIR::UNKNOWN,
@@ -508,14 +516,29 @@ impl Sudoku {
                 else {
                     COLOR_PAIR::DEFAULT
                 };
+                */
 
-                display::color_set(&color_pair);
-                self.color_codes[i][j] = color_pair;
-                display::addstr(format!("{}", self.display_matrix[i][j] as char).as_str());
-                if let Some(_) = SAVED_PUZZLE {
+                match self.color_codes[i][j] {
+                    COLOR_PAIR::CANDIDATES_B | COLOR_PAIR::CANDIDATES_Y
+                        => display::bold_set(true),
+                    _ => display::bold_set(false),
+                }
+                display::color_set(&self.color_codes[i][j]);
+                //self.color_codes[i][j] = color_pair;
+                display::addstr(
+                    if self.display_matrix[i][j] == '?' as u8 ||
+                       self.display_matrix[i][j] == ' ' as u8 {
+                        format!("{}",self.display_matrix[i][j] as char)
+                    }
+                    else {
+                        format!("{}", self.display_matrix[i][j])
+                    }
+                    .as_str());
+                //display::color_set(&COLOR_PAIR::DEFAULT);
+                /*if let Some(_) = SAVED_PUZZLE {
                     display::color_set(&COLOR_PAIR::DEFAULT);
                     display::bold_set(false);
-                }
+                }*/
 
                 if j == 8 || j == 17 {
                     display::addstr("|");
@@ -530,7 +553,7 @@ impl Sudoku {
             }
         }
 
-        if let Some(_) = SAVED_PUZZLE {
+        /*if let Some(_) = SAVED_PUZZLE {
             for i in 0..self.grid2display_map.len()  {
                 let coords: Cell = self.grid2display_map[&(i as u8)];
                 self.mv(coords);
@@ -548,7 +571,7 @@ impl Sudoku {
                 display::addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
                 display::color_set(&COLOR_PAIR::DEFAULT);
             }
-        }
+        }*/
     }
 
     /**
@@ -559,15 +582,20 @@ impl Sudoku {
      *      COORDS -> Pre-offset display line and column numbers.
      */
     fn mv (&mut self, COORDS: Cell) {
-        let TOTAL_OFFSETY: i32 =
+        /*let TOTAL_OFFSETY: i32 =
             (COORDS.y() + display::ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
         let TOTAL_OFFSETX: i32 =
             (COORDS.x() + display::ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
-        display::mv(TOTAL_OFFSETY, TOTAL_OFFSETX);
+        display::mv(TOTAL_OFFSETY, TOTAL_OFFSETX);*/
+        let offset: Cell = *self.actual2offset.get(&COORDS)
+            .expect("Problem getting offset in Sudoku::mv");
+        let display_y: i32 = offset.y().into();
+        let display_x: i32 = offset.x().into();
+        display::mv(display_y, display_x);
 
         //NOTE: Update cursor_pos after moving
-        let (new_cursor_y, new_cursor_x): (i32, i32) = display::get_cur_yx();
-        self.cursor_pos.set(new_cursor_y as u8, new_cursor_x as u8);
+        let (new_cursor_pos_y, new_cursor_pos_x): (i32, i32) = display::get_cur_yx();
+        self.cursor_pos.set(new_cursor_pos_y as u8, new_cursor_pos_x as u8);
     }
 
     /**
