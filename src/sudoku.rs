@@ -392,6 +392,7 @@ impl Sudoku {
         //display::tui_end();
         //std::process::exit(1);
 
+        display::noecho();
         let mut quit_game: bool = false;
         //nodelay(stdscr, true);
         display::timeout(250);
@@ -400,9 +401,11 @@ impl Sudoku {
             match input {
                 Some(display::Input::Character('q')) |
                 Some(display::Input::Character('Q')) => quit_game = true,
-                /*Some(display::Input::Character('m')) |
+                Some(display::Input::Character('m')) |
                 Some(display::Input::Character('M')) => if USE_IN_GAME_MENU {
                     //TODO: Make this reusable somehow like in the C++ version...
+                    //TODO: Fix menu selection highlighting
+                    //TODO: Fix content display
                     let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
 
                     //attron(COLOR_PAIR(MENU_SELECTION));
@@ -435,7 +438,7 @@ impl Sudoku {
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
                 },
-                Some(display::Input::Character('s')) |
+                /*Some(display::Input::Character('s')) |
                 Some(display::Input::Character('S')) => if !USE_IN_GAME_MENU {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();

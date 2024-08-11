@@ -180,7 +180,7 @@ pub mod display {
     /// Initializes the pancurses environment and the global pancurses::Window object.
     pub fn tui_init () {
         pc::cbreak();
-        pc::noecho();
+        noecho();
         window.keypad(true);
     }
 
