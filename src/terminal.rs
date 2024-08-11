@@ -365,19 +365,21 @@ pub mod display {
     pub fn getnstr (target: &mut String, max_len: usize) {
         let mut string: String = String::new();
         let mut count: usize = 0;
+        let x_start: i32 = window.get_cur_x();
         loop {
             match window.getch() {
                 Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,
                 Some(pc::Input::KeyBackspace) => {
-                    string.pop();
-                    count -= if count > 0 {
-                        1
-                    } else {
-                        0
-                    };
-                    window.addstr(" ");
-                    let (y, x): (i32, i32) = window.get_cur_yx();
-                    window.mv(y, x - 1);
+                    if count > 0 {
+                        string.pop();
+                        count -= 1;
+                        window.addstr(" ");
+                        let (y, x): (i32, i32) = window.get_cur_yx();
+                        window.mv(y, x - 1);
+                    }
+                    else {
+                        window.mv(window.get_cur_y(), x_start);
+                    }
                 },
                 Some(pc::Input::Character(c)) => {
                     if count < max_len {
