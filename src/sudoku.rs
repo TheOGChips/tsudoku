@@ -415,7 +415,6 @@ impl Sudoku {
                     display::color_set(&COLOR_PAIR::DEFAULT);
                     display::clrtoeol();
 
-                    //TODO: Fix content display
                     in_game_menu.menu();
                     //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
                     let saved_pos: Cell = self.cursor_pos;
@@ -437,12 +436,13 @@ impl Sudoku {
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
                 },
-                /*Some(display::Input::Character('s')) |
+                //TODO: Fix main menu display not showing up if resizing
+                Some(display::Input::Character('s')) |
                 Some(display::Input::Character('S')) => if !USE_IN_GAME_MENU {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();
                 },
-                Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
+                /*Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
                 Some(display::Input::KeyDown)  | Some(display::Input::Character('s')) |
                 Some(display::Input::KeyLeft)  | Some(display::Input::Character('a')) |
                 Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
@@ -706,13 +706,12 @@ impl Sudoku {
      *               resuming play.
      */
     fn save_game_prompt (&self, DELAY: u8) {
-        let DISPLAY_LINE: i32 =
-            display::ORIGIN.y() as i32 + display::DISPLAY_MATRIX_ROWS as i32 + 3;
+        let DISPLAY_LINE: i32 = display::get_max_y() - 1;
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
         display::addstr("Enter save file name: ");
 
-        /* NOTE: Copy the display matrix int oa pointer in order to pass along to
+        /* NOTE: Copy the display matrix into a pointer in order to pass along to
          *       InGameMenu::save_game
          */
         let name = self.save_game();
@@ -724,7 +723,7 @@ impl Sudoku {
         display::refresh();
 
         //NOTE: Clear output after a delay
-        display::napms(DELAY.into());
+        display::napms(DELAY as i32 * 1000);
         display::mv(DISPLAY_LINE, 0);
         display::clrtoeol();
         display::curs_set(CURSOR_VISIBILITY::BLOCK);
