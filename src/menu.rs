@@ -211,22 +211,19 @@ impl Menu for MainMenu {
             self.set_WINDOW_REQ();
         }
 
-        let (y_max, x_max): (i32, i32) = display::get_max_yx();
         display::curs_set(CURSOR_VISIBILITY::NONE);
 
         //invalid_window_size_handler();
         //clear();
 
-        //TODO: For some reason, the menu selection highlighting is getting turned off
-        //      for the main menu completely after returning from the difficulty menu.
-        //      Highlighting in the difficulty menu is not affected.
-        let max: Cell = Cell::new(y_max as u8, x_max as u8);
         let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
         //self.display_menu(&max, &opt);
         let mut input: Option<display::Input> = None;
         display::timeout(250);
         while input != Some(display::Input::KeyEnter) {
             display::invalid_window_size_handler();
+            let (y_max, x_max): (i32, i32) = display::get_max_yx();
+            let max: Cell = Cell::new(y_max as u8, x_max as u8);
             display::clear();
             self.display_menu(&max, &MenuOption::MAIN_MENU(opt));
             input = display::getch();
