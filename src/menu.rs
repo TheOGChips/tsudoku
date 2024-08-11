@@ -608,6 +608,7 @@ impl Menu for DifficultyMenu {
         let mut input: Option<display::Input> = None;
         display::timeout(250);
         while input != Some(display::Input::KeyEnter) {
+            display::invalid_window_size_handler();
             display::refresh();
             self.display_menu(
                 &Cell::new(display::TOP_PADDING, display::LEFT_PADDING),
