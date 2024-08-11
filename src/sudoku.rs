@@ -384,12 +384,13 @@ impl Sudoku {
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
-        display::getch();
-        display::tui_end();
-        std::process::exit(1);
         display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
         self.cursor_pos.set(display::ORIGIN.y(), display::ORIGIN.x());
         display::refresh();
+        //TODO: Continue testing/debugging the while loop
+        //display::getch();
+        //display::tui_end();
+        //std::process::exit(1);
 
         let mut quit_game: bool = false;
         //nodelay(stdscr, true);
@@ -399,7 +400,7 @@ impl Sudoku {
             match input {
                 Some(display::Input::Character('q')) |
                 Some(display::Input::Character('Q')) => quit_game = true,
-                Some(display::Input::Character('m')) |
+                /*Some(display::Input::Character('m')) |
                 Some(display::Input::Character('M')) => if USE_IN_GAME_MENU {
                     //TODO: Make this reusable somehow like in the C++ version...
                     let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
@@ -457,14 +458,14 @@ impl Sudoku {
                 }
                 Some(display::Input::KeyEnter) => {
                     //TODO
-                }
+                }*/
                 _ => if display::invalid_window_size_handler() {
                     let curr_pos: Cell = self.cursor_pos;
                     self.printw();
                     self.cursor_pos = curr_pos;
                     self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
                     self.reset_cursor();
-                }
+                },
             };
         }
         display::nodelay(false);
@@ -480,8 +481,8 @@ impl Sudoku {
      *                      will be read in beforehand.
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
-        for i in 0..display::DISPLAY_MATRIX_ROWS{
-            //TODO: Continue testing from here
+        self.printw();
+        /*for i in 0..display::DISPLAY_MATRIX_ROWS{
             self.mv(Cell::new(i as u8, 0));
             for j in 0..display::DISPLAY_MATRIX_COLUMNS {
                 //TODO: GET RID OF THIS self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
@@ -517,6 +518,9 @@ impl Sudoku {
                 };
                 */
 
+                //TODO: See if this can be replaced with Sudoku::printw. It looks like it could
+                //      be, but maybe I'll need to add more to this later (probably for saved
+                //      game logic, maybe?)
                 match self.color_codes[i][j] {
                     COLOR_PAIR::CANDIDATES_B | COLOR_PAIR::CANDIDATES_Y
                         => display::bold_set(true),
@@ -550,7 +554,7 @@ impl Sudoku {
                     "---------|---------|---------"
                 );
             }
-        }
+        }*/
 
         /*if let Some(_) = SAVED_PUZZLE {
             for i in 0..self.grid2display_map.len()  {
@@ -650,14 +654,23 @@ impl Sudoku {
         for i in 0..display::DISPLAY_MATRIX_ROWS {
             self.mv(Cell::new(i as u8, 0));
             for j in 0..display::DISPLAY_MATRIX_COLUMNS {
-                if self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_Y ||
-                   self.color_codes[i][j] == COLOR_PAIR::CANDIDATES_B {
-                        display::bold_set(true);
-                    }
+                match self.color_codes[i][j] {
+                    COLOR_PAIR::CANDIDATES_Y | COLOR_PAIR::CANDIDATES_B
+                        => display::bold_set(true),
+                    _ => display::bold_set(false),
+                }
                 display::color_set(&self.color_codes[i][j]);
-                display::addstr(format!("{}", self.display_matrix[i][j]).as_str());
-                display::color_set(&COLOR_PAIR::DEFAULT);
-                display::bold_set(false);
+                display::addstr(
+                    if self.display_matrix[i][j] == '?' as u8 ||
+                       self.display_matrix[i][j] == ' ' as u8 {
+                        format!("{}",self.display_matrix[i][j] as char)
+                    }
+                    else {
+                        format!("{}", self.display_matrix[i][j])
+                    }
+                    .as_str());
+                //display::color_set(&COLOR_PAIR::DEFAULT);
+                //display::bold_set(false);
 
                 if j == 8 || j == 17 {
                     display::addstr("|");
