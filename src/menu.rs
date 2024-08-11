@@ -698,7 +698,6 @@ impl InGameMenu {
      */
     fn clear (&self, EDGE: Cell) {
         let in_game_menu_top_left: i32 = EDGE.y() as i32 +
-            unsafe { display::IN_GAME_MENU_DISPLAY_SPACING as i32 } +
             InGameMenuOption::COUNT as i32 +
             2;
         for y in in_game_menu_top_left..display::get_max_y() {
@@ -714,23 +713,16 @@ impl InGameMenu {
      */
     fn display_rules (&self, EDGE: Cell) {
         let TITLE: &str = "RULES FOR PLAYING SUDOKU";
-        let RULES_INTRO: String = format!("{} {} {} {} {}",
-            "Sudoku is a puzzle game using the numbers 1-9. The",
-            "puzzle board is a 9x9 grid that can be broken up evenly in 3",
-            "different ways: rows, columns, and 3x3 boxes. A completed sudoku",
-            "puzzle is one where each cell contains a number, but with the",
-            "following restrictions:"
-        );
+        let RULES_INTRO: String = String::from("
+Sudoku is a puzzle game using the numbers 1-9. The puzzle board is a 9x9 grid that can be broken
+up evenly in 3 different ways: rows, columns, and 3x3 boxes. A completed sudoku puzzle is one
+where each cell contains a number, but with the following restrictions:");
         let RULES_ROWS: String = String::from("1. Each row can only contain one each of the numbers 1-9");
         let RULES_COLUMNS: String = String::from("2. Each column can only contain one each of the numbers 1-9");
         let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        display::mvprintw(
-            (EDGE.y() + unsafe { display::IN_GAME_MENU_DISPLAY_SPACING }) as i32 +
-                display_offset,
-            EDGE.x() as i32,
-            TITLE);
+        display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
         display_offset += 1;
         for string in [RULES_INTRO, RULES_ROWS, RULES_COLUMNS, RULES_BOXES] {
             display_offset += 1;
@@ -762,10 +754,19 @@ impl InGameMenu {
                 display_str.pop();  // NOTE: Pop the unnecessary extra space
                 display::mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
                     EDGE.x().into(),
-                    &display_str);
+                    &display_str
+                );
                 *display_offset += 1;
-                display_str = String::new();
+                display_str = String::from(word);
+                display_str.push(' ');
             }
+        }
+        if !display_str.is_empty() {
+            display::mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
+                EDGE.x().into(),
+                &display_str
+            );
+            *display_offset += 1;
         }
     }
 
@@ -776,28 +777,20 @@ impl InGameMenu {
      */
     fn display_manual (&self, EDGE: Cell) {
         let TITLE: &str = "TSUDOKU GAME MANUAL";
-        let mut MANUAL_INTRO: String = String::new();
-        MANUAL_INTRO.push_str("Red numbers are givens provided for you when the puzzle ");
-        MANUAL_INTRO.push_str("has been generated. The number of givens present corresponds to ");
-        MANUAL_INTRO.push_str("the difficulty level you have chosen. Cells with white '?' ");
-        MANUAL_INTRO.push_str("symbols are empty cells which you must solve for to complete ");
-        MANUAL_INTRO.push_str("the puzzle. To enter a number 1-9 into an empty cell, simply ");
-        MANUAL_INTRO.push_str("move the cursor over to an empty cell and type the number. The ");
-        MANUAL_INTRO.push_str("'?' symbol will be replaced with the number you entered, which ");
-        MANUAL_INTRO.push_str("will be green in color. To remove a number from one of these ");
-        MANUAL_INTRO.push_str("cells, move the cursor over the cell and press either the ");
-        MANUAL_INTRO.push_str("Backspace or Delete keys; the green number will be replaced ");
-        MANUAL_INTRO.push_str("with a '?' symbol again. The eight blank cells surrounding each ");
-        MANUAL_INTRO.push_str("sudoku puzzle cell are available as a note-taking area when ");
-        MANUAL_INTRO.push_str("analyzing what numbers (candidates) should go in that ");
-        MANUAL_INTRO.push_str("particular cell; numbers entered in these cells will appear ");
-        MANUAL_INTRO.push_str("yellow in color. Numbers in these cells can also be removed by ");
-        MANUAL_INTRO.push_str("pressing either the Backspace or Delete keys while the cursor ");
-        MANUAL_INTRO.push_str("is over the cell. You cannot enter anything in the note-taking ");
-        MANUAL_INTRO.push_str("cells surrounding puzzle cells with red numbers. BEWARE: ");
-        MANUAL_INTRO.push_str("Entering a number in a '?' occupied cell will also erase your ");
-        MANUAL_INTRO.push_str("notes in the eight surrounding cells. This action cannot be ");
-        MANUAL_INTRO.push_str("undone.");
+        let mut MANUAL_INTRO: String = String::from("Red numbers are givens provided for you
+when the puzzle has been generated. The number of givens present corresponds to the difficulty
+level you have chosen. Cells with white '?' symbols are empty cells which you must solve for to
+complete the puzzle. To enter a number 1-9 into an empty cell, simply move the cursor over to an
+empty cell and type the number. The '?' symbol will be replaced with the number you entered,
+which will be green in color. To remove a number from one of these cells, move the cursor over
+the cell and press either the Backspace or Delete keys; the green number will be replaced with a
+'?' symbol again. The eight blank cells surrounding each sudoku puzzle cell are available as a
+note-taking area when analyzing what numbers (candidates) should go in that particular cell;
+numbers entered in these cells will appear yellow in color. Numbers in these cells can also be
+removed by pressing either the Backspace or Delete keys while the cursor is over the cell. You
+cannot enter anything in the note-taking cells surrounding puzzle cells with red numbers. BEWARE:
+Entering a number in a '?' occupied cell will also erase your notes in the eight surrounding
+cells. This action cannot be undone.");
         let MANUAL_M: String = String::from("m/M -> Enter/Exit the in-game manual");
         let MANUAL_Q: String = String::from("q/Q -> Quit the game without saving");
         let MANUAL_DIR_KEYS: String = String::from("Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board");
@@ -805,11 +798,7 @@ impl InGameMenu {
         let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
-        display::mvprintw(
-            (EDGE.y() + unsafe { display::IN_GAME_MENU_DISPLAY_SPACING }) as i32 +
-                display_offset,
-            EDGE.x() as i32,
-            TITLE);
+        display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
         display_offset += 1;
         for string in [MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS, MANUAL_NUM, MANUAL_ENTER] {
             display_offset += 1;
@@ -828,7 +817,7 @@ impl InGameMenu {
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
 
         display::mvprintw(
-            (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
+            EDGE.y() as i32 + display_offset,
             EDGE.x().into(),
             "Enter save file name: ");
         display_offset += 2;
@@ -887,13 +876,14 @@ impl Menu for InGameMenu {
         }
         else {
             println!("Error: Did not receive an InGameMenuOption. Exiting...");
+            display::tui_end();
             std::process::exit(1);
         };
 
         display::mvprintw(EDGE.y() as i32, EDGE.x() as i32, "IN-GAME MENU");
         for (i, variant) in InGameMenuOption::enumerate() {
             if *opt == variant {
-                //attron(COLOR_PAIR(MENU_SELECTION));
+                display::color_set(&COLOR_PAIR::MENU_SELECTION);
             }
             display::mvprintw((EDGE.y() + i) as i32, EDGE.x() as i32, match variant {
                 InGameMenuOption::RULES => "View the rules of sudoku",
@@ -902,7 +892,7 @@ impl Menu for InGameMenu {
                 InGameMenuOption::NONE => "",
             });
             if *opt == variant {
-                //attroff(COLOR_PAIR(MENU_SELECTION));
+                display::color_set(&COLOR_PAIR::DEFAULT);
             }
         }
         display::refresh();

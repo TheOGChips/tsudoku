@@ -404,19 +404,18 @@ impl Sudoku {
                 Some(display::Input::Character('m')) |
                 Some(display::Input::Character('M')) => if USE_IN_GAME_MENU {
                     //TODO: Make this reusable somehow like in the C++ version...
-                    //TODO: Fix menu selection highlighting
-                    //TODO: Fix content display
                     let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
 
-                    //attron(COLOR_PAIR(MENU_SELECTION));
+                    display::color_set(&COLOR_PAIR::MENU_SELECTION);
                     display::mvprintw(
                         display::get_max_y() - LINE_OFFSET_TWEAK as i32,
                         display::ORIGIN.x() as i32,
                          "m -> return to game"
                     );
-                    //attroff(COLOR_PAIR(MENU_SELECTION));
+                    display::color_set(&COLOR_PAIR::DEFAULT);
                     display::clrtoeol();
 
+                    //TODO: Fix content display
                     in_game_menu.menu();
                     //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
                     let saved_pos: Cell = self.cursor_pos;
@@ -425,13 +424,13 @@ impl Sudoku {
                     }
 
                     //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
-                    //attron(COLOR_PAIR(MENU_SELECTION));
+                    display::color_set(&COLOR_PAIR::MENU_SELECTION);
                     display::mvprintw(
                         display::get_max_y() - LINE_OFFSET_TWEAK as i32,
                         display::ORIGIN.x().into(),
                         "m -> in-game menu"
                     );
-                    //attroff(COLOR_PAIR(MENU_SELECTION));
+                    display::color_set(&COLOR_PAIR::DEFAULT);
                     display::clrtoeol();
 
                     display::refresh();
