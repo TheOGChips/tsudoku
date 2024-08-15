@@ -698,7 +698,7 @@ impl InGameMenu {
     fn clear (&self, EDGE: Cell) {
         let in_game_menu_top_left: i32 = EDGE.y() as i32 +
             InGameMenuOption::COUNT as i32 +
-            2;
+            1;
         for y in in_game_menu_top_left..display::get_max_y() {
             display::mv(y, EDGE.x().into());
             display::clrtoeol();
