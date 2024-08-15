@@ -719,7 +719,7 @@ where each cell contains a number, but with the following restrictions:");
         let RULES_ROWS: String = String::from("1. Each row can only contain one each of the numbers 1-9");
         let RULES_COLUMNS: String = String::from("2. Each column can only contain one each of the numbers 1-9");
         let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
-        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 1;
 
         display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
         display_offset += 1;
@@ -795,7 +795,7 @@ cells. This action cannot be undone.");
         let MANUAL_DIR_KEYS: String = String::from("Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board");
         let MANUAL_NUM: String = String::from("1-9 -> Places number in cell highlighted by cursor");
         let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
-        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 1;
 
         display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
         display_offset += 1;
@@ -813,7 +813,7 @@ cells. This action cannot be undone.");
      *              will start here.
      */
     fn save_game_prompt (&self, EDGE: Cell) {
-        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 2;
+        let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 1;
 
         display::mvprintw(
             EDGE.y() as i32 + display_offset,
