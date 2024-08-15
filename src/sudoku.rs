@@ -404,7 +404,10 @@ impl Sudoku {
                 Some(display::Input::Character('m')) |
                 Some(display::Input::Character('M')) => if USE_IN_GAME_MENU {
                     //TODO: Make this reusable somehow like in the C++ version...
-                    let in_game_menu: InGameMenu = InGameMenu::new(&self.display_matrix);
+                    let in_game_menu: InGameMenu = InGameMenu::new(
+                        &self.display_matrix,
+                        &self.save_file_name.borrow(),
+                    );
 
                     display::color_set(&COLOR_PAIR::MENU_SELECTION);
                     display::mvprintw(
@@ -436,7 +439,6 @@ impl Sudoku {
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
                 },
-                //TODO: Fix main menu display not showing up if resizing
                 Some(display::Input::Character('s')) |
                 Some(display::Input::Character('S')) => if !USE_IN_GAME_MENU {
                     self.save_game_prompt(DELAY);
@@ -714,12 +716,24 @@ impl Sudoku {
         /* NOTE: Copy the display matrix into a pointer in order to pass along to
          *       InGameMenu::save_game
          */
-        let name = self.save_game();
+        let old_name: String = self.save_file_name.borrow().to_string();
+        self.save_game();
+        let new_name: String = self.save_file_name.borrow().to_string();
+
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
         //NOTE: Turn off cursor while displaying
         display::curs_set(CURSOR_VISIBILITY::NONE);
-        display::addstr(format!("{} saved!", name).as_str());
+        display::addstr(
+            format!(
+                "{} saved!",
+                if new_name != old_name {
+                    new_name
+                }
+                else {
+                    String::from("Game not")
+                }
+            ).as_str());
         display::refresh();
 
         //NOTE: Clear output after a delay
@@ -732,25 +746,19 @@ impl Sudoku {
     /**
      * 
      */
-    fn save_game (&self) -> String {
-        let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
-        let mut name: String = String::new();   //      requirements of no in-game menu mode
-        display::nodelay(false);
-        pc::echo();
-        display::getnstr(&mut name, NAME_SIZE - 1);
-        pc::noecho();
-        display::nodelay(true);
-
-        /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
+    fn save_game (&self) {
+        /* NOTE: Only save the file if the player was able to enter any text first. The success
          *       message will be handled by the calling function.
          */
-        if !name.is_empty() {
-            self.save_file_name.replace(name.clone());
-            //TODO
-            name
-        }
-        else {
-            String::from("Game not")
+        let in_game_menu: InGameMenu = InGameMenu::new(
+            &self.display_matrix,
+            &self.save_file_name.borrow(),
+        );
+        let old_name: String = in_game_menu.save_file_name();
+        in_game_menu.save_game();
+        let new_name: String = in_game_menu.save_file_name();
+        if new_name != old_name {
+            self.save_file_name.replace(new_name);
         }
     }
 }

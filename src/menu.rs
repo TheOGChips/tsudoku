@@ -656,8 +656,9 @@ impl InGameMenu {
      *      display_matrix -> The display matrix from the main gameplay loop in Sudoku.
      */
     pub fn new (
-        display_matrix: &[[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS])
-        -> Self {
+        display_matrix: &[[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        save_file_name: &str,
+    ) -> Self {
         Self {
             //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
             display_matrix: *display_matrix,
@@ -666,7 +667,7 @@ impl InGameMenu {
                 display::PUZZLE_SPACE +
                 unsafe { display::VERTICAL_DIVIDER },
             IN_GAME_MENU_TITLE_SPACING: 1,
-            save_file_name: RefCell::new(String::new()),
+            save_file_name: RefCell::new(String::from(save_file_name)),
         }
     }
 
@@ -824,10 +825,21 @@ cells. This action cannot be undone.");
         /* NOTE: This message will not be seen if there is a window resize, so no error handling
          *       required.
          */
+        let old_name: String = self.save_file_name();
+        self.save_game();
+        let new_name: String = self.save_file_name();
         display::mvprintw(
             (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
             EDGE.x().into(),
-            format!("{} saved!", self.save_game()).as_str()
+            format!(
+                "{} saved!",
+                if new_name != old_name {
+                    new_name
+                }
+                else {
+                    String::from("Game not")
+                }
+            ).as_str()
         );
         display::curs_set(CURSOR_VISIBILITY::NONE);
     }
@@ -835,7 +847,7 @@ cells. This action cannot be undone.");
     /**
      * 
      */
-    fn save_game (&self) -> String {
+    pub fn save_game (&self) {
         let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
         let mut name: String = String::new();   //      requirements of no in-game menu mode
         display::nodelay(false);
@@ -844,17 +856,20 @@ cells. This action cannot be undone.");
         display::noecho();
         display::nodelay(true);
 
-        /* NOTE: Only save the file if the lplayer was able to enter any text first. The success
+        /* NOTE: Only save the file if the player was able to enter any text first. The success
          *       message will be handled by the calling function.
          */
         if !name.is_empty() {
+            //TODO: Actually save the game, damn it!
             self.save_file_name.replace(name.clone());
-            //TODO
-            name
         }
-        else {
-            String::from("Game not")
-        }
+    }
+
+    /**
+     * 
+     */
+    pub fn save_file_name (&self) -> String {
+        self.save_file_name.borrow().to_string()
     }
 }
 
