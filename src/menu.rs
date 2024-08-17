@@ -26,6 +26,11 @@ use crate::{
 use std::{
     fs,
     cell::RefCell,
+    iter,
+    io::{
+        self,
+        Write,
+    }
 };
 
 /// A wrapper enum to enforce a certain type of MenuOption be used
@@ -862,10 +867,40 @@ cells. This action cannot be undone.");
          */
         if !name.is_empty() {
             let save_dir = common::DIR().join(&name);
-            let _ = fs::create_dir(save_dir);
-            //for i in 0..display::
-            //TODO: Inside this directory it will contain 2 files: numbers.csv, colors.csv
-            //TODO: Actually save the game, damn it!
+            let _ = fs::create_dir(&save_dir);
+            let mut outfile_nums = fs::OpenOptions::new().create(true)
+                .truncate(true)
+                .write(true)
+                .open(save_dir.join("numbers.csv"))
+                .expect("Unable to create or open  numbers.csv");
+            let mut outfile_colors = fs::OpenOptions::new().create(true)
+                .truncate(true)
+                .write(true)
+                .open(save_dir.join("colors.csv"))
+                .expect("Unable to create or open colors.csv");
+            for (numbers, colors) in iter::zip(self.display_matrix, self.color_codes) {
+                let numbers: String = numbers.iter()
+                    .map(|num| num.to_string())
+                    .collect::<Vec<String>>()
+                    .join(",");
+                outfile_nums.write_all(numbers.as_bytes()).expect("Unable to write numbers...");
+                outfile_nums.write_all(b"\n").expect("Unable to write newline for numbers...");
+
+                let colors: String = colors.iter()
+                    .map(|color| match color {
+                        COLOR_PAIR::UNKNOWN => "u",
+                        COLOR_PAIR::GIVEN => "r",
+                        COLOR_PAIR::CANDIDATES_Y => "y",
+                        COLOR_PAIR::CANDIDATES_B => "b",
+                        COLOR_PAIR::GUESS => "g",
+                        _ => "n",
+                    })
+                    .map(|color_code| String::from(color_code))
+                    .collect::<Vec<String>>()
+                    .join(",");
+                outfile_colors.write_all(colors.as_bytes()).expect("Unable to write colors...");
+                outfile_colors.write_all(b"\n").expect("Unable to write newline for colors...");
+            }
             self.save_file_name.replace(name.clone());
         }
         name
