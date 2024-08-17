@@ -406,6 +406,7 @@ impl Sudoku {
                     //TODO: Make this reusable somehow like in the C++ version...
                     let in_game_menu: InGameMenu = InGameMenu::new(
                         &self.display_matrix,
+                        &self.color_codes,
                         &self.save_file_name.borrow(),
                     );
 
@@ -716,9 +717,7 @@ impl Sudoku {
         /* NOTE: Copy the display matrix into a pointer in order to pass along to
          *       InGameMenu::save_game
          */
-        let old_name: String = self.save_file_name.borrow().to_string();
-        self.save_game();
-        let new_name: String = self.save_file_name.borrow().to_string();
+        let new_name: String = self.save_game();
 
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
@@ -727,7 +726,7 @@ impl Sudoku {
         display::addstr(
             format!(
                 "{} saved!",
-                if new_name != old_name {
+                if !new_name.is_empty() {
                     new_name
                 }
                 else {
@@ -746,20 +745,20 @@ impl Sudoku {
     /**
      * 
      */
-    fn save_game (&self) {
+    fn save_game (&self) -> String {
         /* NOTE: Only save the file if the player was able to enter any text first. The success
          *       message will be handled by the calling function.
          */
         let in_game_menu: InGameMenu = InGameMenu::new(
             &self.display_matrix,
+            &self.color_codes,
             &self.save_file_name.borrow(),
         );
-        let old_name: String = in_game_menu.save_file_name();
-        in_game_menu.save_game();
-        let new_name: String = in_game_menu.save_file_name();
-        if new_name != old_name {
-            self.save_file_name.replace(new_name);
+        let new_name: String = in_game_menu.save_game();
+        if !new_name.is_empty() {
+            self.save_file_name.replace(new_name.clone());
         }
+        new_name
     }
 }
 

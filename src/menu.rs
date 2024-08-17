@@ -642,6 +642,7 @@ impl Menu for DifficultyMenu {
 
 pub struct InGameMenu {
     display_matrix: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+    color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     window_resized: RefCell<bool>,
     IN_GAME_MENU_LEFT_EDGE: u8,
     IN_GAME_MENU_TITLE_SPACING: u8,
@@ -657,11 +658,13 @@ impl InGameMenu {
      */
     pub fn new (
         display_matrix: &[[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        color_codes: &[[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
         save_file_name: &str,
     ) -> Self {
         Self {
             //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
             display_matrix: *display_matrix,
+            color_codes: *color_codes,
             window_resized: RefCell::new(false),
             IN_GAME_MENU_LEFT_EDGE: display::LEFT_PADDING +
                 display::PUZZLE_SPACE +
@@ -825,15 +828,13 @@ cells. This action cannot be undone.");
         /* NOTE: This message will not be seen if there is a window resize, so no error handling
          *       required.
          */
-        let old_name: String = self.save_file_name();
-        self.save_game();
-        let new_name: String = self.save_file_name();
+        let new_name: String = self.save_game();
         display::mvprintw(
             (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + display_offset,
             EDGE.x().into(),
             format!(
                 "{} saved!",
-                if new_name != old_name {
+                if !new_name.is_empty() {
                     new_name
                 }
                 else {
@@ -847,7 +848,7 @@ cells. This action cannot be undone.");
     /**
      * 
      */
-    pub fn save_game (&self) {
+    pub fn save_game (&self) -> String {
         let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
         let mut name: String = String::new();   //      requirements of no in-game menu mode
         display::nodelay(false);
@@ -860,9 +861,14 @@ cells. This action cannot be undone.");
          *       message will be handled by the calling function.
          */
         if !name.is_empty() {
+            let save_dir = common::DIR().join(&name);
+            let _ = fs::create_dir(save_dir);
+            //for i in 0..display::
+            //TODO: Inside this directory it will contain 2 files: numbers.csv, colors.csv
             //TODO: Actually save the game, damn it!
             self.save_file_name.replace(name.clone());
         }
+        name
     }
 
     /**
