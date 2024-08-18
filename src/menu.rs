@@ -350,9 +350,14 @@ impl SavedGameMenu {
     fn generate_saved_games_list () -> Vec<String> {
         let mut saved_games: Vec<String> = match fs::read_dir(common::DIR()) {
             Ok(list) => list.filter(
-                |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
+                |item| {
+                    fs::metadata(
+                        item.as_ref().unwrap().path().display().to_string()
+                    ).unwrap()
+                    .is_dir()
+                }
             )
-            .map(|file| file.unwrap().file_name().to_str().unwrap().to_string())
+            .map(|item| item.unwrap().file_name().to_str().unwrap().to_string())
             .collect(),
             Err(msg) => {
                 eprintln!("{}", msg.to_string());
@@ -851,7 +856,11 @@ cells. This action cannot be undone.");
     }
 
     /**
-     * 
+     * Saves the current game, first waiting for the user to input the name they wish to save
+     * the game under. If the user enters nothing, saving is aborted and a message will be
+     * displayed saying the game wasn't saved. If the user enters a name, the game data is
+     * saved inside a directory of the same name, with numbers and color codes saved to
+     * different files. The name the user entered is returned to the calling function.
      */
     pub fn save_game (&self) -> String {
         let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
@@ -907,7 +916,7 @@ cells. This action cannot be undone.");
     }
 
     /**
-     * 
+     * Returns the name the game is currently saved under as a `String`.
      */
     pub fn save_file_name (&self) -> String {
         self.save_file_name.borrow().to_string()

@@ -743,7 +743,8 @@ impl Sudoku {
     }
 
     /**
-     * 
+     * Saves the game data when playing with the in-game menu disabled. This internally creates
+     * an `InGameMenu` object and uses its `save_game` functionality.
      */
     fn save_game (&self) -> String {
         /* NOTE: Only save the file if the player was able to enter any text first. The success

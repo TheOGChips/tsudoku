@@ -9,9 +9,14 @@ use menu::{
     MenuOption,
     MainMenu,
     MainMenuOption,
+    SavedGameMenu,
+    SavedGameMenuOption,
 };
 use common::DIR;
-use sudoku::Sudoku;
+use sudoku::{
+    Sudoku,
+    SavedPuzzle,
+};
 use terminal::display::{
     self,
     CURSOR_VISIBILITY,
@@ -96,11 +101,12 @@ fn main() -> Result<(), &'static str> {
                     //TODO
                 },
                 MainMenuOption::RESUME_GAME => {
-                    /*let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
+                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();  //TODO: Debug from here
+                    display::dbgprint("made it here...");
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                         //TODO: Finish this block after converting over NEW_GAME
-                    }*/
+                    }
                 },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,
