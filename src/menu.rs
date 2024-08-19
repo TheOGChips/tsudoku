@@ -332,7 +332,7 @@ impl SavedGameMenu {
      */
     pub fn new () -> Self {
         let saved_games: Vec<String> = Self::generate_saved_games_list();
-        let selection: String = String::clone(&saved_games[0]);
+        let selection: String = saved_games.first().cloned().unwrap_or(String::new());
         Self {
             saved_games: saved_games,
             saved_game: RefCell::new(SavedPuzzle::new()),
@@ -441,20 +441,57 @@ impl SavedGameMenu {
         !self.saved_games.is_empty()
     }
 
-    /// Reads a saved game from it's CSV file to the saved game and color code matrices.
+    /// Reads a saved game from its CSV files to the saved game and color code matrices.
     fn read_saved_game (&self) {
-        let game_data: Vec<u8> = csv::read(
-            common::DIR().join(self.selection.borrow().to_string()).to_str().unwrap()
+        //TODO: csv::read is broken (it reads in every byte so e.g. 32 is saved as the bytes "3" and "2")
+        let game_data_numbers: Vec<u8> = csv::read(
+                common::DIR().join(self.selection.borrow().to_string())
+                    .join("numbers.csv")
+                    .to_str()
+                    .unwrap()
             )
             .unwrap();
+        let game_data_colors: Vec<char> = csv::read(
+                common::DIR().join(self.selection.borrow().to_string())
+                    .join("colors.csv")
+                    .to_str()
+                    .unwrap()
+            ).unwrap()
+            .iter()
+            .map(|byte| *byte as char)
+            .collect();
 
+        display::tui_end();
+        println!("game_data_numbers:");
+        for number in game_data_numbers {
+            print!("{} ",
+                if number == '\n' as u8 {
+                    '\n' as u8
+                }
+                else {
+                    number
+                }
+            );
+        }
+        println!("game_data_colors:");
+        for color in game_data_colors {
+            print!("{} ",
+                if color == '\n' {
+                    "\n".to_string()
+                }
+                else {
+                    color.to_string()
+                }
+            );
+        }
+        std::process::exit(1);
         let mut i: usize = 0;
         let mut j: usize = 0;
         let mut saved_game: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
             [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
         let mut saved_color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
             [[' '; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        for byte in game_data {
+        for byte in game_data_numbers {
             if (byte as char).is_numeric() {
                 saved_game[i][j] = byte;
             }
@@ -509,16 +546,15 @@ impl Menu for SavedGameMenu {
         display_line += 2;
         for game in &self.saved_games {
             if self.selection.borrow().to_string() == *game {
-                //attron(COLOR_PAIR(MENU_SELECTION));
+                display::color_set(&COLOR_PAIR::MENU_SELECTION);
             }
             display::mvprintw(
                 display_line as i32,
                 EDGE.x() as i32,
-                format!("{}", game.strip_suffix(".csv").unwrap())
-                    .as_str()
+                format!("{}", game).as_str()
             );
             if self.selection.borrow().to_string() == *game {
-                //attroff(COLOR_PAIR(MENU_SELECTION));
+                display::color_set(&COLOR_PAIR::DEFAULT);
             }
             display_line += 1;
         }
@@ -531,6 +567,7 @@ impl Menu for SavedGameMenu {
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
             self.read_saved_game();
+            display::dbgprint("after reading saved game...");
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY)
         }
         else {
@@ -875,41 +912,20 @@ cells. This action cannot be undone.");
          *       message will be handled by the calling function.
          */
         if !name.is_empty() {
-            let save_dir = common::DIR().join(&name);
-            let _ = fs::create_dir(&save_dir);
-            let mut outfile_nums = fs::OpenOptions::new().create(true)
-                .truncate(true)
-                .write(true)
-                .open(save_dir.join("numbers.csv"))
-                .expect("Unable to create or open  numbers.csv");
-            let mut outfile_colors = fs::OpenOptions::new().create(true)
-                .truncate(true)
-                .write(true)
-                .open(save_dir.join("colors.csv"))
-                .expect("Unable to create or open colors.csv");
-            for (numbers, colors) in iter::zip(self.display_matrix, self.color_codes) {
-                let numbers: String = numbers.iter()
-                    .map(|num| num.to_string())
-                    .collect::<Vec<String>>()
-                    .join(",");
-                outfile_nums.write_all(numbers.as_bytes()).expect("Unable to write numbers...");
-                outfile_nums.write_all(b"\n").expect("Unable to write newline for numbers...");
-
-                let colors: String = colors.iter()
-                    .map(|color| match color {
-                        COLOR_PAIR::UNKNOWN => "u",
-                        COLOR_PAIR::GIVEN => "r",
-                        COLOR_PAIR::CANDIDATES_Y => "y",
-                        COLOR_PAIR::CANDIDATES_B => "b",
-                        COLOR_PAIR::GUESS => "g",
-                        _ => "n",
-                    })
-                    .map(|color_code| String::from(color_code))
-                    .collect::<Vec<String>>()
-                    .join(",");
-                outfile_colors.write_all(colors.as_bytes()).expect("Unable to write colors...");
-                outfile_colors.write_all(b"\n").expect("Unable to write newline for colors...");
+            let mut color_codes: Vec<[char; display::DISPLAY_MATRIX_ROWS]> = Vec::new();
+            for row in self.color_codes {
+                let colors: [char; display::DISPLAY_MATRIX_ROWS] = row.map(|color| match color {
+                    COLOR_PAIR::UNKNOWN => 'u',
+                    COLOR_PAIR::GIVEN => 'r',
+                    COLOR_PAIR::CANDIDATES_Y => 'y',
+                    COLOR_PAIR::CANDIDATES_B => 'b',
+                    COLOR_PAIR::GUESS => 'g',
+                    _ => 'n',
+                });
+                color_codes.push(colors);
             }
+            csv::write(&name, "numbers.csv", &self.display_matrix.to_vec());
+            csv::write(&name, "colors.csv", &color_codes);
             self.save_file_name.replace(name.clone());
         }
         name
