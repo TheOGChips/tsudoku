@@ -446,14 +446,14 @@ impl SavedGameMenu {
         //TODO: csv::read is broken (it reads in every byte so e.g. 32 is saved as the bytes "3" and "2")
         let game_data_numbers: Vec<u8> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
-                    .join("numbers.csv")
+                    .join(common::NUMERIC_DATA_FILENAME)
                     .to_str()
                     .unwrap()
             )
             .unwrap();
         let game_data_colors: Vec<char> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
-                    .join("colors.csv")
+                    .join(common::COLOR_DATA_FILENAME)
                     .to_str()
                     .unwrap()
             ).unwrap()
@@ -464,7 +464,7 @@ impl SavedGameMenu {
         display::tui_end();
         println!("game_data_numbers:");
         for number in game_data_numbers {
-            print!("{} ",
+            print!(" {}",
                 if number == '\n' as u8 {
                     '\n' as u8
                 }
@@ -473,9 +473,9 @@ impl SavedGameMenu {
                 }
             );
         }
-        println!("game_data_colors:");
+        println!("\ngame_data_colors:");
         for color in game_data_colors {
-            print!("{} ",
+            print!(" {}",
                 if color == '\n' {
                     "\n".to_string()
                 }
@@ -924,8 +924,8 @@ cells. This action cannot be undone.");
                 });
                 color_codes.push(colors);
             }
-            csv::write(&name, "numbers.csv", &self.display_matrix.to_vec());
-            csv::write(&name, "colors.csv", &color_codes);
+            csv::write(&name, common::NUMERIC_DATA_FILENAME, &self.display_matrix.to_vec());
+            csv::write(&name, common::COLOR_DATA_FILENAME, &color_codes);
             self.save_file_name.replace(name.clone());
         }
         name
