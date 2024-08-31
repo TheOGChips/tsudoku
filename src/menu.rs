@@ -443,49 +443,40 @@ impl SavedGameMenu {
 
     /// Reads a saved game from its CSV files to the saved game and color code matrices.
     fn read_saved_game (&self) {
-        //TODO: csv::read is broken (it reads in every byte so e.g. 32 is saved as the bytes "3" and "2")
-        let game_data_numbers: Vec<u8> = csv::read(
+        display::tui_end();
+        let game_data_numbers: Vec<Vec<u8>> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
                     .join(common::NUMERIC_DATA_FILENAME)
                     .to_str()
                     .unwrap()
             )
             .unwrap();
-        let game_data_colors: Vec<char> = csv::read(
+        let game_data_colors: Vec<Vec<char>> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
                     .join(common::COLOR_DATA_FILENAME)
                     .to_str()
                     .unwrap()
             ).unwrap()
             .iter()
-            .map(|byte| *byte as char)
+            .map(|row| row.iter().map(|byte| *byte as char).collect())
             .collect();
 
-        display::tui_end();
         println!("game_data_numbers:");
-        for number in game_data_numbers {
-            print!(" {}",
-                if number == '\n' as u8 {
-                    '\n' as u8
-                }
-                else {
-                    number
-                }
-            );
+        for row in game_data_numbers {
+            for number in row {
+                print!(" {:>2}", number);
+            }
+            println!("");
         }
         println!("\ngame_data_colors:");
-        for color in game_data_colors {
-            print!(" {}",
-                if color == '\n' {
-                    "\n".to_string()
-                }
-                else {
-                    color.to_string()
-                }
-            );
+        for row in game_data_colors {
+            for color in row {
+                print!(" {}", color.to_string());
+            }
+            println!("");
         }
         std::process::exit(1);
-        let mut i: usize = 0;
+        /*let mut i: usize = 0;
         let mut j: usize = 0;
         let mut saved_game: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
             [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
@@ -513,7 +504,7 @@ impl SavedGameMenu {
             .to_str()
             .unwrap()
         );
-        *self.saved_game.borrow_mut() = puzzle;
+        *self.saved_game.borrow_mut() = puzzle;*/
     }
 
     /**

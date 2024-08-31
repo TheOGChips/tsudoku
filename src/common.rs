@@ -1,9 +1,11 @@
 use std::path::PathBuf;
 
-//TODO: Replace these anywhere I haven't yet
 pub const NUMERIC_DATA_FILENAME: &str = "numbers.csv";
 pub const COLOR_DATA_FILENAME: &str = "colors.csv";
 
+/**
+ * 
+ */
 pub fn DIR () -> PathBuf {
     PathBuf::from(env!("HOME")).join(".tsudoku")//.to_str().unwrap().to_string()
 }
@@ -18,12 +20,15 @@ pub mod csv {
         common,
     };
 
-    //TODO: Just go ahead and have this parse the newlines out and return a 2D vector
-    pub fn read (filename: &str) -> Result<Vec<u8>, std::io::Error> {
-        display::tui_end();
-        let data: Vec<u8> = 
-            if filename == common::COLOR_DATA_FILENAME {
+    /**
+     * Reads saved game data. Exact functionality is different depending on whether numeric or
+     * color code data are being parsed. The parsed data is returned as a 2D vector of bytes.
+     */
+    pub fn read (filename: &str) -> Result<Vec<Vec<u8>>, std::io::Error> {
+        let data_vec: Vec<u8> = 
+            if filename.ends_with(common::COLOR_DATA_FILENAME) {
                 //NOTE: If reading color data, simply read and strip commas from vector
+                println!("in here...");
                 let mut data: Vec<u8> = std::fs::read(filename)?;
                 data.retain(|&b| b != ',' as u8);
                 data
@@ -34,7 +39,6 @@ pub mod csv {
                 );
                 let mut data: Vec<u8> = Vec::new();
                 for line in data_string.split('\n') {
-                    println!("{:?}", line);
                     if !line.is_empty() {
                         let mut line: Vec<u8> = line.split(',').map(
                             |s| s.parse().expect(
@@ -47,18 +51,24 @@ pub mod csv {
                 }
                 data
             };
-        for b in data {
+        let mut data: Vec<Vec<u8>> = Vec::new();
+        let mut row: Vec<u8> = Vec::new();
+        for b in data_vec {
             if b == '\n' as u8 {
-                println!("");
+                data.push(row);
+                row = Vec::new();
             }
             else {
-                print!("{} ", b);
+                row.push(b);
             }
         }
-        std::process::exit(1);
         Ok(data)
     }
 
+    /**
+     * Writes game data to a file. Functionality is the same whether writing numeric or color
+     * code data.
+     */
     pub fn write<T: ToString> (
         save_game_name: &str,
         data_file_name: &str,
