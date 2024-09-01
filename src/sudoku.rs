@@ -63,7 +63,7 @@ pub struct SavedPuzzle {
     /// A 9x9 matrix containing the values in the puzzle cells
     puzzle: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     /// A 9x9 matrix containing the current color codes of the puzzle cells
-    color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+    color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     /// The name of the file the puzzle is saved under
     filename: String,
 }
@@ -73,7 +73,7 @@ impl SavedPuzzle {
     pub fn new () -> Self {
         Self {
             puzzle: [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-            color_codes: [[' '; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+            color_codes: [[COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
             filename: String::new(),
         }
     }
@@ -86,7 +86,7 @@ impl SavedPuzzle {
 
     /// Stores the color codes of the saved puzzle into an array.
     pub fn set_color_codes (&mut self,
-        color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS]) {
+        color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS]) {
         self.color_codes = color_codes;
     }
 

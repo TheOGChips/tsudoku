@@ -443,15 +443,14 @@ impl SavedGameMenu {
 
     /// Reads a saved game from its CSV files to the saved game and color code matrices.
     fn read_saved_game (&self) {
-        display::tui_end();
-        let game_data_numbers: Vec<Vec<u8>> = csv::read(
+        let save_data_numeric: Vec<Vec<u8>> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
                     .join(common::NUMERIC_DATA_FILENAME)
                     .to_str()
                     .unwrap()
             )
             .unwrap();
-        let game_data_colors: Vec<Vec<char>> = csv::read(
+        let save_data_color_codes: Vec<Vec<char>> = csv::read(
                 common::DIR().join(self.selection.borrow().to_string())
                     .join(common::COLOR_DATA_FILENAME)
                     .to_str()
@@ -461,50 +460,77 @@ impl SavedGameMenu {
             .map(|row| row.iter().map(|byte| *byte as char).collect())
             .collect();
 
-        println!("game_data_numbers:");
-        for row in game_data_numbers {
-            for number in row {
-                print!(" {:>2}", number);
-            }
-            println!("");
-        }
-        println!("\ngame_data_colors:");
-        for row in game_data_colors {
-            for color in row {
-                print!(" {}", color.to_string());
-            }
-            println!("");
-        }
-        std::process::exit(1);
-        /*let mut i: usize = 0;
+        // display::tui_end();
+        // println!("save_data_numeric:");
+        // for row in save_data_numeric.clone() {
+        //     for number in row {
+        //         print!(" {:>2}", number);
+        //     }
+        //     println!("");
+        // }
+        // println!("\nsave_data_color_codes:");
+        // for row in save_data_color_codes.clone() {
+        //     for color in row {
+        //         print!(" {}", color);
+        //     }
+        //     println!("");
+        // }
+
+        let mut i: usize = 0;
         let mut j: usize = 0;
-        let mut saved_game: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+        let mut game_data_numeric: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
             [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        let mut saved_color_codes: [[char; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
-            [[' '; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        for byte in game_data_numbers {
-            if (byte as char).is_numeric() {
-                saved_game[i][j] = byte;
-            }
-            else if (byte as char).is_alphabetic() {
-                saved_color_codes[i][j] = byte as char;
-                i += 1;
-            }
-            else if byte == '\n' as u8 {
-                i = 0;
+        let mut game_data_color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+            [[COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
+        for (row_numeric, row_color_code) in iter::zip(save_data_numeric, save_data_color_codes) {
+            for (number, color_code) in iter::zip(row_numeric, row_color_code) {
+                game_data_numeric[i][j] = number;
+                game_data_color_codes[i][j] = match color_code {
+                    'u' => COLOR_PAIR::UNKNOWN,
+                    'r' => COLOR_PAIR::GIVEN,
+                    'y' => COLOR_PAIR::CANDIDATES_Y,
+                    'b' => COLOR_PAIR::CANDIDATES_B,
+                    'g' => COLOR_PAIR::GUESS,
+                    _ => COLOR_PAIR::DEFAULT,
+                };
                 j += 1;
             }
+            j = 0;
+            i += 1;
         }
 
-        display::dbgprint(self.selection.borrow().as_str());
+        // println!("\n\ngame_data_numeric:");
+        // for row in game_data_numeric {
+        //     for number in row {
+        //         print!(" {:>2}", number);
+        //     }
+        //     println!("");
+        // }
+        // println!("\ngame_data_color_codes:");
+        // for row in game_data_color_codes {
+        //     for color in row {
+        //         print!(" {}", match color {
+        //             COLOR_PAIR::UNKNOWN => 'u',
+        //             COLOR_PAIR::GIVEN => 'r',
+        //             COLOR_PAIR::CANDIDATES_Y => 'y',
+        //             COLOR_PAIR::CANDIDATES_B => 'b',
+        //             COLOR_PAIR::GUESS => 'g',
+        //             _ => 'n',
+        //         });
+        //     }
+        //     println!("");
+        // }
+        // std::process::exit(1);
+        
+        // display::dbgprint(self.selection.borrow().as_str());
         let mut puzzle: SavedPuzzle = SavedPuzzle::new();
-        puzzle.set_puzzle(saved_game);
-        puzzle.set_color_codes(saved_color_codes);
+        puzzle.set_puzzle(game_data_numeric);
+        puzzle.set_color_codes(game_data_color_codes);
         puzzle.set_filename(common::DIR().join(self.selection.borrow().as_str())
             .to_str()
             .unwrap()
         );
-        *self.saved_game.borrow_mut() = puzzle;*/
+        *self.saved_game.borrow_mut() = puzzle;
     }
 
     /**
@@ -558,6 +584,7 @@ impl Menu for SavedGameMenu {
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
             self.read_saved_game();
+            //TODO: Continue from here...
             display::dbgprint("after reading saved game...");
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY)
         }
