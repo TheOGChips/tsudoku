@@ -1,6 +1,6 @@
 [package]
 name = "tsudoku"
-version = "0.22.1"
+version = "0.22.2"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"
