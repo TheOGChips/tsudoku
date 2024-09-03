@@ -28,7 +28,6 @@ pub mod csv {
         let data_vec: Vec<u8> = 
             if filename.ends_with(common::COLOR_DATA_FILENAME) {
                 //NOTE: If reading color data, simply read and strip commas from vector
-                println!("in here...");
                 let mut data: Vec<u8> = std::fs::read(filename)?;
                 data.retain(|&b| b != ',' as u8);
                 data

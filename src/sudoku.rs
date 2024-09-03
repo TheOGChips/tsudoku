@@ -311,15 +311,24 @@ impl Sudoku {
          */
         match saved_puzzle {
             Some(puzzle) => {
-                display::tui_end();
-                println!("{}", puzzle.filename);
                 let mat: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
                     puzzle.puzzle;
                 let color_codes: [
                     [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
                 ] = puzzle.color_codes;
-                //TODO: Set the Grid object (probably will need a Grid::from fn)
-                (mat, color_codes, todo!())
+
+                let mut grid: [[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize] = [
+                    [0; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize];
+                for (index, cell) in grid2display {
+                    let grid_i: usize = *index as usize / 9;
+                    let grid_j: usize = *index as usize % 9;
+                    let display_i: usize = cell.row_no().into();
+                    let display_j: usize = cell.col_no().into();
+                    grid[grid_i][grid_j] = mat[display_i][display_j];
+                }
+                let grid: Grid = Grid::from(grid);
+
+                (mat, color_codes, grid)
             },
             None => {
                 let mut mat:
@@ -388,7 +397,7 @@ impl Sudoku {
     /**
      * 
      */
-    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<&SavedPuzzle>) {
+    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>) {
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
@@ -495,7 +504,7 @@ impl Sudoku {
      *                      nullptr. If the user has selected to resume a saved game, this object
      *                      will be read in beforehand.
      */
-    fn init_display (&mut self, SAVED_PUZZLE: Option<&SavedPuzzle>) {
+    fn init_display (&mut self, SAVED_PUZZLE: Option<SavedPuzzle>) {
         self.printw();
         /*for i in 0..display::DISPLAY_MATRIX_ROWS{
             self.mv(Cell::new(i as u8, 0));
@@ -1435,6 +1444,29 @@ impl Grid {
     }
 }
 
+impl From<[[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]> for Grid {
+    /**
+     * 
+     */
+    fn from(mat: [[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]) -> Self {
+        let mut grid: Grid = Self::init(DifficultyMenuOption::EASY);
+        let mut count: u8 = 0;
+        for row in mat {
+            for val in row {
+                grid.set_value(count, val);
+                grid.known_positions[count as usize] = if val == '?' as u8 {
+                        false
+                    }
+                    else {
+                        true
+                    };
+                count += 1;
+            }
+        }
+        grid
+    }
+}
+
 enum CONTAINER {
     ROW,
     COLUMN,
@@ -1444,6 +1476,7 @@ enum CONTAINER {
 //use Container as House;
 use Container as Row;
 use Container as Column;
+//TODO: Consider calling these Blocks instead of Boxes (because of Rust's Box mechanism)
 use Container as Box;
 struct Container {
     container_type: CONTAINER,
