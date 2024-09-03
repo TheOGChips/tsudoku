@@ -169,7 +169,7 @@ impl Sudoku {
         }
         println!("hello there...");
         std::process::exit(0);*/
-        let (display_matrix, grid, color_codes) =
+        let (display_matrix, color_codes, grid) =
             Self::init_display_matrix(&saved_puzzle, &grid2display);
         let (offset2actual, actual2offset) = Self::map_display_matrix_offset();
         //display::tui_end();
@@ -272,8 +272,8 @@ impl Sudoku {
     fn init_display_matrix (saved_puzzle: &Option<SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
         -> (
             [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-            Grid,
             [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+            Grid,
         ) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
          * This will display as intended if looking at it full screen with 1920x1080
@@ -310,10 +310,16 @@ impl Sudoku {
          *  26,0                                         |                                                      |
          */
         match saved_puzzle {
-            Some(_puzzle) => {
+            Some(puzzle) => {
                 display::tui_end();
-                println!("{}", _puzzle.filename);
-                todo!()
+                println!("{}", puzzle.filename);
+                let mat: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
+                    puzzle.puzzle;
+                let color_codes: [
+                    [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
+                ] = puzzle.color_codes;
+                //TODO: Set the Grid object (probably will need a Grid::from fn)
+                (mat, color_codes, todo!())
             },
             None => {
                 let mut mat:
@@ -349,7 +355,7 @@ impl Sudoku {
                 }
                 std::process::exit(1);*/
 
-                (mat, grid, color_codes)
+                (mat, color_codes, grid)
             },
         }
     }
