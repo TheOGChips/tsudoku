@@ -363,9 +363,11 @@ pub mod display {
      *                 characters.
      */
     pub fn getnstr (target: &mut String, max_len: usize) {
-        let mut string: String = String::new();
-        let mut count: usize = 0;
-        let x_start: i32 = window.get_cur_x();
+        //TODO: Have this output the current save game name so the user doesn't have to remember it
+        let mut string: String = target.clone();
+        addstr(format!("{}", string).as_str());
+        let mut count: usize = string.len();
+        let x_start: i32 = window.get_cur_x() - count as i32;
         loop {
             match window.getch() {
                 Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,

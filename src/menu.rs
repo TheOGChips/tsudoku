@@ -526,10 +526,11 @@ impl SavedGameMenu {
         let mut puzzle: SavedPuzzle = SavedPuzzle::new();
         puzzle.set_puzzle(game_data_numeric);
         puzzle.set_color_codes(game_data_color_codes);
-        puzzle.set_filename(common::DIR().join(self.selection.borrow().as_str())
+        /*puzzle.set_filename(common::DIR().join(self.selection.borrow().as_str())
             .to_str()
             .unwrap()
-        );
+        );*/
+        puzzle.set_filename(self.selection.borrow().as_str());
         *self.saved_game.borrow_mut() = puzzle;
     }
 
@@ -584,8 +585,6 @@ impl Menu for SavedGameMenu {
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
             self.read_saved_game();
-            //TODO: Continue from here...
-            display::dbgprint("after reading saved game...");
             MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY)
         }
         else {
@@ -918,9 +917,9 @@ cells. This action cannot be undone.");
      * different files. The name the user entered is returned to the calling function.
      */
     pub fn save_game (&self) -> String {
-        let NAME_SIZE: usize = 16;              //NOTE: NAME_SIZE limited by window width
-        let mut name: String = String::new();   //      requirements of no in-game menu mode
-        display::nodelay(false);
+        let NAME_SIZE: usize = 16;                      //NOTE: NAME_SIZE limited by window
+        let mut name: String = self.save_file_name();   //      width requirements of no in-game
+        display::nodelay(false);                        //      menu mode
         display::echo();
         display::getnstr(&mut name, NAME_SIZE - 1);
         display::noecho();

@@ -104,6 +104,8 @@ fn main() -> Result<(), &'static str> {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();  //TODO: Debug from here
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
+                        display::dbgprint("Saved puzzle retrieved...");
+                        let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
                         //TODO: Finish this block after converting over NEW_GAME
                     }
                 },

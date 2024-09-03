@@ -144,7 +144,7 @@ impl Sudoku {
      * Returns a Sudoku instance, a live interactive game of sudoku. Also coordinates 
      * setup of color mappings and display matrix initialization.
      */
-    pub fn new (saved_puzzle: Option<&SavedPuzzle>) -> Self {
+    pub fn new (saved_puzzle: Option<SavedPuzzle>) -> Self {
         display::init_color_pairs();
         let (grid2display, display2grid) = Self::create_maps();
         /*let color_codes: [
@@ -170,7 +170,7 @@ impl Sudoku {
         println!("hello there...");
         std::process::exit(0);*/
         let (display_matrix, grid, color_codes) =
-            Self::init_display_matrix(saved_puzzle, &grid2display);
+            Self::init_display_matrix(&saved_puzzle, &grid2display);
         let (offset2actual, actual2offset) = Self::map_display_matrix_offset();
         //display::tui_end();
         /*println!("display_matrix:\n");
@@ -269,7 +269,7 @@ impl Sudoku {
      *                      this will be a nullptr. If the user has selected to resume a
      *                      saved game, this object will be read in beforehand.
      */
-    fn init_display_matrix (saved_puzzle: Option<&SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
+    fn init_display_matrix (saved_puzzle: &Option<SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
         -> (
             [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
             Grid,
@@ -310,7 +310,11 @@ impl Sudoku {
          *  26,0                                         |                                                      |
          */
         match saved_puzzle {
-            Some(_puzzle) => todo!(),
+            Some(_puzzle) => {
+                display::tui_end();
+                println!("{}", _puzzle.filename);
+                todo!()
+            },
             None => {
                 let mut mat:
                     [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] = [
