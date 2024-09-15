@@ -580,6 +580,6 @@ pub mod display {
      *      `['x' as pancurses::chtype, 'y' as pancurses::chtype].contains(&ch)`
      */
     pub fn decode_char (ch: pc::chtype) -> pc::chtype {
-        ch & 255
+        ch & pc::A_CHARTEXT
     }
 }
