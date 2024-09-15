@@ -398,6 +398,7 @@ impl Sudoku {
      * 
      */
     pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>) {
+        //TODO: If SAVED_PUZZLE isn't used anywhere else, get rid of it here, in main, and in init_display
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
@@ -464,13 +465,13 @@ impl Sudoku {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();
                 },
-                /*Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
+                Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
                 Some(display::Input::KeyDown)  | Some(display::Input::Character('s')) |
                 Some(display::Input::KeyLeft)  | Some(display::Input::Character('a')) |
                 Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
-                    //TODO
+                    self.move_cursor(input);
                 },
-                Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
+                /*Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
                 Some(display::Input::Character('3')) | Some(display::Input::Character('4')) |
                 Some(display::Input::Character('5')) | Some(display::Input::Character('6')) |
                 Some(display::Input::Character('7')) | Some(display::Input::Character('8')) |
@@ -602,6 +603,8 @@ impl Sudoku {
     }
 
     /**
+     * TODO: Come up with a better name for this function
+     * 
      * Moves the cursor to its offset position for the initial printing of the display matrix
      * from Sudoku::printw. This is necessary so that the the display matrix offset can be mapped
      * correctly.
@@ -779,6 +782,93 @@ impl Sudoku {
             self.save_file_name.replace(new_name.clone());
         }
         new_name
+    }
+
+    /**
+     * Moves the cursor on the sudoku board given a direction. The direction is based on
+     * keyboard input using either the arrow keys, `w`, `a`, `s`, or `d`.
+     * 
+     *      direction -> Optional keyboard input.
+     */
+    fn move_cursor (&mut self, direction: Option<display::Input>) {
+        let MAX_YBOUNDARY: u8 = display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS as u8 + 1;
+        let MAX_XBOUNDARY: u8 = display::ORIGIN.x() + display::DISPLAY_MATRIX_COLUMNS as u8 + 1;
+
+        let new_pos: Cell = match direction {
+            Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => {
+                if self.cursor_pos.y() > display::ORIGIN.y() {
+                    let pos: Cell = Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x());
+                    if self.is_box_border(pos) {
+                        Cell::new(self.cursor_pos.y() - 2, self.cursor_pos.x())
+                    }
+                    else {
+                        pos
+                    }
+                }
+                else {
+                    self.cursor_pos
+                }
+            },
+            Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => {
+                if self.cursor_pos.y() < MAX_YBOUNDARY {
+                    let pos: Cell = Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x());
+                    if self.is_box_border(pos) {
+                        Cell::new(self.cursor_pos.y() + 2, self.cursor_pos.x())
+                    }
+                    else {
+                        pos
+                    }
+                }
+                else {
+                    self.cursor_pos
+                }
+            },
+            Some(display::Input::KeyLeft) | Some(display::Input::Character('a')) => {
+                if self.cursor_pos.x() > display::ORIGIN.x() {
+                    let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() - 1);
+                    if self.is_box_border(pos) {
+                        Cell::new(self.cursor_pos.y(), self.cursor_pos.x() - 2)
+                    }
+                    else {
+                        pos
+                    }
+                }
+                else {
+                    self.cursor_pos
+                }
+            },
+            Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
+                if self.cursor_pos.x() < MAX_XBOUNDARY {
+                    let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() + 1);
+                    if self.is_box_border(pos) {
+                        Cell::new(self.cursor_pos.y(), self.cursor_pos.x() + 2)
+                    }
+                    else {
+                        pos
+                    }
+                }
+                else {
+                    self.cursor_pos
+                }
+            },
+            _ => self.cursor_pos,
+        };
+        
+        display::mv(new_pos.y().into(), new_pos.x().into());
+        let (y, x): (i32, i32) = display::get_cur_yx();
+        self.cursor_pos.set(y as u8, x as u8);
+    }
+
+    /**
+     * Evaluates whether a particular cell contains a character representing a sudoku box border.
+     * Returns `true` if so and `false` otherwise.
+     * 
+     *      COORDS -> Terminal cell to evaluate.
+     */
+    fn is_box_border (&self, COORDS: Cell) -> bool {
+        let ch: pc::chtype = display::mvinch(COORDS.y().into(), COORDS.x().into());
+        let ch: u32 = display::decode_char(ch);
+        ['|' as pc::chtype, '-' as pc::chtype].contains(&ch)
     }
 }
 

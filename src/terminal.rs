@@ -560,4 +560,26 @@ pub mod display {
     pub fn noecho () {
         pc::noecho();
     }
+
+    /**
+     * Retrieves the character and attribute from the specified window position, in the form of
+     * a chtype. This is a wrapper around `pancurses::Window::mvinch`.
+     */
+    pub fn mvinch (y: i32, x: i32) -> pc::chtype {
+        window.mvinch(y, x)
+    }
+
+    /**
+     * Extracts the character out of a `pancurses::chtype` (obtained via
+     * `pancurses::Window::mvinch`). There is no given way to do this with `pancurses` itself,
+     * but bitwise anding against 255 appears to retain only the needed character information.
+     * The result is returned as a `pancurses::chtype`. Comparison can be done against the return value
+     * by casting the character(s) checked to a `pancurses::chtype` like so:
+     * 
+     *      `ch == 'x' as pancurses::chtype`
+     *      `['x' as pancurses::chtype, 'y' as pancurses::chtype].contains(&ch)`
+     */
+    pub fn decode_char (ch: pc::chtype) -> pc::chtype {
+        ch & 255
+    }
 }
