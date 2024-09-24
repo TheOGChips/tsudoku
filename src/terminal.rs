@@ -570,16 +570,54 @@ pub mod display {
     }
 
     /**
-     * Extracts the character out of a `pancurses::chtype` (obtained via
-     * `pancurses::Window::mvinch`). There is no given way to do this with `pancurses` itself,
-     * but bitwise anding against 255 appears to retain only the needed character information.
-     * The result is returned as a `pancurses::chtype`. Comparison can be done against the return value
-     * by casting the character(s) checked to a `pancurses::chtype` like so:
+     * Extracts the character out of a `pancurses::chtype`. Internally, this is obtained by
+     * bitwise anding against `pancurses::A_CHARTEXT`; this information will be left in the
+     * least significant bit. The result is returned as a `pancurses::chtype`.
+     * 
+     *      ch -> Pancurses terminal cell information. This should be the result of a call to
+     *            `pancurses::mvinch`.
+     * 
+     * Comparison can be done against the return value by casting the character(s) checked to a
+     * `pancurses::chtype` like so:
      * 
      *      `ch == 'x' as pancurses::chtype`
      *      `['x' as pancurses::chtype, 'y' as pancurses::chtype].contains(&ch)`
      */
     pub fn decode_char (ch: pc::chtype) -> pc::chtype {
         ch & pc::A_CHARTEXT
+    }
+
+    /**
+     * Extracts the `COLOR_PAIR` information out of a `pancurses::chtype` (obtained via
+     * `pancurses::Window::mvinch`). Internally, this is obtained by bitwise anding against
+     * `pancurses::A_COLOR`. `COLOR_PAIR::DEFAULT` is returned if any of the other `COLOR_PAIR`s
+     * are not found.
+     * 
+     *      ch -> Pancurses terminal cell information. This should be the result of a call to
+     *            `pancurses::mvinch`.
+     */
+    pub fn decode_color_pair (ch: pc::chtype) -> COLOR_PAIR {
+        let code: i16 = ((ch & pc::A_COLOR) >> 8) as i16;
+        if code == pair_code::MENU_SELECTION {
+            COLOR_PAIR::MENU_SELECTION
+        }
+        else if code == pair_code::UNKNOWN {
+            COLOR_PAIR::UNKNOWN
+        }
+        else if code == pair_code::GIVEN {
+            COLOR_PAIR::GIVEN
+        }
+        else if code == pair_code::CANDIDATES_Y {
+            COLOR_PAIR::CANDIDATES_Y
+        }
+        else if code == pair_code::CANDIDATES_B {
+            COLOR_PAIR::CANDIDATES_B
+        }
+        else if code == pair_code::GUESS {
+            COLOR_PAIR::GUESS
+        }
+        else /* code == pair_code::DEFAULT */ {
+            COLOR_PAIR::DEFAULT
+        }
     }
 }

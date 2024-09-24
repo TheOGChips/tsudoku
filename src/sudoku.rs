@@ -40,7 +40,7 @@ const GRID_SIZE: u8 = 81;
 const NUM_CONTAINERS: u8 = 9;
 const CONTAINER_SIZE: u8 = 9;
 
-enum _neighbor_cells {
+enum NEIGHBOR_CELLS {
     TL,
     T,
     TR,
@@ -51,8 +51,8 @@ enum _neighbor_cells {
     BR,
 }
 
-impl _neighbor_cells {
-    const fn _NUM_BORDER_POSITIONS () -> u8 {
+impl NEIGHBOR_CELLS {
+    const fn NUM_BORDER_POSITIONS () -> usize {
         8
     }
 }
@@ -471,14 +471,15 @@ impl Sudoku {
                 Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
                     self.move_cursor(input);
                 },
-                /*Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
+                Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
                 Some(display::Input::Character('3')) | Some(display::Input::Character('4')) |
                 Some(display::Input::Character('5')) | Some(display::Input::Character('6')) |
                 Some(display::Input::Character('7')) | Some(display::Input::Character('8')) |
                 Some(display::Input::Character('9')) => {
+                    self.set_value(input);
                     //TODO
                 },
-                Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
+                /*Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
                     //TODO
                 }
                 Some(display::Input::KeyEnter) => {
@@ -869,6 +870,53 @@ impl Sudoku {
         let ch: pc::chtype = display::mvinch(COORDS.y().into(), COORDS.x().into());
         let ch: u32 = display::decode_char(ch);
         ['|' as pc::chtype, '-' as pc::chtype].contains(&ch)
+    }
+
+    /**
+     * 
+     */
+    fn set_value (&self, value: Option<display::Input>) {
+        if self.do_nothing() {}
+        //TODO
+    }
+
+    /**
+     * Determines whether no action should be taken based on the cursor's current position.
+     * Returns true if the cursor's position or any of the 8 surrounding cells contain a given
+     * number; false otherwise.
+     */
+    fn do_nothing (&self) -> bool {
+        //NOTE: Check all cells surrounding the cursor's current position
+        let surrounding = self.get_surrounding_cells();
+        for cell in surrounding {
+            let color_pair: COLOR_PAIR =
+                display::decode_color_pair(display::mvinch(cell.y().into(), cell.x().into()));
+            if color_pair == COLOR_PAIR::GIVEN {
+                return true;
+            }
+        }
+
+        //NOTE: Lastly, check if the cursor's current position contains a given number
+        self.reset_cursor();
+        display::decode_color_pair(
+            display::mvinch(self.cursor_pos.y().into(), self.cursor_pos.x().into())
+        ) == COLOR_PAIR::GIVEN
+    }
+
+    /**
+     * Returns an array containing the surrounding the Cell objects representing the positions
+     * surrounding the cursor's current position.
+     */
+    fn get_surrounding_cells (&self) -> [Cell; NEIGHBOR_CELLS::NUM_BORDER_POSITIONS()] {
+        self.reset_cursor();
+        [Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x() - 1),   //TL
+         Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x()),       //T
+         Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x() + 1),   //TR
+         Cell::new(self.cursor_pos.y(),     self.cursor_pos.x() - 1),   //L
+         Cell::new(self.cursor_pos.y(),     self.cursor_pos.x() + 1),   //R
+         Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x() - 1),   //BL
+         Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x()),       //B
+         Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x() + 1)]   //BR
     }
 }
 
