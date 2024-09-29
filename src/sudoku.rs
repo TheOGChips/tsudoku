@@ -131,7 +131,7 @@ pub struct Sudoku {
     color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     grid: Grid,
     grid2display_map: HashMap<u8, Cell>,
-    display2grip_map: HashMap<Cell, u8>,
+    display2grid_map: HashMap<Cell, u8>,
     ORIGIN: Cell,
     cursor_pos: Cell,
     offset2actual: HashMap<Cell, Cell>,
@@ -196,7 +196,7 @@ impl Sudoku {
             color_codes: color_codes,
             grid: grid,
             grid2display_map: grid2display,
-            display2grip_map: display2grid,
+            display2grid_map: display2grid,
             ORIGIN: display::ORIGIN,
             cursor_pos: display::ORIGIN,
             offset2actual: offset2actual,
@@ -875,8 +875,56 @@ impl Sudoku {
     /**
      * 
      */
-    fn set_value (&self, value: Option<display::Input>) {
-        if self.do_nothing() {}
+    fn set_value (&mut self, value: Option<display::Input>) {
+        /* NOTE: Algorithm for determining where and/or how to place a value entered by the
+         *       player
+         *
+         * if value is red (starting value)
+         *      then ignore, do nothing
+         * if position is not mapped to position in the Grid
+         *      then place value in display matrix only
+         *      display value on screen
+         *      refresh
+         * if position is mapped to position in Grid
+         *      then place value in display matrix
+         *      clear 8 surrounding cells
+         *      refresh
+         *      place value into appropriate spot in appropriate row, column, and box
+         */
+        
+        if self.do_nothing() {
+            self.reset_cursor();
+        }
+        else {
+            let actual: Cell = self.offset2actual[&self.cursor_pos];
+            self.reset_cursor();
+            let ch: pc::chtype = display::mvinch(
+                self.cursor_pos.y().into(),
+                self.cursor_pos.x().into()
+            );
+            let color_pair: COLOR_PAIR = display::decode_color_pair(ch);
+
+            if color_pair == COLOR_PAIR::UNKNOWN || color_pair == COLOR_PAIR::GUESS {
+                let grid_index: u8 = self.display2grid_map[&actual];
+                match value.expect("Sudoku::set_value: can't perform action on value=None...") {
+                    display::Input::KeyDC | display::Input::KeyBackspace => {
+                        if color_pair == COLOR_PAIR::GUESS {
+                            // display::color_set(&COLOR_PAIR::UNKNOWN);
+                            self.grid.set_value(grid_index, '?' as u8);
+                            self.display_matrix[actual.y() as usize][actual.x() as usize] =
+                                '?' as u8;
+                            self.color_codes[actual.y() as usize][actual.x() as usize] =
+                                COLOR_PAIR::UNKNOWN;
+                        }
+                    },
+                    _ => {
+                        self.clear_surrounding_cells();
+                        //TODO
+                    },
+                }
+            }
+            //TODO
+        }
         //TODO
     }
 
@@ -917,6 +965,21 @@ impl Sudoku {
          Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x() - 1),   //BL
          Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x()),       //B
          Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x() + 1)]   //BR
+    }
+
+    /**
+     * Clears the cells surrounding the cursor's position of their values. This is only done
+     * when entering a number into a guess cell, but not when removing.
+     */
+    fn clear_surrounding_cells (&mut self) {
+        let surrounding: [Cell; NEIGHBOR_CELLS::NUM_BORDER_POSITIONS()] =
+            self.get_surrounding_cells();
+        for cell in surrounding {
+            // TODO: Will this work (and be simpler) by just calling print?
+            // display::mvprintw(cell.y().into(), cell.x().into(), " ");
+            let actual: Cell = self.offset2actual[&cell];
+            self.display_matrix[actual.y() as usize][actual.x() as usize] = ' ' as u8;
+        }
     }
 }
 
