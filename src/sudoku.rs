@@ -460,15 +460,18 @@ impl Sudoku {
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
                 },
-                Some(display::Input::Character('s')) |
-                Some(display::Input::Character('S')) => if !USE_IN_GAME_MENU {
+                Some(display::Input::Character('z')) |
+                Some(display::Input::Character('Z')) => if !USE_IN_GAME_MENU {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();
                 },
-                Some(display::Input::KeyUp)    | Some(display::Input::Character('w')) |
-                Some(display::Input::KeyDown)  | Some(display::Input::Character('s')) |
-                Some(display::Input::KeyLeft)  | Some(display::Input::Character('a')) |
-                Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
+                //TODO: The upper case letters don't seem to be registering for some reason
+                Some(display::Input::KeyUp)          | Some(display::Input::Character('w')) |
+                Some(display::Input::KeyDown)        | Some(display::Input::Character('s')) |
+                Some(display::Input::KeyLeft)        | Some(display::Input::Character('a')) |
+                Some(display::Input::KeyRight)       | Some(display::Input::Character('d')) |
+                Some(display::Input::Character('W')) | Some(display::Input::Character('A')) |
+                Some(display::Input::Character('S')) | Some(display::Input::Character('D')) => {
                     self.move_cursor(input);
                 },
                 Some(display::Input::Character('1')) | Some(display::Input::Character('2')) |
@@ -658,7 +661,7 @@ impl Sudoku {
      */
     fn display_hotkey (&self, USE_IN_GAME_MENU: bool, LINE_OFFSET_TWEAK: u8) {
         let hotkey_string: &str = if !USE_IN_GAME_MENU {
-            "s -> save game"
+            "z -> save game"
         }
         else {
             "m -> in-game menu"
@@ -979,7 +982,6 @@ impl Sudoku {
         display::refresh();
         /* TODO: Test to make sure input using numeric characters works. If it does, go back to
          *       finishing start_game.
-         * TODO: 's' doesn't move the cursor down
          * TODO: Entering a number over a '?' seems to work
          * TODO: Entering a number around a given number moves the cursor to the bottom left
          * TODO: Entering a number around a '?' crashes the game
