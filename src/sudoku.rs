@@ -628,8 +628,8 @@ impl Sudoku {
         display::mv(display_y, display_x);
 
         //NOTE: Update cursor_pos after moving
-        let (new_cursor_pos_y, new_cursor_pos_x): (i32, i32) = display::get_cur_yx();
-        self.cursor_pos.set(new_cursor_pos_y as u8, new_cursor_pos_x as u8);
+        // let (new_cursor_pos_y, new_cursor_pos_x): (i32, i32) = display::get_cur_yx();
+        // self.cursor_pos.set(new_cursor_pos_y as u8, new_cursor_pos_x as u8);
     }
 
     /**
@@ -982,8 +982,6 @@ impl Sudoku {
         display::refresh();
         /* TODO: Test to make sure input using numeric characters works. If it does, go back to
          *       finishing start_game.
-         * TODO: Entering a number over a '?' seems to work
-         * TODO: Entering a number around a given number moves the cursor to the bottom left
          * TODO: Entering a number around a '?' crashes the game
          */
     }
