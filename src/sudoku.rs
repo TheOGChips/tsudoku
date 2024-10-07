@@ -891,12 +891,13 @@ impl Sudoku {
          *      refresh
          *      place value into appropriate spot in appropriate row, column, and box
          */
-        
+
         if self.do_nothing() {
             self.reset_cursor();
         }
         else {
             let actual: Cell = self.offset2actual[&self.cursor_pos];
+            let display_index: (usize, usize) = (actual.y() as usize, actual.x() as usize);
             self.reset_cursor();
             let ch: pc::chtype = display::mvinch(
                 self.cursor_pos.y().into(),
@@ -904,28 +905,85 @@ impl Sudoku {
             );
             let color_pair: COLOR_PAIR = display::decode_color_pair(ch);
 
-            if color_pair == COLOR_PAIR::UNKNOWN || color_pair == COLOR_PAIR::GUESS {
+            if [COLOR_PAIR::UNKNOWN, COLOR_PAIR::GUESS].contains(&color_pair) {
                 let grid_index: u8 = self.display2grid_map[&actual];
-                match value.expect("Sudoku::set_value: can't perform action on value=None...") {
+                match value.expect("Sudoku::set_value: Can't perform action on value=None") {
                     display::Input::KeyDC | display::Input::KeyBackspace => {
                         if color_pair == COLOR_PAIR::GUESS {
                             // display::color_set(&COLOR_PAIR::UNKNOWN);
                             self.grid.set_value(grid_index, '?' as u8);
-                            self.display_matrix[actual.y() as usize][actual.x() as usize] =
-                                '?' as u8;
-                            self.color_codes[actual.y() as usize][actual.x() as usize] =
+                            self.display_matrix[display_index.0][display_index.1] = '?' as u8;
+                            self.color_codes[display_index.0][display_index.1] =
                                 COLOR_PAIR::UNKNOWN;
                         }
                     },
-                    _ => {
+                    display::Input::Character(c) => {
                         self.clear_surrounding_cells();
-                        //TODO
+                        let val: u8 = c.to_digit(10)
+                            .expect("Sudoku::set_value: Expected value to be 1..9")
+                            .try_into()
+                            .expect("Sudoku::set_value: value exceeds 8-bit limit");
+                        self.grid.set_value(grid_index, val);
+                        self.display_matrix[display_index.0][display_index.1] = val;
+                        self.color_codes[display_index.0][display_index.1] =
+                            COLOR_PAIR::GUESS;
                     },
+                    _ => (),
                 }
             }
-            //TODO
+            else {
+                match value.expect("Sudoku::set_value: Can't perform action on value=None") {
+                    display::Input::KeyDC | display::Input::KeyBackspace => {
+                        self.display_matrix[display_index.0][display_index.1] = ' ' as u8;
+                        self.color_codes[display_index.0][display_index.1] = COLOR_PAIR::DEFAULT;
+                    },
+                    display::Input::Character(c) => {
+                        let surrounding: [Cell; NEIGHBOR_CELLS::NUM_BORDER_POSITIONS()] =
+                            self.get_surrounding_cells();
+                        let mut cp: COLOR_PAIR = COLOR_PAIR::DEFAULT;
+                        for cell in surrounding {
+                            let ch: pc::chtype = display::mvinch(cell.y().into(), cell.x().into());
+                            cp = display::decode_color_pair(ch);
+                            if [COLOR_PAIR::UNKNOWN, COLOR_PAIR::GUESS].contains(&cp) {
+                                cp = if self.display2grid_map[&self.offset2actual[&cell]] % 2 == 1 {
+                                    COLOR_PAIR::CANDIDATES_B
+                                }
+                                else {
+                                    COLOR_PAIR::CANDIDATES_Y
+                                };
+                            }
+                        }
+                        self.reset_cursor();
+
+                        let val: u8 = c.to_digit(10)
+                            .expect("Sudoku::set_value: Expected value to be 1..9")
+                            .try_into()
+                            .expect("Sudoku::set_value: value exceeds 8-bit limit");
+                        self.display_matrix[display_index.0][display_index.1] = val;
+                        self.color_codes[display_index.0][display_index.1] = cp;
+                    },
+                    _ => (),
+                }
+            }
+            // display::refresh();
         }
-        //TODO
+
+        /* TODO: It makes more sense for the display refresh to be down here now. Since this
+         *       version of printw doesn't alter self.cursor_pos, the commented lines below
+         *       shouldn't be needed. Erase these if it looks like everything is working.
+         */
+        // let curr_pos: Cell = self.cursor_pos;
+        self.printw();
+        // self.cursor_pos = curr_pos;
+        self.reset_cursor();
+        display::refresh();
+        /* TODO: Test to make sure input using numeric characters works. If it does, go back to
+         *       finishing start_game.
+         * TODO: 's' doesn't move the cursor down
+         * TODO: Entering a number over a '?' seems to work
+         * TODO: Entering a number around a given number moves the cursor to the bottom left
+         * TODO: Entering a number around a '?' crashes the game
+         */
     }
 
     /**

@@ -299,7 +299,7 @@ pub mod display {
 
     /**
      * Updates the terminal display with any changes. This is a wrapper around
-     * `pancurses::refresh`.
+     * `pancurses::Window::refresh`.
      */
     pub fn refresh () {
         window.refresh();
