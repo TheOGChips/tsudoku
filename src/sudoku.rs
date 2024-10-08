@@ -486,10 +486,22 @@ impl Sudoku {
                 },
                 Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
                     self.set_value(input);
-                }
-                /*Some(display::Input::KeyEnter) => {
-                    //TODO
-                }*/
+                },
+                Some(display::Input::KeyEnter) => {
+                    display::curs_set(CURSOR_VISIBILITY::NONE);
+                    display::mvprintw(
+                        display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK,
+                        display::ORIGIN.x(),
+                        "Result: "
+                    );
+                    if (self.evaluate()) {
+                        //TODO
+                    }
+                    else {
+                        //TODO
+                    }
+                    display::curs_set(CURSOR_VISIBILITY::BLOCK);
+                },
                 _ => if display::invalid_window_size_handler() {
                     let curr_pos: Cell = self.cursor_pos;
                     self.printw();
@@ -1047,6 +1059,14 @@ impl Sudoku {
             self.display_matrix[actual.y() as usize][actual.x() as usize] = ' ' as u8;
             self.color_codes[actual.y() as usize][actual.x() as usize] = COLOR_PAIR::DEFAULT;
         }
+    }
+
+    /**
+     * 
+     */
+    fn evaluate (&self) -> bool {
+        self.grid.evaluate()
+        //TODO
     }
 }
 
@@ -1710,6 +1730,17 @@ impl Grid {
         //self.get_column(self.map_column(INDEX)).at(self.get_column_index(INDEX))
         //self.get_box(self.map_box_index(INDEX)).at(self.get_box_index(INDEX))
     }
+
+    /**
+     * 
+     */
+    fn evaluate (&self) -> bool {
+        let mut completed: bool = true;
+        for (r, c, b) in itertools::izip!(self.rows, self.columns, self.boxes) {
+            completed &= r.evaluate() && c.evaluate() && b.evaluate();
+        }
+        //TODO
+    }
 }
 
 impl From<[[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]> for Grid {
@@ -1786,7 +1817,7 @@ impl Container {
             _ => VALUE + '0' as u8,
         };*/
         if VALUE == '?' as u8 {
-            false
+            true
         }
         else {
             let mut exists: bool = false;
@@ -1807,5 +1838,17 @@ impl Container {
      */
     fn set_value (&mut self, INDEX: usize, VALUE: u8) {
         self.arr[INDEX] = VALUE;
+    }
+
+    /**
+     * Evaluates whether the container's internal array values are valid for a solved sudoku
+     * puzzle (i.e. exactly one each of the values 1-9 in the array).
+     */
+    fn evaluate (&self) -> bool {
+        let mut completed: bool = !self.value_exists('?' as u8);
+        for i in 1..=CONTAINER_SIZE {
+            completed &= self.value_exists(i);
+        }
+        completed
     }
 }
