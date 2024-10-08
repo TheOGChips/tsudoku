@@ -483,7 +483,6 @@ impl Sudoku {
                 Some(display::Input::Character('7')) | Some(display::Input::Character('8')) |
                 Some(display::Input::Character('9')) => {
                     self.set_value(input);
-                    //TODO
                 },
                 /*Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
                     //TODO
@@ -883,7 +882,15 @@ impl Sudoku {
     }
 
     /**
+     * Places or removes a value in the display matrix with the appropriate coloring if the
+     * cursor's curent position is a valid cell for input. The appropriate Row, Column, and Box
+     * from the internal Grid member is updated with the value if the cursor's position is over
+     * a guess cell (i.e. a cell that is also mapped by the Grid's own internal map).
      * 
+     *      value -> The value to be placed into the display matrix and (possibly) the
+     *               appropriate Row, Column, and Box of this game's Grid member variable. If
+     *               the value corresponds to that of the Delete or Backspace keys, this function
+     *               performs a removal instead.
      */
     fn set_value (&mut self, value: Option<display::Input>) {
         /* NOTE: Algorithm for determining where and/or how to place a value entered by the
@@ -982,9 +989,6 @@ impl Sudoku {
         // self.cursor_pos = curr_pos;
         self.reset_cursor();
         display::refresh();
-        /* TODO: Test to make sure input using numeric characters works. If it does, go back to
-         *       finishing start_game.
-         */
     }
 
     /**
