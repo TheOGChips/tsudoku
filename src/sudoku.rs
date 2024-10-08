@@ -104,7 +104,7 @@ impl SavedPuzzle {
  *      grid -> Grid object representing just the 81 cells of a sudoku board.
  *      grid2display_map -> Mapping of 81 positions of a grid to their (y, x) coordinates in the
  *                          display matrix.
- *      display2grid_map -> Reverse mapping of _map_.
+ *      display2grid_map -> Reverse mapping of grid2display_map.
  *      ORIGIN -> Starting cell of the display matrix's (0, 0) position on the actual terminal
  *                window. This is effectively the row and column offset from the top left cell of the
  *                terminal and also controls the size of the buffers from the edges of the terminal
@@ -340,7 +340,7 @@ impl Sudoku {
                     [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
                     display::DISPLAY_MATRIX_ROWS
                 ] = [
-                    [COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS];
+                    [COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS];
                     display::DISPLAY_MATRIX_ROWS
                 ];
 
@@ -354,9 +354,12 @@ impl Sudoku {
                     let y: usize = cell.y() as usize;
                     let x: usize = cell.x() as usize;
                     mat[y][x] = grid.at(*i);
-                    if grid.at(*i) != '?' as u8 {
-                        color_codes[y][x] = COLOR_PAIR::GIVEN;
+                    color_codes[y][x] = if grid.at(*i) != '?' as u8 {
+                        COLOR_PAIR::GIVEN
                     }
+                    else {
+                        COLOR_PAIR::UNKNOWN
+                    };
                 }
                 /*display::tui_end();
                 for row in mat {
@@ -912,13 +915,9 @@ impl Sudoku {
                 let grid_index: u8 = self.display2grid_map[&actual];
                 match value.expect("Sudoku::set_value: Can't perform action on value=None") {
                     display::Input::KeyDC | display::Input::KeyBackspace => {
-                        if color_pair == COLOR_PAIR::GUESS {
-                            // display::color_set(&COLOR_PAIR::UNKNOWN);
-                            self.grid.set_value(grid_index, '?' as u8);
-                            self.display_matrix[display_index.0][display_index.1] = '?' as u8;
-                            self.color_codes[display_index.0][display_index.1] =
-                                COLOR_PAIR::UNKNOWN;
-                        }
+                        self.grid.set_value(grid_index, '?' as u8);
+                        self.display_matrix[display_index.0][display_index.1] = '?' as u8;
+                        self.color_codes[display_index.0][display_index.1] = COLOR_PAIR::UNKNOWN;
                     },
                     display::Input::Character(c) => {
                         self.clear_surrounding_cells();
@@ -928,8 +927,7 @@ impl Sudoku {
                             .expect("Sudoku::set_value: value exceeds 8-bit limit");
                         self.grid.set_value(grid_index, val);
                         self.display_matrix[display_index.0][display_index.1] = val;
-                        self.color_codes[display_index.0][display_index.1] =
-                            COLOR_PAIR::GUESS;
+                        self.color_codes[display_index.0][display_index.1] = COLOR_PAIR::GUESS;
                     },
                     _ => (),
                 }
@@ -958,7 +956,7 @@ impl Sudoku {
                         }
                         self.reset_cursor();
 
-                        let val: u8 = c.to_digit(10)
+                        let val = c.to_digit(10)
                             .expect("Sudoku::set_value: Expected value to be 1..9")
                             .try_into()
                             .expect("Sudoku::set_value: value exceeds 8-bit limit");
