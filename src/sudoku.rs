@@ -398,7 +398,19 @@ impl Sudoku {
     }
 
     /**
+     * Starts a and runs a game of sudoku until the user either completes the puzzle or decides
+     * to quit. Dispatches calls to the in-game menu (when enabled), to directly save the game
+     * (when the in-game menu isn't enabled), to exit, to move the cursor, or to handle input
+     * values for the display matrix and Grid member.
      * 
+     *      USE_IN_GAME_MENU -> Boolean controlling whether or not the in-game menu is enabled.
+     *                          This is determined based on whether or not the user runs this
+     *                          program with the `--no-in-game-menu` or `-n` command line
+     *                          options.
+     *      SAVED_PUZZLE -> Optional SavedPuzzle object that represents a previously saved game.
+     *                      If the user has selected to start a new game, this will be `None`.
+     *                      If the user has selected to resume a saved game, this object will be
+     *                      read in beforehand.
      */
     pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>)
         -> bool {
@@ -406,7 +418,6 @@ impl Sudoku {
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
         let DELAY: i32 = 2;              // NOTE: # seconds to delay after printing out results
-        let mut completed: bool = false;
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
         display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
@@ -419,6 +430,7 @@ impl Sudoku {
 
         display::noecho();
         let mut quit_game: bool = false;
+        let mut completed: bool = false;
         //nodelay(stdscr, true);
         display::timeout(250);
         while !quit_game {
@@ -514,7 +526,8 @@ impl Sudoku {
                         //         LINE_OFFSET_TWEAK,
                         //     0);
                         display::mv(display::get_cur_y(), 0);
-                        //TODO
+                        display::clrtoeol();
+                        self.reset_cursor();
                     }
                     display::curs_set(CURSOR_VISIBILITY::BLOCK);
                 },

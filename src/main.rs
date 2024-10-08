@@ -98,6 +98,7 @@ fn main() -> Result<(), &'static str> {
                 MainMenuOption::NEW_GAME => {
                     let mut puzzle: Sudoku = Sudoku::new(None);
                     puzzle.start_game(use_in_game_menu, None);
+                    //TODO: Increment completed games if start_game returns true
                     //TODO
                 },
                 MainMenuOption::RESUME_GAME => {
@@ -106,6 +107,9 @@ fn main() -> Result<(), &'static str> {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                         let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
                         puzzle.start_game(use_in_game_menu, None);
+                        /* TODO: Increment completed games and remove save file if start_game
+                         *       returns true
+                         */
                         //TODO: Finish this block after converting over NEW_GAME
                     }
                 },
