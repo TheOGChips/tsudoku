@@ -707,10 +707,14 @@ impl Sudoku {
                 //display::bold_set(false);
 
                 if j == 8 || j == 17 {
+                    display::color_set(&COLOR_PAIR::DEFAULT);
+                    display::bold_set(false);
                     display::addstr("|");
                 }
             }
             if i == 8 || i == 17 {
+                display::color_set(&COLOR_PAIR::DEFAULT);
+                display::bold_set(false);
                 display::mvprintw(
                     i as i32 + display::ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
                     display::ORIGIN.x().into(),
