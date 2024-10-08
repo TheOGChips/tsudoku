@@ -1062,11 +1062,12 @@ impl Sudoku {
     }
 
     /**
-     * 
+     * Calls the Grid member to evaluate its Rows, Columns, and Boxes for validity (i.e. a valid
+     * solution or solved puzzle). Returns `true` only if the puzzle currently has a valid
+     * solution.
      */
     fn evaluate (&self) -> bool {
         self.grid.evaluate()
-        //TODO
     }
 }
 
