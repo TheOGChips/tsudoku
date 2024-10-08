@@ -1786,7 +1786,9 @@ impl Grid {
 
 impl From<[[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]> for Grid {
     /**
+     * Creates a sudoku grid from a 9x9 matrix.
      * 
+     *      mat -> A 9x9 matrix representing a sudoku grid.
      */
     fn from(mat: [[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]) -> Self {
         let mut grid: Grid = Self::init(DifficultyMenuOption::EASY);
