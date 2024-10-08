@@ -944,8 +944,8 @@ impl Sudoku {
                         let mut cp: COLOR_PAIR = COLOR_PAIR::DEFAULT;
                         for cell in surrounding {
                             let ch: pc::chtype = display::mvinch(cell.y().into(), cell.x().into());
-                            cp = display::decode_color_pair(ch);
-                            if [COLOR_PAIR::UNKNOWN, COLOR_PAIR::GUESS].contains(&cp) {
+                            let cp_surr = display::decode_color_pair(ch);
+                            if [COLOR_PAIR::UNKNOWN, COLOR_PAIR::GUESS].contains(&cp_surr) {
                                 cp = if self.display2grid_map[&self.offset2actual[&cell]] % 2 == 1 {
                                     COLOR_PAIR::CANDIDATES_B
                                 }
@@ -980,7 +980,6 @@ impl Sudoku {
         display::refresh();
         /* TODO: Test to make sure input using numeric characters works. If it does, go back to
          *       finishing start_game.
-         * TODO: Entering a number around a '?' crashes the game
          */
     }
 
