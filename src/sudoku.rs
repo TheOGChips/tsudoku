@@ -541,6 +541,27 @@ impl Sudoku {
             };
         }
         display::nodelay(false);
+
+        /* TODO: Games always report that the puzzle is incomplete, even when it isn't
+         *       It appears to be working when puzzle is read in and after adding new input
+         *       Time to check what actually gets returned from evaluate
+         */
+        // display::getch();
+        // display::tui_end();
+        // println!("\nrows\n");
+        // for r in &self.grid.rows {
+        //     println!("{:?}", r.arr);
+        // }
+        // println!("\ncolumns:\n");
+        // for c in &self.grid.columns {
+        //     println!("{:?}", c.arr);
+        // }
+        // println!("\nboxes:\n");
+        // for b in &self.grid.boxes {
+        //     println!("{:?}", b.arr)
+        // }
+        // println!("");
+        // std::process::exit(1);
         completed
     }
 
@@ -1777,9 +1798,16 @@ impl Grid {
      */
     fn evaluate (&self) -> bool {
         let mut completed: bool = true;
+        // display::tui_end();
+        //TODO: The problem lies here. evaluate always returns false
         for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
+            // println!("r: {}", r.evaluate());
+            // println!("c: {}", c.evaluate());
+            // println!("b: {}\n", b.evaluate());
             completed &= r.evaluate() && c.evaluate() && b.evaluate();
         }
+        // println!("Grid::evaluate -> completed: {}", completed);
+        // std::process::exit(1);
         completed
     }
 }
@@ -1859,10 +1887,11 @@ impl Container {
             '?' => VALUE,
             _ => VALUE + '0' as u8,
         };*/
-        if VALUE == '?' as u8 {
-            true
-        }
-        else {
+        // println!("VALUE: {}", VALUE);
+        // if VALUE == '?' as u8 {
+        //     true
+        // }
+        // else {
             let mut exists: bool = false;
             for i in 0..CONTAINER_SIZE as usize {
                 if self.at(i) == VALUE {
@@ -1870,7 +1899,7 @@ impl Container {
                 }
             }
             exists
-        }
+        // }
     }
 
     /**
@@ -1888,10 +1917,15 @@ impl Container {
      * puzzle (i.e. exactly one each of the values 1-9 in the array).
      */
     fn evaluate (&self) -> bool {
-        let mut completed: bool = !self.value_exists('?' as u8);
-        for i in 1..=CONTAINER_SIZE {
-            completed &= self.value_exists(i);
-        }
-        completed
+        // if self.value_exists('?' as u8) {
+        //     false
+        // }
+        // else {
+            let mut completed = !self.value_exists('?' as u8);
+            for i in 1..=CONTAINER_SIZE {
+                completed &= self.value_exists(i);
+            }
+            completed
+        // }
     }
 }

@@ -3,7 +3,10 @@
 #![allow(non_snake_case)]
 //include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 use clap;
-use std::fs;
+use std::{
+    fs,
+    path::PathBuf,
+};
 use menu::{
     Menu,
     MenuOption,
@@ -94,23 +97,21 @@ fn main() -> Result<(), &'static str> {
     loop {
         if let MenuOption::MAIN_MENU(main_menu_option) = main_menu.menu() {
             match main_menu_option {
-                //TODO: Convert NEW_GAME & RESUME_GAME
                 MainMenuOption::NEW_GAME => {
                     let mut puzzle: Sudoku = Sudoku::new(None);
-                    puzzle.start_game(use_in_game_menu, None);
-                    //TODO: Increment completed games if start_game returns true
-                    //TODO
+                    if puzzle.start_game(use_in_game_menu, None) {
+                        increment_completed_games();
+                    }
                 },
                 MainMenuOption::RESUME_GAME => {
-                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();  //TODO: Debug from here
+                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
                     if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
                         let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                         let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
-                        puzzle.start_game(use_in_game_menu, None);
-                        /* TODO: Increment completed games and remove save file if start_game
-                         *       returns true
-                         */
-                        //TODO: Finish this block after converting over NEW_GAME
+                        if puzzle.start_game(use_in_game_menu, None) {
+                            increment_completed_games();
+                            //TODO: Remove save file if start_game returns true
+                        }
                     }
                 },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
@@ -157,7 +158,7 @@ fn main() -> Result<(), &'static str> {
  * information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
-    let num_completed = fs::read_to_string(DIR().join("completed_puzzles.txt"))
+    let num_completed: String = fs::read_to_string(DIR().join("completed_puzzles.txt"))
         .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
     //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
@@ -184,4 +185,21 @@ fn display_completed_puzzles () {
         }
     }
     display::curs_set(CURSOR_VISIBILITY::BLOCK);
+}
+
+/**
+ * Increments the number of completed games recorded by 1. This is only called once the user has
+ * solved the current puzzle.
+ */
+fn increment_completed_games () {
+    let path: PathBuf = DIR().join("completed_puzzles.txt");
+    let num_completed: u128 = fs::read_to_string(path.clone())
+        .expect("Error 404: File Not Found")
+        .to_owned()
+        .trim_end()
+        .parse()
+        .expect("Error: Unable to parse number of completed puzzles");
+
+    fs::write(path, format!("{}\n", num_completed + 1))
+        .expect("Error: Unable to update # completed puzzles");
 }
