@@ -218,6 +218,14 @@ pub mod display {
     }
 
     /**
+     * Returns the current y-coordinate of the terminal window (i.e. the current line number).
+     * This is a wrapper around `pancurses::get_cur_y`.
+     */
+    pub fn get_cur_y () -> i32 {
+        window.get_cur_y()
+    }
+
+    /**
      * Clears the terminal window of all content. This is a wrapper around `pancurses::clear`.
      */
     pub fn clear () {

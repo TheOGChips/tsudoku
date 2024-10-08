@@ -400,11 +400,13 @@ impl Sudoku {
     /**
      * 
      */
-    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>) {
+    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>)
+        -> bool {
         //TODO: If SAVED_PUZZLE isn't used anywhere else, get rid of it here, in main, and in init_display
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
-        let DELAY: u8 = 2;              // NOTE: # seconds to delay after printing out results
+        let DELAY: i32 = 2;              // NOTE: # seconds to delay after printing out results
+        let mut completed: bool = false;
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
         display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
@@ -490,14 +492,28 @@ impl Sudoku {
                 Some(display::Input::KeyEnter) => {
                     display::curs_set(CURSOR_VISIBILITY::NONE);
                     display::mvprintw(
-                        display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS + LINE_OFFSET_TWEAK,
-                        display::ORIGIN.x(),
+                        (display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS as u8 + LINE_OFFSET_TWEAK).into(),
+                        display::ORIGIN.x().into(),
                         "Result: "
                     );
-                    if (self.evaluate()) {
-                        //TODO
+                    if self.evaluate() {
+                        display::addstr("You win!");
+                        display::clrtoeol();
+                        display::refresh();
+                        // self.increment_completed_games();
+                        completed = true;
+                        quit_game = true;
+                        display::napms(DELAY * 1000);
                     }
                     else {
+                        display::addstr("Puzzle incomplete!");
+                        display::refresh();
+                        display::napms(DELAY * 1000);
+                        // display::mv(
+                        //     display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS +
+                        //         LINE_OFFSET_TWEAK,
+                        //     0);
+                        display::mv(display::get_cur_y(), 0);
                         //TODO
                     }
                     display::curs_set(CURSOR_VISIBILITY::BLOCK);
@@ -512,6 +528,7 @@ impl Sudoku {
             };
         }
         display::nodelay(false);
+        completed
     }
 
     /**
@@ -752,7 +769,7 @@ impl Sudoku {
      *      DELAY -> Amount of time to display the status message before clearing it and
      *               resuming play.
      */
-    fn save_game_prompt (&self, DELAY: u8) {
+    fn save_game_prompt (&self, DELAY: i32) {
         let DISPLAY_LINE: i32 = display::get_max_y() - 1;
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
@@ -783,7 +800,7 @@ impl Sudoku {
         display::refresh();
 
         //NOTE: Clear output after a delay
-        display::napms(DELAY as i32 * 1000);
+        display::napms(DELAY * 1000);
         display::mv(DISPLAY_LINE, 0);
         display::clrtoeol();
         display::curs_set(CURSOR_VISIBILITY::BLOCK);
@@ -1068,6 +1085,13 @@ impl Sudoku {
      */
     fn evaluate (&self) -> bool {
         self.grid.evaluate()
+    }
+
+    /**
+     * 
+     */
+    fn increment_completed_games (&self) {
+
     }
 }
 
