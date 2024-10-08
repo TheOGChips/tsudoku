@@ -1035,6 +1035,7 @@ impl Sudoku {
             // display::mvprintw(cell.y().into(), cell.x().into(), " ");
             let actual: Cell = self.offset2actual[&cell];
             self.display_matrix[actual.y() as usize][actual.x() as usize] = ' ' as u8;
+            self.color_codes[actual.y() as usize][actual.x() as usize] = COLOR_PAIR::DEFAULT;
         }
     }
 }
