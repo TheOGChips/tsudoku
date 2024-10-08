@@ -484,10 +484,10 @@ impl Sudoku {
                 Some(display::Input::Character('9')) => {
                     self.set_value(input);
                 },
-                /*Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
-                    //TODO
+                Some(display::Input::KeyBackspace) | Some(display::Input::KeyDC) => {
+                    self.set_value(input);
                 }
-                Some(display::Input::KeyEnter) => {
+                /*Some(display::Input::KeyEnter) => {
                     //TODO
                 }*/
                 _ => if display::invalid_window_size_handler() {
@@ -748,6 +748,9 @@ impl Sudoku {
 
         /* NOTE: Copy the display matrix into a pointer in order to pass along to
          *       InGameMenu::save_game
+         */
+        /* TODO: The name of the saved game isn't printed out the first time after exiting and
+         *       re-entering the in-game menu.
          */
         let new_name: String = self.save_game();
 
