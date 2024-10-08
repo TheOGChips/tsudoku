@@ -1732,14 +1732,17 @@ impl Grid {
     }
 
     /**
-     * 
+     * Evaluates whether the Grid's internal Container arrays are valid for a solved sudoku
+     * puzzle (i.e. exactly one each of the values 1-9 in each array). These can each be checked
+     * independently for correctness. Any remaining '?' values in any array automatically
+     * results in a return value of false.
      */
     fn evaluate (&self) -> bool {
         let mut completed: bool = true;
-        for (r, c, b) in itertools::izip!(self.rows, self.columns, self.boxes) {
+        for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
             completed &= r.evaluate() && c.evaluate() && b.evaluate();
         }
-        //TODO
+        completed
     }
 }
 
