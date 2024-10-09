@@ -94,6 +94,11 @@ impl SavedPuzzle {
     pub fn set_filename (&mut self, filename: &str) {
         self.filename = String::from(filename);
     }
+
+    /// Returns the filename of the saved game.
+    pub fn filename (&self) -> &str {
+        self.filename.as_str()
+    }
 }
 
 /**
@@ -206,6 +211,11 @@ impl Sudoku {
                 None => String::new(),
             }),
         }
+    }
+
+    /// Returns the save filename of the sudoku game
+    pub fn filename (&self) -> String {
+        self.save_file_name.borrow().to_string()
     }
 
     /**

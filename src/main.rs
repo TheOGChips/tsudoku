@@ -110,7 +110,8 @@ fn main() -> Result<(), &'static str> {
                         let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
                         if puzzle.start_game(use_in_game_menu, None) {
                             increment_completed_games();
-                            //TODO: Remove save file if start_game returns true
+                            fs::remove_dir_all(DIR().join(puzzle.filename()))
+                                .expect("Error: Issue removing save game files");
                         }
                     }
                 },
