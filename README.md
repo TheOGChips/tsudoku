@@ -2,7 +2,7 @@
 
 ## Status Update: 12 October 2024
 
-Good news! The Rust port of `tsudoku` is now fully playable and ready for v2.0.0! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. The new Rust port will still have a few updates lined up, and this README will be updated accordingly.
+Good news! The Rust port of `tsudoku` is now fully playable and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. The new Rust port will still have a few updates lined up, and this README will be updated accordingly. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net . If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! And if you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
 
 ## Description
 
@@ -110,8 +110,4 @@ Follow the instructions at the official Rust website here: https://www.rust-lang
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
 >`$ cargo build --release`
-
-[//]: # ## Status update: 3 March 2023
-
-[//]: # tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
 
