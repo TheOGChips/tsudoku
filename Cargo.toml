@@ -1,5 +1,6 @@
 [package]
 name = "tsudoku"
+# TODO: Update version to 2.0.0
 version = "0.31.0"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
@@ -9,10 +10,13 @@ repository = "https://github.com/TheOGChips/tsudoku"
 license = "GPL-3.0-or-later"
 keywords = ["sudoku", "TUI", "games", "puzzle"]
 categories = ["command-line-utilities", "games"]
+# TODO: Clean up old C++ build with Makefile before getting rid of it
+# TODO: Can probably get rid of this once the Makefile is gone
 exclude = ["include/*.hpp", "src/*.cpp", "Makefile"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+# TODO: Get rid of unused packages
+# TODO: Update the README
 [dependencies]
 clap = { version = "4.4.4", features = ["cargo"] }
 itertools = "0.13.0"

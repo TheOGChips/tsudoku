@@ -492,7 +492,9 @@ impl Sudoku {
                     self.save_game_prompt(DELAY);
                     self.reset_cursor();
                 },
-                //TODO: The upper case letters don't seem to be registering for some reason
+                /* TODO: The upper case letters don't seem to be registering for some reason
+                 *       v2.2.0
+                 */
                 Some(display::Input::KeyUp)          | Some(display::Input::Character('w')) |
                 Some(display::Input::KeyDown)        | Some(display::Input::Character('s')) |
                 Some(display::Input::KeyLeft)        | Some(display::Input::Character('a')) |

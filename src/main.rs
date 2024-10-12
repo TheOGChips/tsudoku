@@ -1,3 +1,4 @@
+// TODO: Get rid of these linter-related lines if you can
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -35,6 +36,16 @@ pub mod sudoku;
 }*/
 
 fn main() -> Result<(), &'static str> {
+    // TODO: Clean up unused comments
+    // TODO: Add in any missing doc comments
+    // TODO: Fix formatting
+    // TODO: Fix all compiler warnings
+    /* TODO: The best way to handle removing all save game data is probably via a new command
+     *       line argument. If that argument is detected, then $HOME/.tsudoku gets removed and
+     *       the program immediately ends. It should probably ask for double confirmation as
+     *       well.
+     *       v2.1.0
+     */
     let matches = clap::command!()
         .arg(
             clap::arg!(-n --"no-in-game-menu"
@@ -159,13 +170,19 @@ fn main() -> Result<(), &'static str> {
  * information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
-    let num_completed: String = fs::read_to_string(DIR().join("completed_puzzles.txt"))
-        .expect("Error 404: File Not Found");
+    let num_completed: Result<String, _> = fs::read_to_string(DIR().join("completed-puzzles.txt"));
+        // .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
     //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
     //    .expect("Unable to parse number of completed puzzles");
 
-    let prompt1: String = format!("Completed Sudoku puzzles: {}", num_completed);
+    let prompt1: String = format!(
+        "Completed Sudoku puzzles: {}",
+        match num_completed {
+            Ok(num) => num,
+            Err(_) => String::from("0"),
+        }
+    );
     let prompt2: &str = "Press Enter to continue";
 
     /*let mut y_max: i32 = 0;
@@ -193,13 +210,13 @@ fn display_completed_puzzles () {
  * solved the current puzzle.
  */
 fn increment_completed_games () {
-    let path: PathBuf = DIR().join("completed_puzzles.txt");
-    let num_completed: u128 = fs::read_to_string(path.clone())
-        .expect("Error 404: File Not Found")
-        .to_owned()
-        .trim_end()
-        .parse()
-        .expect("Error: Unable to parse number of completed puzzles");
+    let path: PathBuf = DIR().join("completed-puzzles.txt");
+    let num_completed: Result<String, _> = fs::read_to_string(path.clone());
+    let num_completed: u128 = match num_completed {
+        Ok(num) => num.trim_end().parse()
+                        .expect("Error: Unable to parse number of completed puzzles"),
+        Err(_) => 0,
+    };
 
     fs::write(path, format!("{}\n", num_completed + 1))
         .expect("Error: Unable to update # completed puzzles");
