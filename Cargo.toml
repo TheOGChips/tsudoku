@@ -1,7 +1,7 @@
 [package]
 name = "tsudoku"
 # TODO: Update version to 2.0.0
-version = "0.31.0"
+version = "0.32.0"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"

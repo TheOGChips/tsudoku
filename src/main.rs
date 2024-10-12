@@ -34,6 +34,7 @@ pub mod sudoku;
 /*extern "C" {
     fn clear ();    //ncurses.h
 }*/
+const save_file_name: &str = "completed-puzzles.txt";
 
 fn main() -> Result<(), &'static str> {
     // TODO: Clean up unused comments
@@ -170,7 +171,7 @@ fn main() -> Result<(), &'static str> {
  * information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
-    let num_completed: Result<String, _> = fs::read_to_string(DIR().join("completed-puzzles.txt"));
+    let num_completed: Result<String, _> = fs::read_to_string(DIR().join(save_file_name));
         // .expect("Error 404: File Not Found");
     //TODO: Keep this around for later when I have to update the number read in
     //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
@@ -210,7 +211,7 @@ fn display_completed_puzzles () {
  * solved the current puzzle.
  */
 fn increment_completed_games () {
-    let path: PathBuf = DIR().join("completed-puzzles.txt");
+    let path: PathBuf = DIR().join(save_file_name);
     let num_completed: Result<String, _> = fs::read_to_string(path.clone());
     let num_completed: u128 = match num_completed {
         Ok(num) => num.trim_end().parse()
