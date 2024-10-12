@@ -1,8 +1,8 @@
 # tsudoku
 
-## Status Update: 16 June 2024
+## Status Update: 12 October 2024
 
-`tsudoku` is currently in the transition process of converted from C++ to Rust. For a fully playable version, the latest C++ version can be built from the `main` branch of the `tsudoku` Github repository mentioned later in this README. Once the Rust port has been completed, the C++ version will no longer be maintained.. This README will be updated once the Rust version is fully playable.
+Good news! The Rust port of `tsudoku` is now fully playable and ready for v2.0.0! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. The new Rust port will still have a few updates lined up, and this README will be updated accordingly.
 
 ## Description
 
@@ -10,13 +10,12 @@ tsudoku (both short for "terminal sudoku" and inspired phonetically by other Jap
 
 ## Supported systems
 
-The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported.
+The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported without much hindrance. The new Rust version should also work in Windows thanks to the use of the `pancurses` library, but that has yet to be tested.
 
 >\- Debian Linux  
->\- MacOS  
 >\- WSL (Windows Subsystem for Linux)
 
-**Note for MacOS users**: It's possible that certain (e.g. the Makefile and this README) will be marked as executable during the install process and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
+**Note for MacOS users**: It's possible that this README will be marked as executable if you clone this repo directly and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
 
 >`$ less README.md`  
 >`$ view README.md`  
@@ -30,21 +29,20 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 ## Prerequisites
 
-NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
+NOTE: See **Prerequisites Installation** section for install instructions.
 
->\- The GNU C++ compiler `g++` (tsudoku compiles using the C++17 standard)  
->\- NCurses C API
+>\- The Rust compiler `rustc`
+>\- The Rust package manager `cargo`
 
 ## Prerequisites Installation
 
-If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager.
-
->`$ sudo apt install g++`  
->`$ sudo apt install libncurses-dev`
-
-**Note for MacOS Users**: The best option for a MacOS package manager is Homebrew and is relatively similar to a Linux package manager such as that found on Linux and WSL. MacOS should come pre-installed with `clang++`, which should be mapped to `g++`. You can use this instead if you wish. Homebrew's version of an NCurses package is likely just called `ncurses`.
+Follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install
 
 ## Installation
+
+### From crates.io (recommended)
+
+`$ cargo install tsudoku`
 
 ### From source
 
@@ -60,11 +58,16 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`
 
-#### Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the *tsudoku* directory of the cloned source code.
+#### Step 2: Compile the source code using `cargo`. Performing any of the three methods above should have already placed you inside the *tsudoku* directory of the cloned source code.
 
->`$ make`
+>`$ cargo build --release`
 
-#### Step 3: Source your shell's RC file to allow running *tsudoku* in the current shell instance.
+#### Step 3: Create a symbolic link to the *tsudoku* executable
+
+>`$ mkdir -p $HOME/.local/bin`
+>`$ ln -s target/release/tsudoku $HOME/.local/bin`
+
+#### Step 4: Source your shell's RC file to allow running *tsudoku* in the current shell instance.
 
 - Examples:
 >`$ source ~/.bashrc    # if using bash`  
@@ -99,15 +102,16 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 #### If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the *tsudoku* directory, then perform the following steps:
 
 >`$ git pull`  
->`$ make upgrade`
+>`$ cargo clean && cargo build --release`
 
 #### If installed via direct downloaded (option 3), delete the *tsudoku* directory and repeat the installation process as described in the **Installation** section again.
 
 >`$ rm -rf tsudoku`  
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
->`$ make`
+>`$ cargo build --release`
 
-## Status update: 3 March 2023
+[//]: # ## Status update: 3 March 2023
 
-tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
+[//]: # tsudoku is now ready for official release! Barring any potential future bug fixes, this will be the last update until either the documentation is finished or this project has been officially added to the Debian APT repository. Anyone is welcome to notify me of a bug fix by email at: swindell.christian.g@gmail.com . If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
+
