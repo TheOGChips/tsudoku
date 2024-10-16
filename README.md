@@ -8,6 +8,10 @@ Good news! The Rust port of `tsudoku` is now fully playable and ready for an off
 
 tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
 
+## What happened to v1.x?
+
+If you're wondering what happened to v1.x, that is the original C++ version. Since all that work wasn't tracked in crates.io, it will look like v1.x is missing; however, anyone who wants to see the v1.x source code can still find it on this project's Github page.
+
 ## Supported systems
 
 The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported without much hindrance. The new Rust version should also work in Windows thanks to the use of the `pancurses` library, but that has yet to be tested.
@@ -31,12 +35,19 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 NOTE: See **Prerequisites Installation** section for install instructions.
 
->\- The Rust compiler `rustc`
->\- The Rust package manager `cargo`
+>\- The Rust compiler: `rustc`
+
+>\- The Rust package manager: `cargo`
+
+>\- A C compiler: `gcc` via `build-essential`
+
+>\- A C-based TUI library: `libncurses-dev`
 
 ## Prerequisites Installation
 
-Follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install
+>\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install
+
+>\- `sudo apt install build-essential libncurses-dev`
 
 ## Installation
 
