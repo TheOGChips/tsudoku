@@ -47,7 +47,7 @@ NOTE: See **Prerequisites Installation** section for install instructions.
 
 ## Prerequisites Installation
 
->\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install . The standard installation will work just fine for installing `tsudoku`.
+>\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install . The standard installation will work just fine for installing `tsudoku`. Follow the instructions after installing for sourcing `cargo` in the current terminal shell (closing out of the terminal and starting a new instance should also work).
 
 >\- `sudo apt install build-essential libncurses-dev curl`
 
