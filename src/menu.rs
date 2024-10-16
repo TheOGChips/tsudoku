@@ -144,6 +144,8 @@ pub trait Menu {
         std::process::exit(0);
         /* TODO: Look into a cleaner way to do this. This might not be needed, but no destructors
          *       will get called for any objects still on the stack. This works for now, though.
+         * TODO: Change this to use display::SIGINT_handler. The above TODO is probably not
+         *       important anymore.
          */
     }
 }
@@ -188,7 +190,6 @@ impl Menu for MainMenu {
         for (i, variant) in MainMenuOption::enumerate() {
             if *opt == variant {
                 display::color_set(&COLOR_PAIR::MENU_SELECTION);
-                //mvprintw(2, 2, format!("status: {}", COLOR_PAIR(MAIN_MENU_SELECTION)).as_str());
             }
             display::mvprintw((Y_CENTER + i) as i32, X_CENTER as i32, match variant {
                 MainMenuOption::NEW_GAME => "New Game",
@@ -218,11 +219,7 @@ impl Menu for MainMenu {
 
         display::curs_set(CURSOR_VISIBILITY::NONE);
 
-        //invalid_window_size_handler();
-        //clear();
-
         let mut opt: MainMenuOption = MainMenuOption::NEW_GAME;
-        //self.display_menu(&max, &opt);
         let mut input: Option<display::Input> = None;
         display::timeout(250);
         while input != Some(display::Input::KeyEnter) {
@@ -394,7 +391,8 @@ impl SavedGameMenu {
                             "Press ENTER to continue..."
                         );
                         display::refresh();
-                        input = display::getch();    //This needs to be here for the display to work correctly
+                        //This next line needs to be here for the display to work correctly
+                        input = display::getch();
                         display::invalid_window_size_handler();
                     }
                 }
@@ -460,22 +458,6 @@ impl SavedGameMenu {
             .map(|row| row.iter().map(|byte| *byte as char).collect())
             .collect();
 
-        // display::tui_end();
-        // println!("save_data_numeric:");
-        // for row in save_data_numeric.clone() {
-        //     for number in row {
-        //         print!(" {:>2}", number);
-        //     }
-        //     println!("");
-        // }
-        // println!("\nsave_data_color_codes:");
-        // for row in save_data_color_codes.clone() {
-        //     for color in row {
-        //         print!(" {}", color);
-        //     }
-        //     println!("");
-        // }
-
         let mut i: usize = 0;
         let mut j: usize = 0;
         let mut game_data_numeric: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
@@ -499,37 +481,9 @@ impl SavedGameMenu {
             i += 1;
         }
 
-        // println!("\n\ngame_data_numeric:");
-        // for row in game_data_numeric {
-        //     for number in row {
-        //         print!(" {:>2}", number);
-        //     }
-        //     println!("");
-        // }
-        // println!("\ngame_data_color_codes:");
-        // for row in game_data_color_codes {
-        //     for color in row {
-        //         print!(" {}", match color {
-        //             COLOR_PAIR::UNKNOWN => 'u',
-        //             COLOR_PAIR::GIVEN => 'r',
-        //             COLOR_PAIR::CANDIDATES_Y => 'y',
-        //             COLOR_PAIR::CANDIDATES_B => 'b',
-        //             COLOR_PAIR::GUESS => 'g',
-        //             _ => 'n',
-        //         });
-        //     }
-        //     println!("");
-        // }
-        // std::process::exit(1);
-        
-        // display::dbgprint(self.selection.borrow().as_str());
         let mut puzzle: SavedPuzzle = SavedPuzzle::new();
         puzzle.set_puzzle(game_data_numeric);
         puzzle.set_color_codes(game_data_color_codes);
-        /*puzzle.set_filename(common::DIR().join(self.selection.borrow().as_str())
-            .to_str()
-            .unwrap()
-        );*/
         puzzle.set_filename(self.selection.borrow().as_str());
         *self.saved_game.borrow_mut() = puzzle;
     }
@@ -889,8 +843,8 @@ cells. This action cannot be undone.");
         display_offset += 2;
 
         display::curs_set(CURSOR_VISIBILITY::BLOCK);
-        /* NOTE: This message will not be seen if there is a window resize, so no error handling
-         *       required.
+        /* NOTE: Saving will not be interrupted until the user hits Enter, but this message will
+         *       not be seen if there is a window resize, so no error handling required.
          */
         let new_name: String = self.save_game();
         display::mvprintw(

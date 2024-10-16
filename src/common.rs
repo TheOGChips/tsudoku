@@ -3,11 +3,9 @@ use std::path::PathBuf;
 pub const NUMERIC_DATA_FILENAME: &str = "numbers.csv";
 pub const COLOR_DATA_FILENAME: &str = "colors.csv";
 
-/**
- * 
- */
+/// Returns the path of the hidden directory where game data is stored for `tsudoku`.
 pub fn DIR () -> PathBuf {
-    PathBuf::from(env!("HOME")).join(".tsudoku")//.to_str().unwrap().to_string()
+    PathBuf::from(env!("HOME")).join(".tsudoku")
 }
 
 pub mod csv {
@@ -23,6 +21,10 @@ pub mod csv {
     /**
      * Reads saved game data. Exact functionality is different depending on whether numeric or
      * color code data are being parsed. The parsed data is returned as a 2D vector of bytes.
+     * 
+     *      filename -> The name to use to search for the save game data. This should be
+     *                  equivalent to either `common::NUMERIC_DATA_FILENAME` or
+     *                  `common::COLOR_DATA_FILENAME`.
      */
     pub fn read (filename: &str) -> Result<Vec<Vec<u8>>, std::io::Error> {
         let data_vec: Vec<u8> = 
@@ -44,6 +46,10 @@ pub mod csv {
                                 format!("Expected to parse a number from {}", filename).as_str()
                             )
                         ).collect();
+                        /* NOTE: Newlines are still needed to properly form the data matrix in
+                         *       the for loop at the end of this function, so they need to be
+                         *       added back once each line is parsed like this.
+                         */
                         line.push('\n' as u8);
                         data = [data, line].concat();
                     }
@@ -67,6 +73,13 @@ pub mod csv {
     /**
      * Writes game data to a file. Functionality is the same whether writing numeric or color
      * code data.
+     * 
+     *      save_game_name -> The name to save the game under. This will internally create a
+     *                        directory that stores the numeric and color data.
+     *      data_file_name -> The file data is being saved to. This should be equivalent to
+     *                        either `common::NUMERIC_DATA_FILENAME` or
+     *                        `common::COLOR_DATA_FILENAME`.
+     *      data -> The game data being saved. This will be either numeric or color data.
      */
     pub fn write<T: ToString> (
         save_game_name: &str,

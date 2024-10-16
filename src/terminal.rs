@@ -1,6 +1,7 @@
 /// A cell in the terminal display.
 #[derive(Eq, Hash, PartialEq, Copy, Clone, Debug)]
 pub struct Cell (u8, u8);
+
 impl Cell {
     /**
      * Returns a new Cell representing a cell in the terminal display. The terminal origin is at
@@ -329,7 +330,7 @@ pub mod display {
         /// The Backspace key
         KeyBackspace,
         /// The Delete key
-         KeyDC,
+        KeyDC,
     }
 
     /**
@@ -371,7 +372,6 @@ pub mod display {
      *                 characters.
      */
     pub fn getnstr (target: &mut String, max_len: usize) {
-        //TODO: Have this output the current save game name so the user doesn't have to remember it
         let mut string: String = target.clone();
         addstr(format!("{}", string).as_str());
         let mut count: usize = string.len();
@@ -446,11 +446,12 @@ pub mod display {
             pc::init_pair(pair_code::GUESS, pc::COLOR_GREEN, pc::COLOR_BLACK);
         }
         else {  //Monochrome mode
+            //NOTE: Given and guess cells have reversed color scheme to better stand out
             pc::init_pair(pair_code::UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(pair_code::GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE); //Reversed to better stand out
+            pc::init_pair(pair_code::GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE);
             pc::init_pair(pair_code::CANDIDATES_Y, pc::COLOR_WHITE, pc::COLOR_BLACK);
             pc::init_pair(pair_code::CANDIDATES_B, pc::COLOR_WHITE, pc::COLOR_BLACK);
-            pc::init_pair(pair_code::GUESS, pc::COLOR_WHITE, pc::COLOR_BLACK);
+            pc::init_pair(pair_code::GUESS, pc::COLOR_BLACK, pc::COLOR_WHITE);
         }
     }
 

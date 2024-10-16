@@ -1,4 +1,3 @@
-//include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 use clap;
 use std::{
     fs,
@@ -27,14 +26,9 @@ pub mod terminal;
 pub mod common;
 pub mod sudoku;
 
-/*extern "C" {
-    fn clear ();    //ncurses.h
-}*/
 const save_file_name: &str = "completed-puzzles.txt";
 
 fn main() -> Result<(), &'static str> {
-    // TODO: Clean up unused comments
-    // TODO: Add in any missing doc comments
     // TODO: Fix formatting
     // TODO: Fix all compiler warnings
     /* TODO: The best way to handle removing all save game data is probably via a new command
@@ -73,11 +67,7 @@ fn main() -> Result<(), &'static str> {
     if num_clargs > 1 {
         return Err("\nError: Too many arguments. Only one argument can be accepted.\n");
     }
-    println!("use_in_game_menu: {}", use_in_game_menu);
-    println!("delete_saved_games: {}", delete_saved_games);
-    //println!("ncurses::KEY_ENTER: {}", ncurses::KEY_ENTER);
-    //println!("KEY_ENTER: {}", KEY_ENTER);
-
+    
     if delete_saved_games {
         // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
         //TODO: Change "dir" to "saved_games"
@@ -91,7 +81,6 @@ fn main() -> Result<(), &'static str> {
             },
         };
         for file in dir {
-            //println!("{}", file.as_ref().unwrap().path().display());
             let _ = fs::remove_file(file.unwrap().path());
         }
     }
@@ -128,35 +117,7 @@ fn main() -> Result<(), &'static str> {
             }
         }
     }
-    /*unsafe {
-        let mut main_menu = MainMenu::new();
-        //Example of how enums and enum classes are handled (look at constified_enums):
-        //  https://mdaverde.com/posts/rust-bindgen-enum/
-        let mut opt: i32;// = options_NEW_GAME;
-        loop {
-            opt = main_menu.menu(use_in_game_menu);
-            if opt == options_NEW_GAME {
-                let mut puzzle = Sudoku::new(null());
-                puzzle.start_game(use_in_game_menu, null());
-            }
-            else if opt == options_RESUME_GAME {
-                let mut saved_game_menu = SavedGameMenu::new();
-                if saved_game_menu.run_menu() == options_SAVE_READY {
-                    let saved_puzzle = saved_game_menu.get_saved_game();
-                    let mut puzzle = Sudoku::new(&saved_puzzle);
-                    puzzle.start_game(use_in_game_menu, &saved_puzzle);
-                }
-            }
-            else if opt == options_SHOW_STATS {
-                display_completed_puzzles();
-            }
-            else if opt == options_EXIT {
-                break;
-            }
-        }
-        clear();
-    }*/
-
+    
     display::clear();
     display::tui_end();
     Ok(())
@@ -168,11 +129,6 @@ fn main() -> Result<(), &'static str> {
  */
 fn display_completed_puzzles () {
     let num_completed: Result<String, _> = fs::read_to_string(DIR().join(save_file_name));
-        // .expect("Error 404: File Not Found");
-    //TODO: Keep this around for later when I have to update the number read in
-    //let num_completed: u64 = num_completed[..num_completed.len() - 1].parse()
-    //    .expect("Unable to parse number of completed puzzles");
-
     let prompt1: String = format!(
         "Completed Sudoku puzzles: {}",
         match num_completed {
@@ -181,10 +137,6 @@ fn display_completed_puzzles () {
         }
     );
     let prompt2: &str = "Press Enter to continue";
-
-    /*let mut y_max: i32 = 0;
-    let mut x_max: i32 = 0;
-    getmaxyx(stdscr(), &mut y_max, &mut x_max);*/
     let (y_max, x_max): (i32, i32) = display::get_max_yx();
 
     display::curs_set(CURSOR_VISIBILITY::NONE);

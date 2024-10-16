@@ -12,7 +12,6 @@ use crate::{
         Menu,
         DifficultyMenuOption,
         MenuOption,
-        //MENU_SELECTION,
         InGameMenu,
     },
 };
@@ -33,6 +32,7 @@ use queues::{
 };
 
 extern "C" {
+    /// This is C's `time.h` library called via FFI.
     fn time (_: i32) -> i32;
 }
 
@@ -152,50 +152,10 @@ impl Sudoku {
     pub fn new (saved_puzzle: Option<SavedPuzzle>) -> Self {
         display::init_color_pairs();
         let (grid2display, display2grid) = Self::create_maps();
-        /*let color_codes: [
-            [display::COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
-            display::DISPLAY_MATRIX_ROWS
-        ] = Self::create_color_codes(&grid2display);*/
-        /*
-        println!("The maps {} the same size...",
-            if grid2display.len() == display2grid.len() {
-                "are"
-            }
-            else {
-                "are not"
-            }
-        );
-        for i in 0..grid2display.len() as u8 {
-            let (_, val) = grid2display.get_key_value(&i).unwrap();
-            println!("{:?} -> {:?}",
-                grid2display.get_key_value(&i).unwrap(),
-                display2grid.get_key_value(&val).unwrap()
-            );
-        }
-        println!("hello there...");
-        std::process::exit(0);*/
         let (display_matrix, color_codes, grid) =
             Self::init_display_matrix(&saved_puzzle, &grid2display);
         let (offset2actual, actual2offset) = Self::map_display_matrix_offset();
-        //display::tui_end();
-        /*println!("display_matrix:\n");
-        for row in display_matrix {
-            println!("{:?}", row);
-        }
-        //println!("offset2actual: {:?}", offset2actual);
-        for i in display::ORIGIN.y()..display::DISPLAY_MATRIX_ROWS as u8 + display::ORIGIN.y() {
-            for j in display::ORIGIN.x()..display::DISPLAY_MATRIX_COLUMNS as u8 + display::ORIGIN.x() {
-                let mapping = offset2actual.get_key_value(&Cell::new(i, j));
-                if mapping.is_some() {
-                    let (actual, offset): (&Cell, &Cell) = mapping.unwrap();
-                    println!("{:?}: {:?}", actual, offset);
-                }
-                else {
-                    println!("{}, {}: None", i, j);
-                }
-            }
-        }*/
-        //std::process::exit(0);
+        
         Self {
             display_matrix: display_matrix,
             color_codes: color_codes,
@@ -249,26 +209,6 @@ impl Sudoku {
 
         (grid2display, display2grid)
     }
-
-    /**
-     * 
-     */
-    /*fn create_color_codes (grid2display: &HashMap<u8, Cell>) -> [
-        [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
-        display::DISPLAY_MATRIX_ROWS
-    ] {
-        let color_codes = [[COLOR_PAIR::UNKNOWN; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        let mut cells = grid2display.values();
-        for i in 0..display::DISPLAY_MATRIX_ROWS as u8 {
-            for j in 0..display::DISPLAY_MATRIX_COLUMNS as u8 {
-                match cells.find(|&&cell| cell == Cell::new(i, j)) {
-                    Some(_) => color_codes[i][j] = COLOR_PAIR::GIVEN,
-                    None => todo!(),
-                }
-            }
-        }
-        color_codes
-    }*/
 
     /**
      * Initialiizes the display matrix with either a newly generated puzzle or a saved
@@ -371,11 +311,6 @@ impl Sudoku {
                         COLOR_PAIR::UNKNOWN
                     };
                 }
-                /*display::tui_end();
-                for row in mat {
-                    println!("\t{:?}", row);
-                }
-                std::process::exit(1);*/
 
                 (mat, color_codes, grid)
             },
@@ -396,10 +331,7 @@ impl Sudoku {
                 let TOTAL_OFFSETX: u8 = j + display::ORIGIN.x() + (j / CONTAINER_SIZE);
                 let actual: Cell = Cell::new(i, j);
                 let offset: Cell = Cell::new(TOTAL_OFFSETY, TOTAL_OFFSETX);
-                /* TODO: These may need to be switched? I thought I had it the other way (where
-                 *       the actual gave you the offset), but the code makes it look like the
-                 *       offset gives you the actual.
-                 */
+
                 offset2actual.insert(offset, actual);
                 actual2offset.insert(actual, offset);
             }
@@ -427,21 +359,17 @@ impl Sudoku {
         //TODO: If SAVED_PUZZLE isn't used anywhere else, get rid of it here, in main, and in init_display
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
-        let DELAY: i32 = 2;              // NOTE: # seconds to delay after printing out results
+        let DELAY: i32 = 2;             // NOTE: # seconds to delay after printing out results
 
         self.display_hotkey(USE_IN_GAME_MENU, LINE_OFFSET_TWEAK);
         display::mv(display::ORIGIN.y().into(), display::ORIGIN.x().into());
         self.cursor_pos.set(display::ORIGIN.y(), display::ORIGIN.x());
         display::refresh();
-        //TODO: Continue testing/debugging the while loop
-        //display::getch();
-        //display::tui_end();
-        //std::process::exit(1);
 
         display::noecho();
         let mut quit_game: bool = false;
         let mut completed: bool = false;
-        //nodelay(stdscr, true);
+        display::nodelay(true);
         display::timeout(250);
         while !quit_game {
             let input: Option<display::Input> = display::getch();
@@ -524,7 +452,6 @@ impl Sudoku {
                         display::addstr("You win!");
                         display::clrtoeol();
                         display::refresh();
-                        // self.increment_completed_games();
                         completed = true;
                         quit_game = true;
                         display::napms(DELAY * 1000);
@@ -533,10 +460,6 @@ impl Sudoku {
                         display::addstr("Puzzle incomplete!");
                         display::refresh();
                         display::napms(DELAY * 1000);
-                        // display::mv(
-                        //     display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS +
-                        //         LINE_OFFSET_TWEAK,
-                        //     0);
                         display::mv(display::get_cur_y(), 0);
                         display::clrtoeol();
                         self.reset_cursor();
@@ -554,26 +477,6 @@ impl Sudoku {
         }
         display::nodelay(false);
 
-        /* TODO: Games always report that the puzzle is incomplete, even when it isn't
-         *       It appears to be working when puzzle is read in and after adding new input
-         *       Time to check what actually gets returned from evaluate
-         */
-        // display::getch();
-        // display::tui_end();
-        // println!("\nrows\n");
-        // for r in &self.grid.rows {
-        //     println!("{:?}", r.arr);
-        // }
-        // println!("\ncolumns:\n");
-        // for c in &self.grid.columns {
-        //     println!("{:?}", c.arr);
-        // }
-        // println!("\nboxes:\n");
-        // for b in &self.grid.boxes {
-        //     println!("{:?}", b.arr)
-        // }
-        // println!("");
-        // std::process::exit(1);
         completed
     }
 
@@ -588,142 +491,23 @@ impl Sudoku {
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<SavedPuzzle>) {
         self.printw();
-        /*for i in 0..display::DISPLAY_MATRIX_ROWS{
-            self.mv(Cell::new(i as u8, 0));
-            for j in 0..display::DISPLAY_MATRIX_COLUMNS {
-                //TODO: GET RID OF THIS self.map_display_matrix_offset(Cell::new(i as u8, j as u8));
-                /*let mut color_pair: i16 = UNKNOWN;
-                if let Some(saved_puzzle) = SAVED_PUZZLE {
-                    if saved_puzzle.color_codes[i][j] == 'u' {
-                        color_pair
-                    }
-                    //TODO
-                }*/
-                /* TODO: This could probably go into the Some case of Sudoku::init_display_matrix
-                let color_pair: COLOR_PAIR = if let Some(saved_puzzle) = SAVED_PUZZLE {
-                    match saved_puzzle.color_codes[i][j] {
-                        'u' => COLOR_PAIR::UNKNOWN,
-                        'r' => COLOR_PAIR::GIVEN,
-                        'y' => {
-                            //nc::attron(nc::A_BOLD);
-                            //self.window.attron(pc::A_BOLD);
-                            display::bold_set(true);
-                            COLOR_PAIR::CANDIDATES_Y
-                        },
-                        'b' => {
-                            //self.window.attron(pc::A_BOLD);
-                            display::bold_set(true);
-                            COLOR_PAIR::CANDIDATES_B
-                        },
-                        'g' => COLOR_PAIR::GUESS,
-                        _ => COLOR_PAIR::DEFAULT, // NOTE: Also case 'n'
-                    }
-                }
-                else {
-                    COLOR_PAIR::DEFAULT
-                };
-                */
-
-                //TODO: See if this can be replaced with Sudoku::printw. It looks like it could
-                //      be, but maybe I'll need to add more to this later (probably for saved
-                //      game logic, maybe?)
-                match self.color_codes[i][j] {
-                    COLOR_PAIR::CANDIDATES_B | COLOR_PAIR::CANDIDATES_Y
-                        => display::bold_set(true),
-                    _ => display::bold_set(false),
-                }
-                display::color_set(&self.color_codes[i][j]);
-                //self.color_codes[i][j] = color_pair;
-                display::addstr(
-                    if self.display_matrix[i][j] == '?' as u8 ||
-                       self.display_matrix[i][j] == ' ' as u8 {
-                        format!("{}",self.display_matrix[i][j] as char)
-                    }
-                    else {
-                        format!("{}", self.display_matrix[i][j])
-                    }
-                    .as_str());
-                //display::color_set(&COLOR_PAIR::DEFAULT);
-                /*if let Some(_) = SAVED_PUZZLE {
-                    display::color_set(&COLOR_PAIR::DEFAULT);
-                    display::bold_set(false);
-                }*/
-
-                if j == 8 || j == 17 {
-                    display::addstr("|");
-                }
-            }
-            if i == 8 || i == 17 {
-                display::mvprintw(
-                    (i as u8 + display::ORIGIN.y() + (i as u8 / CONTAINER_SIZE) + 1) as i32,
-                    display::ORIGIN.x() as i32,
-                    "---------|---------|---------"
-                );
-            }
-        }*/
-
-        /*if let Some(_) = SAVED_PUZZLE {
-            for i in 0..self.grid2display_map.len()  {
-                let coords: Cell = self.grid2display_map[&(i as u8)];
-                self.mv(coords);
-
-                let row_index: usize = coords.y().into();
-                let column_index: usize = coords.x().into();
-                let color_pair: COLOR_PAIR = if self.grid.is_known(i) {
-                    COLOR_PAIR::GIVEN
-                }
-                else {
-                    COLOR_PAIR::UNKNOWN
-                };
-                display::color_set(&color_pair);
-                self.color_codes[row_index][column_index] = color_pair;
-                display::addstr(format!("{}",self.display_matrix[row_index][column_index] as char).as_str());
-                display::color_set(&COLOR_PAIR::DEFAULT);
-            }
-        }*/
     }
 
     /**
-     * TODO: Come up with a better name for this function
-     * 
      * Moves the cursor to its offset position for the initial printing of the display matrix
      * from Sudoku::printw. This is necessary so that the the display matrix offset can be mapped
      * correctly.
      * 
      *      COORDS -> Pre-offset display line and column numbers.
      */
+    //TODO: Come up with a better name for this function
     fn mv (&mut self, COORDS: Cell) {
-        /*let TOTAL_OFFSETY: i32 =
-            (COORDS.y() + display::ORIGIN.y() + (COORDS.y() / CONTAINER_SIZE)) as i32;
-        let TOTAL_OFFSETX: i32 =
-            (COORDS.x() + display::ORIGIN.x() + (COORDS.x() / CONTAINER_SIZE)) as i32;
-        display::mv(TOTAL_OFFSETY, TOTAL_OFFSETX);*/
         let offset: Cell = *self.actual2offset.get(&COORDS)
             .expect("Problem getting offset in Sudoku::mv");
         let display_y: i32 = offset.y().into();
         let display_x: i32 = offset.x().into();
         display::mv(display_y, display_x);
-
-        //NOTE: Update cursor_pos after moving
-        // let (new_cursor_pos_y, new_cursor_pos_x): (i32, i32) = display::get_cur_yx();
-        // self.cursor_pos.set(new_cursor_pos_y as u8, new_cursor_pos_x as u8);
     }
-
-    /**
-     * Creates a mapping between a cell in the display matrix and it's actual location on the
-     * screen. A call to this function is made for one cell at a time during the initial printing
-     * of the display matrix to the screen.
-     * 
-     *      DISPLAY_INDECES -> Cell object containing the display line and display column number.
-     * 
-     * NOTE: This looks like it doesn't work as expected, but the use of the overloaded
-     *       Sudoku::move in printw takes care of applying the offset before this function is
-     *       called.
-     */
-    /*fn map_display_matrix_offset (&mut self, DISPLAY_INDECES: Cell) {
-        let (y, x): (i32, i32) = display::get_cur_yx();
-        self.display_matrix_offset.insert(Cell::new(y as u8, x as u8), DISPLAY_INDECES);
-    }*/
 
     /**
      * Displays the hotkey command available in the bottom left corner depending on whether the
@@ -777,8 +561,6 @@ impl Sudoku {
                         format!("{}", self.display_matrix[i][j])
                     }
                     .as_str());
-                //display::color_set(&COLOR_PAIR::DEFAULT);
-                //display::bold_set(false);
 
                 if j == 8 || j == 17 {
                     display::color_set(&COLOR_PAIR::DEFAULT);
@@ -821,18 +603,15 @@ impl Sudoku {
         display::clrtoeol();
         display::addstr("Enter save file name: ");
 
-        /* NOTE: Copy the display matrix into a pointer in order to pass along to
-         *       InGameMenu::save_game
-         */
         /* TODO: The name of the saved game isn't printed out the first time after exiting and
          *       re-entering the in-game menu.
          */
         let new_name: String = self.save_game();
 
+        // NOTE: Display whether the game was saved successfully or not
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
-        //NOTE: Turn off cursor while displaying
-        display::curs_set(CURSOR_VISIBILITY::NONE);
+        display::curs_set(CURSOR_VISIBILITY::NONE); //NOTE: Turn off cursor while displaying
         display::addstr(
             format!(
                 "{} saved!",
@@ -1055,16 +834,9 @@ impl Sudoku {
                     _ => (),
                 }
             }
-            // display::refresh();
         }
 
-        /* TODO: It makes more sense for the display refresh to be down here now. Since this
-         *       version of printw doesn't alter self.cursor_pos, the commented lines below
-         *       shouldn't be needed. Erase these if it looks like everything is working.
-         */
-        // let curr_pos: Cell = self.cursor_pos;
         self.printw();
-        // self.cursor_pos = curr_pos;
         self.reset_cursor();
         display::refresh();
     }
@@ -1181,17 +953,6 @@ impl Grid {
         let boxes: [Box; NUM_CONTAINERS as usize] =
             array::from_fn(|_| Box::new(CONTAINER::BOX, [unk; CONTAINER_SIZE as usize]));
         
-        /*display::tui_end();
-        println!("grid_map:\n{:?}", grid_map);
-        println!("known_positions:\n{:?}", known_positions);
-        println!("rows, columns, and boxes:");
-        for (r, c, b) in itertools::izip!(rows, columns, boxes) {
-            println!("r: {:?}", r.arr);
-            println!("c: {:?}", c.arr);
-            println!("b: {:?}\n", b.arr);
-        }
-        std::process::exit(1);*/
-        
         Self {
             grid_map: grid_map,
             known_positions: known_positions,
@@ -1237,12 +998,10 @@ impl Grid {
         let solved_puzzle = self.generate_solved_puzzle(&seed);
         //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
 
+        //NOTE: Randomly shuffle the locations in the Grid
         let mut generator = thread_rng();
         let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
-        //display::tui_end();
-        //println!("positions: {:?}", positions);
         positions.shuffle(&mut generator);
-        //println!("positions: {:?}", positions);
 
         let NUM_POSITIONS: usize = match diff {
             DifficultyMenuOption::EASY => 60,
@@ -1256,42 +1015,13 @@ impl Grid {
             self.known_positions[POS as usize] = true;
         }
         
-        /*for i in 0..9 {
-            print!("\t[");
-            for j in 0..9 {
-                if j < 8 {
-                    print!("{}, ", solved_puzzle[i*9 + j]);
-                }
-                else { print!("{}" , solved_puzzle[i*9 + j]);
-                };
-            }
-            println!("]");
-        }
-        println!("");
-        for row in &self.rows {
-            println!("\t{:?}", row.arr);
-        }
-        println!("");
-        for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
-            println!("r: {:?}", r.arr);
-            println!("c: {:?}", c.arr);
-            println!("b: {:?}", b.arr);
-            println!("");
-        }
-        for row in &self.rows {
-            println!("\t{:?}", row.arr);
-        }*/
-
         /* NOTE: It doesn't seem like this should be needed, but it is. There's probably a
          *       "better" way to fix the way known_positions is updated, but I don't think it's
          *       worth trying to figure out.
          */
-        
         for i in NUM_POSITIONS..GRID_SIZE as usize {
             self.known_positions[positions[i] as usize] = false;
         }
-        //println!("{:?}", self.known_positions);
-        //std::process::exit(1);
     }
 
     /**
@@ -1307,17 +1037,19 @@ impl Grid {
         //NOTE: Initialize the solution matrix with '?' placeholders
         let mut soln_matrix: [[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize] =
             [['?' as u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize];
-        let mut generator = thread_rng();   /* NOTE: The original C++ code used a
-                                                        *       Mersenne-Twister engine. This
-                                                        *       just uses the default RNG
-                                                        *       created by rand.
-                                                        */
+
+        /* NOTE: The original C++ code used a Mersenne-Twister engine. This just uses the
+         *       default RNG created by rand.
+         */
+        let mut generator = thread_rng();   
+
         //NOTE: Random numbers with values of 1-81 will be uniformly generated.
         let _ = Uniform::new_inclusive(1, CONTAINER_SIZE + 1);
         let mut values: [u8; CONTAINER_SIZE as usize] = array::from_fn(|i| i as u8 + 1);
 
-        /* NOTE: Fill in boxes along the diagonal first.On an empty puzzle, boxes 1, 5, and 9 are
-         *       independent of each other, and can be randomly filled in a more trivial manner.
+        /* NOTE: Fill in boxes along the diagonal first.On an empty puzzle, boxes 1, 5, and 9
+         *       are independent of each other, and can be randomly filled in a more trivial
+         *       manner.
          */
         let mut i: usize = 0;
         while i < NUM_CONTAINERS as usize {
@@ -1339,14 +1071,7 @@ impl Grid {
         let mut soln_rows: [Row; NUM_CONTAINERS as usize] =
             array::from_fn(|i| Row::new(CONTAINER::ROW, soln_matrix[i]));
         let mut soln_columns: [Column; NUM_CONTAINERS as usize] = array::from_fn(
-            |i| {
-                /*let mut temp_col: [u8; NUM_CONTAINERS as usize] = [0; NUM_CONTAINERS as usize];
-                for j in 0..NUM_CONTAINERS {
-                    temp_col[j] = soln_matrix[j][i];
-                }
-                Column::new(CONTAINER::COLUMN, temp_col)*/
-                Column::new(CONTAINER::COLUMN, array::from_fn(|j| soln_matrix[j][i]))
-            }
+            |i| Column::new(CONTAINER::COLUMN, array::from_fn(|j| soln_matrix[j][i]))
         );
         let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = array::from_fn(
             |i| {
@@ -1385,23 +1110,6 @@ impl Grid {
             }
         }
 
-        /*display::tui_end();
-        //println!("soln:\n{:?}", soln_matrix);
-        println!("soln:");
-        for row in soln_matrix {
-            println!("\t{:?}", row);
-        }
-        println!("");
-        for (r, c, b) in itertools::izip!(soln_rows, soln_columns, soln_boxes) {
-            println!("r: {:?}", r.arr);
-            println!("c: {:?}", c.arr);
-            println!("b: {:?}\n", b.arr);
-        }
-        println!("");
-        for row in soln_matrix {
-            println!("\t{:?}", row);
-        }
-        std::process::exit(1);*/
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
                 soln[i * CONTAINER_SIZE as usize + j] = soln_matrix[i][j];
@@ -1474,30 +1182,24 @@ impl Grid {
         }
         positions[0] += 3 * (BOX % 3);
 
-        // Figure out the remaining 8 positions in box
+        // NOTE: Figure out the remaining 8 positions in box
         for i in 1..CONTAINER_SIZE {
             positions[i as usize] = positions[0] + CONTAINER_SIZE * (i / 3) + i % 3;
         }
 
-        /* NOTE: Figure out positions VALUE can and can't be placed.
-         *       Map row and column (box shouldn't be needed).
+        /* NOTE: Figure out positions VALUE can and can't be placed. Map row and column (box
+         *       shouldn't be needed).
          */
         for i in 0..CONTAINER_SIZE as usize {
             let ROW_NUMBER: usize = Self::map_row(positions[i]);
             let COLUMN_NUMBER: usize = Self::map_column(positions[i]);
-            /*println!("y: {}, x: {}, val: {}, y_exists: {}, x_exists: {}, is_known: {}",
-                ROW_NUMBER, COLUMN_NUMBER, VALUE, rows[ROW_NUMBER].value_exists(VALUE),
-                columns[COLUMN_NUMBER].value_exists(VALUE), self.is_known(positions[i] as usize)
-            );*/
             if !rows[ROW_NUMBER].value_exists(VALUE) &&
                !columns[COLUMN_NUMBER].value_exists(VALUE) &&
                !self.is_known(positions[i] as usize) {
-                //println!("Trying to add to the queue...");
                 let _ = available_pos.add(positions[i]);
             }
         }
 
-        //println!("testing before recursion...");
         /* NOTE: set_value cannot be used here because the rows, columns, and boxes being used
          *       are not the Grid's internal Containers. They belong to the solution matrix and
          *       are completely separate. Interesting things happened when I tested that out
@@ -1505,59 +1207,44 @@ impl Grid {
          */
         let mut stop: bool = false;
         let mut soln: bool = true;
-        //while true {
         while !stop {
             if available_pos.size() == 0 {
                 return false
             }
-            //println!("After available_pos.size() check...");
 
             let next_available_pos = available_pos.peek()
                 .expect("Error retrieving next position while solving...");
-            //let ROW_NUMBER: usize = Self::map_row(next_available_pos);
-            //let COLUMN_NUMBER: usize = Self::map_column(next_available_pos);
-            //let BOX_NUMBER: usize = BOX as usize;
             let (ROW_NUMBER, COLUMN_NUMBER, BOX_NUMBER): (usize, usize, usize) =
                 Self::map_containers(next_available_pos);
-            //let ROW_INDEX: usize = Self::get_row_index(next_available_pos);
-            //let COLUMN_INDEX: usize = Self::get_column_index(next_available_pos);
-            //let BOX_INDEX: usize = Self::get_box_index(next_available_pos);
             let (ROW_INDEX, COLUMN_INDEX, BOX_INDEX): (usize, usize, usize) =
                 Self::get_container_indeces(next_available_pos);
             
-            rows[ROW_NUMBER].set_value(ROW_INDEX, VALUE);                  //NOTE: STEP 1
+            rows[ROW_NUMBER].set_value(ROW_INDEX, VALUE);                   //NOTE: STEP 1
             columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, VALUE);
             boxes[BOX_NUMBER].set_value(BOX_INDEX, VALUE);
             self.known_positions[next_available_pos as usize] = true;
 
-            if BOX == 7 && VALUE == 9 {                                    //NOTE: STEP 2
+            if BOX == 7 && VALUE == 9 {                                     //NOTE: STEP 2
                 return true;
             }
 
-            let next_box: u8 = if      BOX == 3 { 5 }                      //NOTE: STEP 4
+            let next_box: u8 = if      BOX == 3 { 5 }                       //NOTE: STEP 4
                                else if BOX == 7 { 1 }
                                else             { BOX + 1 };
-            let next_value: u8 = if BOX == 7 { VALUE + 1 }                 //NOTE: STEP 5
+            let next_value: u8 = if BOX == 7 { VALUE + 1 }                  //NOTE: STEP 5
                                  else        { VALUE };
 
             soln = self.solve(next_box, next_value, rows, columns, boxes);
-            //if soln { break; }  //TODO: Find a better way to do this
             if soln { stop = true; }
-            //if soln { return soln; }
             else {
-                rows[ROW_NUMBER].set_value(ROW_INDEX, '?' as u8);   //NOTE: STEP 6
+                rows[ROW_NUMBER].set_value(ROW_INDEX, '?' as u8);           //NOTE: STEP 6
                 columns[COLUMN_NUMBER].set_value(COLUMN_INDEX, '?' as u8);
                 boxes[BOX_NUMBER].set_value(BOX_INDEX, '?' as u8);
                 self.known_positions[next_available_pos as usize] = false;
                 let _ = available_pos.remove();
             }
-            //println!("stop: {}", stop);
         }
         
-        /*for row in rows {
-            println!("row: {:?}", row.arr);
-        }
-        println!("");*/
         soln
     }
 
@@ -1810,16 +1497,9 @@ impl Grid {
      */
     fn evaluate (&self) -> bool {
         let mut completed: bool = true;
-        // display::tui_end();
-        //TODO: The problem lies here. evaluate always returns false
         for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
-            // println!("r: {}", r.evaluate());
-            // println!("c: {}", c.evaluate());
-            // println!("b: {}\n", b.evaluate());
             completed &= r.evaluate() && c.evaluate() && b.evaluate();
         }
-        // println!("Grid::evaluate -> completed: {}", completed);
-        // std::process::exit(1);
         completed
     }
 }
@@ -1864,14 +1544,15 @@ struct Container {
     container_type: CONTAINER,
     arr: [u8; CONTAINER_SIZE as usize],
 }
-//
 
 impl Container {
     /**
      * Initializes internal array to the same values as it's array parameter.
      * 
-     *      container_type -> 
-     *      arr -> 
+     *      container_type -> Whether this container is a `ROW`, `COLUMN`, or `BOX`.
+     *      arr -> An array representing the contents of this Container on the Grid. Rows are
+     *             intended to be read left-to-right, Columns up-to-down, and Boxes a
+     *             combination of both.
      */
     pub fn new (container_type: CONTAINER, arr: [u8; CONTAINER_SIZE as usize]) -> Self {
         Self {
@@ -1895,23 +1576,13 @@ impl Container {
      *      VALUE -> Integer value that is searched for in the container's internal array.
      */
     fn value_exists (&self, VALUE: u8) -> bool {
-        /*let CONVERTED: u8 = match VALUE as char {
-            '?' => VALUE,
-            _ => VALUE + '0' as u8,
-        };*/
-        // println!("VALUE: {}", VALUE);
-        // if VALUE == '?' as u8 {
-        //     true
-        // }
-        // else {
-            let mut exists: bool = false;
-            for i in 0..CONTAINER_SIZE as usize {
-                if self.at(i) == VALUE {
-                    exists = true;
-                }
+        let mut exists: bool = false;
+        for i in 0..CONTAINER_SIZE as usize {
+            if self.at(i) == VALUE {
+                exists = true;
             }
-            exists
-        // }
+        }
+        exists
     }
 
     /**
@@ -1929,15 +1600,10 @@ impl Container {
      * puzzle (i.e. exactly one each of the values 1-9 in the array).
      */
     fn evaluate (&self) -> bool {
-        // if self.value_exists('?' as u8) {
-        //     false
-        // }
-        // else {
-            let mut completed = !self.value_exists('?' as u8);
-            for i in 1..=CONTAINER_SIZE {
-                completed &= self.value_exists(i);
-            }
-            completed
-        // }
+        let mut completed = !self.value_exists('?' as u8);
+        for i in 1..=CONTAINER_SIZE {
+            completed &= self.value_exists(i);
+        }
+        completed
     }
 }
