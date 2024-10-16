@@ -43,11 +43,13 @@ NOTE: See **Prerequisites Installation** section for install instructions.
 
 >\- A C-based TUI library: `libncurses-dev`
 
+>\- `curl`
+
 ## Prerequisites Installation
 
->\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install
+>\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install . The standard installation will work just fine for installing `tsudoku`.
 
->\- `sudo apt install build-essential libncurses-dev`
+>\- `sudo apt install build-essential libncurses-dev curl`
 
 ## Installation
 
