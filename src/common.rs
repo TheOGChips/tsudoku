@@ -4,7 +4,7 @@ pub const NUMERIC_DATA_FILENAME: &str = "numbers.csv";
 pub const COLOR_DATA_FILENAME: &str = "colors.csv";
 
 /// Returns the path of the hidden directory where game data is stored for `tsudoku`.
-pub fn DIR () -> PathBuf {
+pub fn game_dir () -> PathBuf {
     PathBuf::from(env!("HOME")).join(".tsudoku")
 }
 
@@ -85,7 +85,7 @@ pub mod csv {
         save_game_name: &str,
         data_file_name: &str,
         data: &Vec<[T; display::DISPLAY_MATRIX_ROWS]>) {
-            let save_dir = crate::DIR().join(&save_game_name);
+            let save_dir = crate::game_dir().join(&save_game_name);
             let _ = fs::create_dir(&save_dir);
             let mut outfile: fs::File = fs::OpenOptions::new().create(true)
                 .truncate(true)

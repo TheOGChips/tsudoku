@@ -105,7 +105,7 @@ pub mod display {
      * Global pancurses::Window object that controls the curses display. All wrapper functions in
      * the `display` module use this object.
      */ 
-    const window: Lazy<pc::Window> = Lazy::new(|| pc::initscr());
+    const WINDOW: Lazy<pc::Window> = Lazy::new(|| pc::initscr());
     
     /**
      * Sets the value of the vertical divider between the display puzzle and the in-game menu.
@@ -113,7 +113,7 @@ pub mod display {
      *      n -> The number of columns to be used as the vertical divider. If the in-game menu is
      *           disabled, the vertical divider is set to 0.
      */
-    pub unsafe fn set_VERTICAL_DIVIDER (n: u8) {
+    pub unsafe fn set_vertical_divider (n: u8) {
         VERTICAL_DIVIDER = n;
     }
 
@@ -123,7 +123,7 @@ pub mod display {
      *      n -> The number of columns to be used to display the in-game menu. If the in-game
      *           menu is disabled, the number of columns is set to 0.
      */
-    pub unsafe fn set_IN_GAME_MENU_DISPLAY_SPACING (n: u8) {
+    pub unsafe fn set_in_game_menu_display_spacing (n: u8) {
         IN_GAME_MENU_DISPLAY_SPACING = n;
     }
 
@@ -133,55 +133,55 @@ pub mod display {
      */
     pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
-            low_level::register(consts::SIGINT, || SIGINT_handler())
+            low_level::register(consts::SIGINT, || sigint_handler())
         }.expect("Error: Signal not found");
 
-        let (mut y_max, mut x_max): (i32, i32) = window.get_max_yx();
+        let (mut y_max, mut x_max): (i32, i32) = WINDOW.get_max_yx();
         
         unsafe {
             if y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32 {
                 return false
             }
             while y_max != WINDOW_REQ.y() as i32 || x_max != WINDOW_REQ.x() as i32 {
-                window.clear();
+                WINDOW.clear();
                 let msg1: &str = "The current window size is incorrect.";
                 let msg2: String = format!("Required dimensions: {} x {}",
                                             WINDOW_REQ.x(), WINDOW_REQ.y());
                 let msg3: String = format!("Current dimensions:  {} x {}", x_max, y_max);
                 let msg4: &str =
                     "Resize the terminal window to the required dimensions to continue.";
-                window.mvprintw(
+                    WINDOW.mvprintw(
                     (y_max/2).into(),     x_max/2 - msg1.len() as i32/2, msg1
                 );
-                window.mvprintw(
+                WINDOW.mvprintw(
                     (y_max/2 + 2).into(), x_max/2 - msg2.len() as i32/2, msg2.as_str()
                 );
-                window.mvprintw(
+                WINDOW.mvprintw(
                     (y_max/2 + 3).into(), x_max/2 - msg3.len() as i32/2, msg3.as_str()
                 );
 
                 if msg4.len() as i32 > x_max {
-                    let PARTITION: usize = 30;
-                    window.mvprintw(
+                    let partition: usize = 30;
+                    WINDOW.mvprintw(
                         (y_max/2 + 5).into(),
                         x_max/2 - msg4.len() as i32/2,
-                        msg4.get(..PARTITION).unwrap()
+                        msg4.get(..partition).unwrap()
                     );
-                    window.mvprintw(
+                    WINDOW.mvprintw(
                         (y_max/2 + 6).into(),
                         x_max/2 - msg4.len() as i32/2,
-                        msg4.get(PARTITION..).unwrap()
+                        msg4.get(partition..).unwrap()
                     );
                 }
                 else {
-                    window.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32 / 2, msg4);
+                    WINDOW.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32 / 2, msg4);
                 }
 
-                window.refresh();
+                WINDOW.refresh();
                 napms(100);
-                (y_max, x_max) = window.get_max_yx();
+                (y_max, x_max) = WINDOW.get_max_yx();
             }
-            window.clear();
+            WINDOW.clear();
             true
         }
     }
@@ -190,7 +190,7 @@ pub mod display {
      * Resets the terminal settings to their previous state from before the pancurses environment
      * was initialized, then terminates the program.
      */
-    fn SIGINT_handler () {
+    fn sigint_handler () {
         tui_end();
         std::process::exit(0);
     }
@@ -199,12 +199,12 @@ pub mod display {
     pub fn tui_init () {
         pc::cbreak();
         noecho();
-        window.keypad(true);
+        WINDOW.keypad(true);
     }
 
     /// Resets the terminal settings to the default before destroying pancurses environment.
     pub fn tui_end () {
-        curs_set(CURSOR_VISIBILITY::BLOCK);
+        curs_set(CursorVisibility::Block);
         echo();
         pc::nocbreak();
         pc::endwin();
@@ -216,7 +216,7 @@ pub mod display {
      * `pancurses::get_max_yx`.
      */
     pub fn get_max_yx () -> (i32, i32) {
-        window.get_max_yx()
+        WINDOW.get_max_yx()
     }
 
     /**
@@ -224,7 +224,7 @@ pub mod display {
      * bottom row of the terminal. This function is a wrapper around `pancurses::get_max_y`.
      */
     pub fn get_max_y () -> i32 {
-        window.get_max_y()
+        WINDOW.get_max_y()
     }
 
     /**
@@ -232,7 +232,7 @@ pub mod display {
      * around `pancurses::get_cur_yx`.
      */
     pub fn get_cur_yx () -> (i32, i32) {
-        window.get_cur_yx()
+        WINDOW.get_cur_yx()
     }
 
     /**
@@ -240,14 +240,14 @@ pub mod display {
      * This is a wrapper around `pancurses::get_cur_y`.
      */
     pub fn get_cur_y () -> i32 {
-        window.get_cur_y()
+        WINDOW.get_cur_y()
     }
 
     /**
      * Clears the terminal window of all content. This is a wrapper around `pancurses::clear`.
      */
     pub fn clear () {
-        window.clear();
+        WINDOW.clear();
     }
 
     /**
@@ -255,36 +255,36 @@ pub mod display {
      * is currently on. This is a wrapper around `pancurses::clrtoeol`.
      */
     pub fn clrtoeol () {
-        window.clrtoeol();
+        WINDOW.clrtoeol();
     }
 
     /**
      * Variants of cursor visibility that can be toggled between. This partially emulates the
      * `ncurses::CURSOR_VISIBILITY` enum.
      */
-    pub enum CURSOR_VISIBILITY {
+    pub enum CursorVisibility {
         /** 
          * Do not display the cursor at all. This is similar to
          * `ncurses::CURSOR_VISIBILITY::CURSOR_INVISIBLE`.
          */
-        NONE,
+        None,
         /**
          * Displays the cursor as a block (usually). This is similar to 
          * `ncurses::CURSORY_VISIBILITY::VERY_VISIBLE`.
          */
-        BLOCK,
+        Block,
     }
 
     /**
      * Toggles the visibility of the cursor. This is a wrapper around `pancurses::curs_set`,
      * although the function signature intentionally looks exactly like `ncurses::curs_set`.
      * 
-     *      visibility -> Level of visibility of the cursor. See `display::CURSOR_VISIBILITY`.
+     *      visibility -> Level of visibility of the cursor. See `display::CursorVisibility`.
      */
-    pub fn curs_set (visibility: CURSOR_VISIBILITY) {
+    pub fn curs_set (visibility: CursorVisibility) {
         pc::curs_set(match visibility {
-            CURSOR_VISIBILITY::NONE => 0,
-            CURSOR_VISIBILITY::BLOCK => 2,
+            CursorVisibility::None => 0,
+            CursorVisibility::Block => 2,
         });
     }
 
@@ -295,7 +295,7 @@ pub mod display {
      *      string -> The string to be printed. A string reference.
      */
     pub fn addstr (string: &str) {
-        window.addstr(string);
+        WINDOW.addstr(string);
     }
 
     /**
@@ -306,7 +306,7 @@ pub mod display {
      *      string -> The string to be printed. A string reference.
      */
     pub fn mvprintw (y: i32, x: i32, string: &str) {
-        window.mvprintw(y, x, string);
+        WINDOW.mvprintw(y, x, string);
     }
 
     /**
@@ -328,7 +328,7 @@ pub mod display {
      * `pancurses::Window::refresh`.
      */
     pub fn refresh () {
-        window.refresh();
+        WINDOW.refresh();
     }
 
     /**
@@ -361,7 +361,7 @@ pub mod display {
      */
     pub fn getch () -> Option<Input> {
         //TODO: Return KeyEnter on \r, too
-        match window.getch() {
+        match WINDOW.getch() {
             Some(pc::Input::Character('\n')) | Some(pc::Input::KeyEnter) => Some(Input::KeyEnter),
             Some(pc::Input::Character(ch)) => Some(Input::Character(ch)),
             Some(pc::Input::KeyUp) => Some(Input::KeyUp),
@@ -392,20 +392,20 @@ pub mod display {
         let mut string: String = target.clone();
         addstr(format!("{}", string).as_str());
         let mut count: usize = string.len();
-        let x_start: i32 = window.get_cur_x() - count as i32;
+        let x_start: i32 = WINDOW.get_cur_x() - count as i32;
         loop {
-            match window.getch() {
+            match WINDOW.getch() {
                 Some(pc::Input::KeyEnter) | Some(pc::Input::Character('\n')) => break,
                 Some(pc::Input::KeyBackspace) => {
                     if count > 0 {
                         string.pop();
                         count -= 1;
-                        window.addstr(" ");
-                        let (y, x): (i32, i32) = window.get_cur_yx();
-                        window.mv(y, x - 1);
+                        WINDOW.addstr(" ");
+                        let (y, x): (i32, i32) = WINDOW.get_cur_yx();
+                        WINDOW.mv(y, x - 1);
                     }
                     else {
-                        window.mv(window.get_cur_y(), x_start);
+                        WINDOW.mv(WINDOW.get_cur_y(), x_start);
                     }
                 },
                 Some(pc::Input::Character(c)) => {
@@ -479,7 +479,7 @@ pub mod display {
      *      x -> The column to move to.
      */
     pub fn mv (y: i32, x: i32) {
-        window.mv(y, x);
+        WINDOW.mv(y, x);
     }
 
     /**
@@ -489,7 +489,7 @@ pub mod display {
      *      wait_time -> Time to wait for input in milliseconds.
      */
     pub fn timeout (wait_time: i32) {
-        window.timeout(wait_time);
+        WINDOW.timeout(wait_time);
     }
 
     /**
@@ -499,7 +499,7 @@ pub mod display {
      *      no_delay -> Whether to delay or not (false or true, respectively).
      */
     pub fn nodelay (no_delay: bool) {
-        window.nodelay(no_delay);
+        WINDOW.nodelay(no_delay);
     }
 
     /**
@@ -519,10 +519,10 @@ pub mod display {
      */
     pub fn bold_set (bold_on: bool) {
         if bold_on {
-            window.attron(pc::A_BOLD);
+            WINDOW.attron(pc::A_BOLD);
         }
         else {
-            window.attroff(pc::A_BOLD);
+            WINDOW.attroff(pc::A_BOLD);
         }
     }
 
@@ -531,42 +531,42 @@ pub mod display {
      * display.
      */
     #[derive(PartialEq, Copy, Clone, Debug)]
-    pub enum COLOR_PAIR {
+    pub enum ColorPair {
         /// The uninteresting default of white text on black background.
-        DEFAULT,
+        Default,
         /// The currently highlighted option in the current menu.
-        MENU_SELECTION,
+        MenuSelection,
         /// The default coloring of a `Sudoku` terminal `Cell`.
-        UNKNOWN,
+        Unknown,
         /// The color of a given clue (aka "hint") in a `Sudoku` puzzle.
-        GIVEN,
+        Given,
         /// One possible color option of a candidate cell.
-        CANDIDATES_Y,
+        CandidatesY,
         /// The other possible color option of a candidate cell.
-        CANDIDATES_B,
+        CandidatesB,
         /// The color of a guess cell.
-        GUESS,
+        Guess,
     }
 
     /**
      * Toggles the foreground and background color pair used when printing in the terminal
-     * display. The `display::COLOR_PAIR` variant requested is converted to a numeric code
+     * display. The `display::ColorPair` variant requested is converted to a numeric code
      * internally for use in actually setting the color pair. This is a wrapper around
      * `pancurses::color_set`.
      * 
-     *      pair -> Foreground/background `display::COLOR_PAIR` variant used for requesting what
+     *      pair -> Foreground/background `display::ColorPair` variant used for requesting what
      *              color pair to toggle on.
      */
-    pub fn color_set (pair: &COLOR_PAIR) {
-        window.color_set(
+    pub fn color_set (pair: &ColorPair) {
+        WINDOW.color_set(
             match pair {
-                COLOR_PAIR::DEFAULT => pair_code::DEFAULT,
-                COLOR_PAIR::MENU_SELECTION => pair_code::MENU_SELECTION,
-                COLOR_PAIR::UNKNOWN => pair_code::UNKNOWN,
-                COLOR_PAIR::GIVEN => pair_code::GIVEN,
-                COLOR_PAIR::CANDIDATES_Y => pair_code::CANDIDATES_Y,
-                COLOR_PAIR::CANDIDATES_B => pair_code::CANDIDATES_B,
-                COLOR_PAIR::GUESS => pair_code::GUESS,
+                ColorPair::Default => pair_code::DEFAULT,
+                ColorPair::MenuSelection => pair_code::MENU_SELECTION,
+                ColorPair::Unknown => pair_code::UNKNOWN,
+                ColorPair::Given => pair_code::GIVEN,
+                ColorPair::CandidatesY => pair_code::CANDIDATES_Y,
+                ColorPair::CandidatesB => pair_code::CANDIDATES_B,
+                ColorPair::Guess => pair_code::GUESS,
             }
         );
     }
@@ -592,7 +592,7 @@ pub mod display {
      * a chtype. This is a wrapper around `pancurses::Window::mvinch`.
      */
     pub fn mvinch (y: i32, x: i32) -> pc::chtype {
-        window.mvinch(y, x)
+        WINDOW.mvinch(y, x)
     }
 
     /**
@@ -614,36 +614,36 @@ pub mod display {
     }
 
     /**
-     * Extracts the `COLOR_PAIR` information out of a `pancurses::chtype` (obtained via
+     * Extracts the `ColorPair` information out of a `pancurses::chtype` (obtained via
      * `pancurses::Window::mvinch`). Internally, this is obtained by bitwise anding against
-     * `pancurses::A_COLOR`. `COLOR_PAIR::DEFAULT` is returned if any of the other `COLOR_PAIR`s
+     * `pancurses::A_COLOR`. `ColorPair::DEFAULT` is returned if any of the other `ColorPair`s
      * are not found.
      * 
      *      ch -> Pancurses terminal cell information. This should be the result of a call to
      *            `pancurses::mvinch`.
      */
-    pub fn decode_color_pair (ch: pc::chtype) -> COLOR_PAIR {
+    pub fn decode_color_pair (ch: pc::chtype) -> ColorPair {
         let code: i16 = ((ch & pc::A_COLOR) >> 8) as i16;
         if code == pair_code::MENU_SELECTION {
-            COLOR_PAIR::MENU_SELECTION
+            ColorPair::MenuSelection
         }
         else if code == pair_code::UNKNOWN {
-            COLOR_PAIR::UNKNOWN
+            ColorPair::Unknown
         }
         else if code == pair_code::GIVEN {
-            COLOR_PAIR::GIVEN
+            ColorPair::Given
         }
         else if code == pair_code::CANDIDATES_Y {
-            COLOR_PAIR::CANDIDATES_Y
+            ColorPair::CandidatesY
         }
         else if code == pair_code::CANDIDATES_B {
-            COLOR_PAIR::CANDIDATES_B
+            ColorPair::CandidatesB
         }
         else if code == pair_code::GUESS {
-            COLOR_PAIR::GUESS
+            ColorPair::Guess
         }
         else /* code == pair_code::DEFAULT */ {
-            COLOR_PAIR::DEFAULT
+            ColorPair::Default
         }
     }
 }
