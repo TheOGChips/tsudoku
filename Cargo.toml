@@ -2,7 +2,7 @@
 name = "tsudoku"
 # TODO: Add install of necessary packages to a shell script
 # TODO: Remove all source code except for the shell script from main branch
-version = "2.0.2"
+version = "2.0.3"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"

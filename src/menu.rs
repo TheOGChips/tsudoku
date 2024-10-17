@@ -689,9 +689,6 @@ impl InGameMenu {
         save_file_name: &str,
     ) -> Self {
         Self {
-            /* TODO: Might need to manually copy this over like in the C++ version if weird
-             *       stuff happens
-             */
             display_matrix: *display_matrix,
             color_codes: *color_codes,
             window_resized: RefCell::new(false),
@@ -908,7 +905,6 @@ cells. This action cannot be undone.");
         /* NOTE: Only save the file if the player was able to enter any text first. The success
          *       message will be handled by the calling function.
          */
-        // TODO: Does COLOR_PAIR::DEFAULT need to be handled here?
         if !name.is_empty() {
             let mut color_codes: Vec<[char; display::DISPLAY_MATRIX_ROWS]> = Vec::new();
             for row in self.color_codes {
@@ -918,6 +914,7 @@ cells. This action cannot be undone.");
                     ColorPair::CandidatesY => 'y',
                     ColorPair::CandidatesB => 'b',
                     ColorPair::Guess => 'g',
+                    ColorPair::Default => 'd',
                     _ => 'n',
                 });
                 color_codes.push(colors);
