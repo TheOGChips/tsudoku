@@ -89,7 +89,16 @@ pub mod display {
      */
     pub static mut IN_GAME_MENU_DISPLAY_SPACING: u8 = 80;
 
+    /**
+     * Number of rows to use for the display matrix. This doesn't include the rows containing
+     * Box border characters.
+     */
     pub const DISPLAY_MATRIX_ROWS: usize = 27;
+
+    /**
+     * Number of columns to use for the display matrix. This doesn't include the columns
+     * containing Box border characters.
+     */
     pub const DISPLAY_MATRIX_COLUMNS: usize = DISPLAY_MATRIX_ROWS;
 
     /**
@@ -119,13 +128,8 @@ pub mod display {
     }
 
     /**
-     * Enforce window size on initial startup if terminal window is not already compliant. The
-     * user will be updated as to whether the window is the correct size or not after pressing
-     * the Enter key twice. The reason the Enter key must be hit twice is actually a bug I
-     * decided to make a feature. For some reason, it's required to hit twice only in this
-     * section. Since it doesn't affect anything else, I just left it alone. I now suspect it
-     * has something to do with how NCurses handles window resizing, and might not be fixable
-     * anyway.
+     * Enforces window size if terminal window is not compliant and displays what the appropriate
+     * size should be.
      */
     pub fn invalid_window_size_handler () -> bool {
         let _ = unsafe {
@@ -144,17 +148,30 @@ pub mod display {
                 let msg2: String = format!("Required dimensions: {} x {}",
                                             WINDOW_REQ.x(), WINDOW_REQ.y());
                 let msg3: String = format!("Current dimensions:  {} x {}", x_max, y_max);
-                let msg4: &str = "Resize the terminal window to the required dimensions to continue.";
-                window.mvprintw((y_max/2).into(),     x_max/2 - msg1.len() as i32/2, msg1);
-                window.mvprintw((y_max/2 + 2).into(), x_max/2 - msg2.len() as i32/2, msg2.as_str());
-                window.mvprintw((y_max/2 + 3).into(), x_max/2 - msg3.len() as i32/2, msg3.as_str());
+                let msg4: &str =
+                    "Resize the terminal window to the required dimensions to continue.";
+                window.mvprintw(
+                    (y_max/2).into(),     x_max/2 - msg1.len() as i32/2, msg1
+                );
+                window.mvprintw(
+                    (y_max/2 + 2).into(), x_max/2 - msg2.len() as i32/2, msg2.as_str()
+                );
+                window.mvprintw(
+                    (y_max/2 + 3).into(), x_max/2 - msg3.len() as i32/2, msg3.as_str()
+                );
 
                 if msg4.len() as i32 > x_max {
                     let PARTITION: usize = 30;
-                    window.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32/2,
-                                msg4.get(..PARTITION).unwrap());
-                    window.mvprintw((y_max/2 + 6).into(), x_max/2 - msg4.len() as i32/2,
-                                msg4.get(PARTITION..).unwrap());
+                    window.mvprintw(
+                        (y_max/2 + 5).into(),
+                        x_max/2 - msg4.len() as i32/2,
+                        msg4.get(..PARTITION).unwrap()
+                    );
+                    window.mvprintw(
+                        (y_max/2 + 6).into(),
+                        x_max/2 - msg4.len() as i32/2,
+                        msg4.get(PARTITION..).unwrap()
+                    );
                 }
                 else {
                     window.mvprintw((y_max/2 + 5).into(), x_max/2 - msg4.len() as i32 / 2, msg4);
@@ -410,7 +427,7 @@ pub mod display {
      */
     pub mod pair_code {
         /* NOTE: Don't use 0 with COLOR_PAIRs. This seems to have the effect of having no
-                 attribute on.
+         *       attribute on.
          */
         /// The uninteresting default of white text on black background.
         pub const DEFAULT: i16 = 1;
@@ -446,7 +463,7 @@ pub mod display {
             pc::init_pair(pair_code::GUESS, pc::COLOR_GREEN, pc::COLOR_BLACK);
         }
         else {  //Monochrome mode
-            //NOTE: Given and guess cells have reversed color scheme to better stand out
+            // NOTE: Given and guess cells have reversed color scheme to better stand out
             pc::init_pair(pair_code::UNKNOWN, pc::COLOR_WHITE, pc::COLOR_BLACK);
             pc::init_pair(pair_code::GIVEN, pc::COLOR_BLACK, pc::COLOR_WHITE);
             pc::init_pair(pair_code::CANDIDATES_Y, pc::COLOR_WHITE, pc::COLOR_BLACK);

@@ -29,7 +29,6 @@ pub mod sudoku;
 const save_file_name: &str = "completed-puzzles.txt";
 
 fn main() -> Result<(), &'static str> {
-    // TODO: Fix formatting
     // TODO: Fix all compiler warnings
     /* TODO: The best way to handle removing all save game data is probably via a new command
      *       line argument. If that argument is detected, then $HOME/.tsudoku gets removed and
@@ -85,8 +84,8 @@ fn main() -> Result<(), &'static str> {
         }
     }
 
-    /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if it
-     * doesn't already exist.
+    /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if
+     * it doesn't already exist.
      */
     let _ = fs::create_dir(DIR());
 
@@ -102,15 +101,16 @@ fn main() -> Result<(), &'static str> {
                 },
                 MainMenuOption::RESUME_GAME => {
                     let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
-                    if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) = saved_game_menu.menu() {
-                        let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
-                        let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
-                        if puzzle.start_game(use_in_game_menu, None) {
-                            increment_completed_games();
-                            fs::remove_dir_all(DIR().join(puzzle.filename()))
-                                .expect("Error: Issue removing save game files");
+                    if let MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::SAVE_READY) =
+                        saved_game_menu.menu() {
+                            let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
+                            let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
+                            if puzzle.start_game(use_in_game_menu, None) {
+                                increment_completed_games();
+                                fs::remove_dir_all(DIR().join(puzzle.filename()))
+                                    .expect("Error: Issue removing save game files");
+                            }
                         }
-                    }
                 },
                 MainMenuOption::SHOW_STATS => display_completed_puzzles(),
                 MainMenuOption::EXIT => break,
@@ -124,8 +124,8 @@ fn main() -> Result<(), &'static str> {
 }
 
 /**
- * Reads in the current number of games the player has successfully completed and then displays that
- * information to the screen in the terminal window.
+ * Reads in the current number of games the player has successfully completed and then displays
+ * that information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
     let num_completed: Result<String, _> = fs::read_to_string(DIR().join(save_file_name));

@@ -73,7 +73,10 @@ impl SavedPuzzle {
     pub fn new () -> Self {
         Self {
             puzzle: [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-            color_codes: [[COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+            color_codes: [
+                [COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS];
+                display::DISPLAY_MATRIX_ROWS
+            ],
             filename: String::new(),
         }
     }
@@ -86,7 +89,10 @@ impl SavedPuzzle {
 
     /// Stores the color codes of the saved puzzle into an array.
     pub fn set_color_codes (&mut self,
-        color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS]) {
+        color_codes: [
+            [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS];
+            display::DISPLAY_MATRIX_ROWS
+        ]) {
         self.color_codes = color_codes;
     }
 
@@ -104,32 +110,33 @@ impl SavedPuzzle {
 /**
  * Represents an interactive live game of sudoku.
  * 
- *      display_matrix -> 27x27 matrix of 8-bit characters that is displayed to the screen during
- *                        play. This is the data structure the user directly interacts with.
+ *      display_matrix -> 27x27 matrix of 8-bit characters that is displayed to the screen
+ *                        during play. This is the data structure the user directly interacts
+ *                        with.
  *      grid -> Grid object representing just the 81 cells of a sudoku board.
- *      grid2display_map -> Mapping of 81 positions of a grid to their (y, x) coordinates in the
- *                          display matrix.
+ *      grid2display_map -> Mapping of 81 positions of a grid to their (y, x) coordinates in
+ *                          the display matrix.
  *      display2grid_map -> Reverse mapping of grid2display_map.
  *      ORIGIN -> Starting cell of the display matrix's (0, 0) position on the actual terminal
- *                window. This is effectively the row and column offset from the top left cell of the
- *                terminal and also controls the size of the buffers from the edges of the terminal
- *                window.
- *                NOTE: Terminal coordinates are in (y,x) format. Origin coordinates can be found in
- *                      misc.hpp
- *      cursor_pos -> The current position of the cursor on the display matrix. At the start of the
- *                    game, this is equivalent to the ORIGIN, and his is constantly tracked and
- *                    updated every time the cursor moves afterwards. This is primarily beneficial
- *                    for resetting (with the appearance of maintaining) the cursor on the current
- *                    position after reacting to user input (i.e. this object's primary purpose is to
- *                    make the cursor appear as if it never moved after the user inputs a character
- *                    on the display matrix).
+ *                window. This is effectively the row and column offset from the top left cell
+ *                of the terminal and also controls the size of the buffers from the edges of
+ *                the terminal window.
+ *                NOTE: Terminal coordinates are in (y,x) format. Origin coordinates can be
+ *                      found in misc.hpp
+ *      cursor_pos -> The current position of the cursor on the display matrix. At the start of
+ *                    the game, this is equivalent to the ORIGIN, and his is constantly tracked
+ *                    and updated every time the cursor moves afterwards. This is primarily
+ *                    beneficial for resetting (with the appearance of maintaining) the cursor
+ *                    on the current position after reacting to user input (i.e. this object's
+ *                    primary purpose is to make the cursor appear as if it never moved after
+ *                    the user inputs a character on the display matrix).
  *      display_matrix_offset -> Mapping of the display matrix's index pairs to their (y, x)
- *                               positions displayed in the terminal window. This makes the math
- *                               behind making position-related changes easier. display_matrix[0][0]
- *                               is mapped to the ORIGIN and so forth.
+ *                               positions displayed in the terminal window. This makes the
+ *                               math behind making position-related changes easier.
+ *                               `display_matrix[0][0]` is mapped to the ORIGIN and so forth.
  *      neighbor_cells -> Enumeration of shorthand constants used when retrieving a cell's 8
- *                          surrounding (i.e. border) cells along with a constant for the number of
- *                          border positions.
+ *                        surrounding (i.e. border) cells along with a constant for the number
+ *                        of border positions.
  */
 pub struct Sudoku {
     display_matrix: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
@@ -181,8 +188,7 @@ impl Sudoku {
     /**
      * Creates a mapping between the 81 cells in a grid to their positions in the display
      * matrix. A reverse mapping is also created simultaneously. This mapping assumes a
-     * display matrix origin of (0, 0), and a offset is applied later during actual
-     * display.
+     * display matrix origin of (0, 0), and a offset is applied later during actual display.
      */
     fn create_maps () -> (HashMap<u8, Cell>, HashMap<Cell, u8>) {
         let mut row: u8 = 1;
@@ -214,20 +220,22 @@ impl Sudoku {
      * Initialiizes the display matrix with either a newly generated puzzle or a saved
      * game.
      * 
-     *      saved_puzzle -> Pointer to a SavedPuzzle object that represents a previously
-     *                      saved game. If the user has selected to start a new game,
-     *                      this will be a nullptr. If the user has selected to resume a
-     *                      saved game, this object will be read in beforehand.
+     *      saved_puzzle -> Pointer to a SavedPuzzle object that represents a previously saved
+     *                      game. If the user has selected to start a new game, this will be a
+     *                      nullptr. If the user has selected to resume a saved game, this
+     *                      object will be read in beforehand.
      */
-    fn init_display_matrix (saved_puzzle: &Option<SavedPuzzle>, grid2display: &HashMap<u8, Cell>)
-        -> (
-            [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-            [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-            Grid,
-        ) {
-        /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out.
-         * This will display as intended if looking at it full screen with 1920x1080
-         * screen dimensions.
+    fn init_display_matrix (
+        saved_puzzle: &Option<SavedPuzzle>,
+        grid2display: &HashMap<u8, Cell>
+    ) -> (
+        [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        Grid,
+    ) {
+        /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out. This
+         * will display as intended if looking at it full screen with 1920x1080 screen
+         * dimensions.
          * 
          *   0,0  0,1  0,2  0,3  0,4  0,5  0,6  0,7  0,8 |  0,9  0,10  0,11  0,12  0,13  0,14  0,15  0,16  0,17 |  0,18  0,19  0,20  0,21  0,22  0,23  0,24  0,25  0,26
          *   1,0  1,1            1,4            1,7      |       1,10              1,13              1,16       |        1,19              1,22              1,25
@@ -354,8 +362,11 @@ impl Sudoku {
      *                      If the user has selected to resume a saved game, this object will be
      *                      read in beforehand.
      */
-    pub fn start_game (&mut self, USE_IN_GAME_MENU: bool, SAVED_PUZZLE: Option<SavedPuzzle>)
-        -> bool {
+    pub fn start_game (
+        &mut self,
+        USE_IN_GAME_MENU: bool,
+        SAVED_PUZZLE: Option<SavedPuzzle>
+    ) -> bool {
         //TODO: If SAVED_PUZZLE isn't used anywhere else, get rid of it here, in main, and in init_display
         self.init_display(SAVED_PUZZLE);
         let LINE_OFFSET_TWEAK: u8 = 3;  // NOTE: # lines to get display output correct
@@ -395,13 +406,15 @@ impl Sudoku {
                     display::clrtoeol();
 
                     in_game_menu.menu();
-                    //NOTE: Save cursor position before (potentially) needing to reprint the puzzle
+                    /* NOTE: Save cursor position before (potentially) needing to reprint the
+                     *       puzzle
+                     */
                     let saved_pos: Cell = self.cursor_pos;
                     if in_game_menu.get_window_resized() {
                         self.printw();
                     }
 
-                    //NOTE: Toggle hotkey back to original meaning when leaving in-game menu
+                    // NOTE: Toggle hotkey back to original meaning when leaving in-game menu
                     display::color_set(&COLOR_PAIR::MENU_SELECTION);
                     display::mvprintw(
                         display::get_max_y() - LINE_OFFSET_TWEAK as i32,
@@ -444,7 +457,8 @@ impl Sudoku {
                 Some(display::Input::KeyEnter) => {
                     display::curs_set(CURSOR_VISIBILITY::NONE);
                     display::mvprintw(
-                        (display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS as u8 + LINE_OFFSET_TWEAK).into(),
+                        (display::ORIGIN.y() + display::DISPLAY_MATRIX_ROWS as u8 +
+                            LINE_OFFSET_TWEAK).into(),
                         display::ORIGIN.x().into(),
                         "Result: "
                     );
@@ -486,8 +500,8 @@ impl Sudoku {
      * 
      *      SAVED_PUZZLE -> Pointer to a SavedPuzzle object that represents a previously saved
      *                      game. If the user has selected to start a new game, this will be a
-     *                      nullptr. If the user has selected to resume a saved game, this object
-     *                      will be read in beforehand.
+     *                      nullptr. If the user has selected to resume a saved game, this
+     *                      object will be read in beforehand.
      */
     fn init_display (&mut self, SAVED_PUZZLE: Option<SavedPuzzle>) {
         self.printw();
@@ -495,8 +509,8 @@ impl Sudoku {
 
     /**
      * Moves the cursor to its offset position for the initial printing of the display matrix
-     * from Sudoku::printw. This is necessary so that the the display matrix offset can be mapped
-     * correctly.
+     * from Sudoku::printw. This is necessary so that the the display matrix offset can be
+     * mapped correctly.
      * 
      *      COORDS -> Pre-offset display line and column numbers.
      */
@@ -538,9 +552,8 @@ impl Sudoku {
     }
 
     /**
-     * Prints the entire sudoku puzzle (the display matrix) to the screen whenever
-     * there has been an update by the player (i.e. removal or insertion of a
-     * value).
+     * Prints the entire sudoku puzzle (the display matrix) to the screen whenever there has
+     * been an update by the player (i.e. removal or insertion of a value).
      */
     fn printw (&mut self) {
         for i in 0..display::DISPLAY_MATRIX_ROWS {
@@ -572,7 +585,9 @@ impl Sudoku {
                 display::color_set(&COLOR_PAIR::DEFAULT);
                 display::bold_set(false);
                 display::mvprintw(
-                    i as i32 + display::ORIGIN.y() as i32 + (i as i32 / CONTAINER_SIZE as i32) + 1,
+                    i as i32 + display::ORIGIN.y() as i32 +
+                        (i as i32 / CONTAINER_SIZE as i32) +
+                        1,
                     display::ORIGIN.x().into(),
                     "---------|---------|---------"
                 );
@@ -611,7 +626,7 @@ impl Sudoku {
         // NOTE: Display whether the game was saved successfully or not
         display::mv(DISPLAY_LINE, 1);
         display::clrtoeol();
-        display::curs_set(CURSOR_VISIBILITY::NONE); //NOTE: Turn off cursor while displaying
+        display::curs_set(CURSOR_VISIBILITY::NONE); // NOTE: Turn off cursor while displaying
         display::addstr(
             format!(
                 "{} saved!",
@@ -624,7 +639,7 @@ impl Sudoku {
             ).as_str());
         display::refresh();
 
-        //NOTE: Clear output after a delay
+        // NOTE: Clear output after a delay
         display::napms(DELAY * 1000);
         display::mv(DISPLAY_LINE, 0);
         display::clrtoeol();
@@ -727,8 +742,8 @@ impl Sudoku {
     }
 
     /**
-     * Evaluates whether a particular cell contains a character representing a sudoku box border.
-     * Returns `true` if so and `false` otherwise.
+     * Evaluates whether a particular cell contains a character representing a sudoku box
+     * border. Returns `true` if so and `false` otherwise.
      * 
      *      COORDS -> Terminal cell to evaluate.
      */
@@ -746,8 +761,8 @@ impl Sudoku {
      * 
      *      value -> The value to be placed into the display matrix and (possibly) the
      *               appropriate Row, Column, and Box of this game's Grid member variable. If
-     *               the value corresponds to that of the Delete or Backspace keys, this function
-     *               performs a removal instead.
+     *               the value corresponds to that of the Delete or Backspace keys, this
+     *               function performs a removal instead.
      */
     fn set_value (&mut self, value: Option<display::Input>) {
         /* NOTE: Algorithm for determining where and/or how to place a value entered by the
@@ -785,7 +800,7 @@ impl Sudoku {
                     display::Input::KeyDC | display::Input::KeyBackspace => {
                         self.grid.set_value(grid_index, '?' as u8);
                         self.display_matrix[display_index.0][display_index.1] = '?' as u8;
-                        self.color_codes[display_index.0][display_index.1] = COLOR_PAIR::UNKNOWN;
+                        self.color_codes[display_index.0][display_index.1]= COLOR_PAIR::UNKNOWN;
                     },
                     display::Input::Character(c) => {
                         self.clear_surrounding_cells();
@@ -811,15 +826,20 @@ impl Sudoku {
                             self.get_surrounding_cells();
                         let mut cp: COLOR_PAIR = COLOR_PAIR::DEFAULT;
                         for cell in surrounding {
-                            let ch: pc::chtype = display::mvinch(cell.y().into(), cell.x().into());
+                            let ch: pc::chtype = display::mvinch(
+                                cell.y().into(),
+                                cell.x().into()
+                            );
                             let cp_surr = display::decode_color_pair(ch);
                             if [COLOR_PAIR::UNKNOWN, COLOR_PAIR::GUESS].contains(&cp_surr) {
-                                cp = if self.display2grid_map[&self.offset2actual[&cell]] % 2 == 1 {
-                                    COLOR_PAIR::CANDIDATES_B
-                                }
-                                else {
-                                    COLOR_PAIR::CANDIDATES_Y
-                                };
+                                cp = 
+                                    if self.display2grid_map[&self.offset2actual[&cell]] % 2
+                                        == 1 {
+                                        COLOR_PAIR::CANDIDATES_B
+                                    }
+                                    else {
+                                        COLOR_PAIR::CANDIDATES_Y
+                                    };
                             }
                         }
                         self.reset_cursor();
@@ -847,7 +867,7 @@ impl Sudoku {
      * number; false otherwise.
      */
     fn do_nothing (&self) -> bool {
-        //NOTE: Check all cells surrounding the cursor's current position
+        // NOTE: Check all cells surrounding the cursor's current position
         let surrounding = self.get_surrounding_cells();
         for cell in surrounding {
             let color_pair: COLOR_PAIR =
@@ -857,7 +877,7 @@ impl Sudoku {
             }
         }
 
-        //NOTE: Lastly, check if the cursor's current position contains a given number
+        // NOTE: Lastly, check if the cursor's current position contains a given number
         self.reset_cursor();
         display::decode_color_pair(
             display::mvinch(self.cursor_pos.y().into(), self.cursor_pos.x().into())
@@ -897,19 +917,12 @@ impl Sudoku {
     }
 
     /**
-     * Calls the Grid member to evaluate its Rows, Columns, and Boxes for validity (i.e. a valid
-     * solution or solved puzzle). Returns `true` only if the puzzle currently has a valid
-     * solution.
+     * Calls the Grid member to evaluate its Rows, Columns, and Boxes for validity (i.e. a
+     * valid solution or solved puzzle). Returns `true` only if the puzzle currently has a
+     * valid solution.
      */
     fn evaluate (&self) -> bool {
         self.grid.evaluate()
-    }
-
-    /**
-     * 
-     */
-    fn increment_completed_games (&self) {
-
     }
 }
 
@@ -923,8 +936,8 @@ struct Grid {
 
 impl Grid {
     /**
-     * Begins initialization of internal Container data structures based on the difficulty level
-     * chosen by the user.
+     * Begins initialization of internal Container data structures based on the difficulty
+     * level chosen by the user.
      * 
      *      diff -> Enum value of difficulty level chosen by the user from the main menu.
      */
@@ -938,13 +951,13 @@ impl Grid {
      * Creates an empty Sudoku grid. This helps facilitate some of the later setup functions in
      * `Grid::new`.
      * 
-     *      unused DifficultyMenuOption -> Enum value of difficulty level chosen by the user from the main menu.
+     *      unused DifficultyMenuOption -> Enum value of difficulty level chosen by the user
+     *                                     from the main menu.
      */
     //TODO: Get rid of the DifficultyMenuOption parameter if not needed
     fn init (_: DifficultyMenuOption) -> Self {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
-        //let rows: [Row; CONTAINER_SIZE as usize] = [Row::new(CONTAINER::ROW, [0; CONTAINER_SIZE as usize]); NUM_CONTAINERS as usize];
         let unk: u8 = '?' as u8;
         let rows: [Row; NUM_CONTAINERS as usize] =
             array::from_fn(|_| Row::new(CONTAINER::ROW, [unk; CONTAINER_SIZE as usize]));
@@ -992,13 +1005,14 @@ impl Grid {
      *                       menu.
      */
     fn set_starting_positions (&mut self, diff: DifficultyMenuOption) {
+        // TODO: Get rid of this seed variable if no longer needed
         let seed: i32 = unsafe {
             time(0x0)
         };
         let solved_puzzle = self.generate_solved_puzzle(&seed);
-        //Self::generate_solved_puzzle(unsafe { time(0x0) }); //This will also work
+        //Self::generate_solved_puzzle(unsafe { time(0x0) }); // NOTE: This will also work
 
-        //NOTE: Randomly shuffle the locations in the Grid
+        // NOTE: Randomly shuffle the locations in the Grid
         let mut generator = thread_rng();
         let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
         positions.shuffle(&mut generator);
@@ -1138,12 +1152,12 @@ impl Grid {
      * algorithm recursively focuses on placing the same value into each box before working to
      * place the next value (i.e. each box is iterated through placing a 1 in a valid position,
      * then the same is done for 2, followed by 3, etc.). Even though it is technically possible
-     * for false to be returned up the recursive chain to generate_solved_puzzle, indicating that
-     * a solved puzzle couldn't be generated, this logically should never happen (i.e. this
-     * function always returns a solved puzzle). The solved puzzle is "returned" in the sense that
-     * the Row, Column, and Box parameters will be filled after this function successfully
-     * returns. The algorithm for this is described below the parameters list, but like all good
-     * algorithms is coded in practice slightly out of order.
+     * for false to be returned up the recursive chain to generate_solved_puzzle, indicating
+     * that a solved puzzle couldn't be generated, this logically should never happen (i.e.
+     * this function always returns a solved puzzle). The solved puzzle is "returned" in the
+     * sense that the Row, Column, and Box parameters will be filled after this function
+     * successfully returns. The algorithm for this is described below the parameters list, but
+     * like all good algorithms is coded in practice slightly out of order.
      * 
      *      BOX -> Box number of the current recursive iteration.
      *      VALUE -> The numerical value 1-9 being placed in the current Box.
@@ -1154,9 +1168,14 @@ impl Grid {
      *      boxes -> Array of Box objects each representing a box of the solved puzzle. All
      *               recursive iterations have access to the same array.
      */
-    fn solve (&mut self, BOX: u8, VALUE: u8, rows: &mut [Row; NUM_CONTAINERS as usize],
-              columns: &mut [Column; NUM_CONTAINERS as usize],
-              boxes: &mut [Box; NUM_CONTAINERS as usize]) -> bool {
+    fn solve (
+        &mut self,
+        BOX: u8,
+        VALUE: u8,
+        rows: &mut [Row; NUM_CONTAINERS as usize],
+        columns: &mut [Column; NUM_CONTAINERS as usize],
+        boxes: &mut [Box; NUM_CONTAINERS as usize]
+    ) -> bool {
         /* NOTE: Figure out positions in box based on box number.
          *       Start with upper right.
          *
@@ -1267,10 +1286,11 @@ impl Grid {
     }
 
     /**
-     * Returns the box number based on the grid position. This function is reliant on the row and
-     * column having been mapped prior to being called. This simplifies mapping the box number as
-     * the row and column numbers aren't calculated a second time, and is logically sound since
-     * there is never a situation where boxes are mapped independently of rows and columns.
+     * Returns the box number based on the grid position. This function is reliant on the row
+     * and column having been mapped prior to being called. This simplifies mapping the box
+     * number as the row and column numbers aren't calculated a second time, and is logically
+     * sound since there is never a situation where boxes are mapped independently of rows and
+     * columns.
      * 
      *      ROW -> Previously mapped row number 0-8 used to map the appropriate box.
      *      COLUMN -> Previously mapped column number 0-8 used to map the appropriate box.
@@ -1430,8 +1450,8 @@ impl Grid {
 
     /**
      * Returns a mutable address to the Column Container from this Grid's internal Column array.
-     * This allows the Column object to be mutable from the Grid when an input is passed from the
-     * Sudoku object.
+     * This allows the Column object to be mutable from the Grid when an input is passed from
+     * the Sudoku object.
      * 
      *      INDEX -> The index to return from the Grid's internal Column array.
      */
@@ -1460,7 +1480,8 @@ impl Grid {
         let ROW_NUMBER: usize = Self::map_row(POS);
         let COLUMN_NUMBER: usize = Self::map_column(POS);
         let BOX_NUMBER: usize = Self::map_box(ROW_NUMBER, COLUMN_NUMBER);
-        let (INDEX_ROW, INDEX_COLUMN, INDEX_BOX): (usize, usize, usize) = Self::get_container_indeces(POS);
+        let (INDEX_ROW, INDEX_COLUMN, INDEX_BOX): (usize, usize, usize) =
+            Self::get_container_indeces(POS);
 
         /*
          * NOTE: Check the row, column, and box for the value and add value from solved puzzle
@@ -1477,9 +1498,9 @@ impl Grid {
     }
 
     /**
-     * Returns the value at a given index from the Grid. This can be done using Rows, Columns, or
-     * Boxes. Only one type of container needs to return the value, although all three have been
-     * tested for correctness.
+     * Returns the value at a given index from the Grid. This can be done using Rows, Columns,
+     * or Boxes. Only one type of container needs to return the value, although all three have
+     * been tested for correctness.
      * 
      *      INDEX -> Index of the grid to return the value from.
      */

@@ -60,9 +60,9 @@ pub enum MainMenuOption {
 
 impl MainMenuOption {
     /**
-     * Returns a zipped iterator associating an 8-bit integer with each MainMenuOption variant. This
-     * helps in determining the offset for displaying the options in the terminal window where each
-     * 8-bit integer is the offset from the center of the screen.
+     * Returns a zipped iterator associating an 8-bit integer with each MainMenuOption variant.
+     * This helps in determining the offset for displaying the options in the terminal window
+     * where each 8-bit integer is the offset from the center of the screen.
      */
     fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, MainMenuOptionIter> {
         (0..Self::COUNT as u8).zip(Self::iter()).into()
@@ -98,10 +98,9 @@ pub enum DifficultyMenuOption {
 
 impl DifficultyMenuOption {
     /**
-     * Returns a zipped iterator associating an 8-bit integer with each
-     * DifficultyMenuOption variant. This helps in determining the offset for displaying
-     * the options in the terminal window where each 8-bit integer is the offset from the
-     * center of the screen.
+     * Returns a zipped iterator associating an 8-bit integer with each DifficultyMenuOption
+     * variant. This helps in determining the offset for displaying the options in the terminal
+     * window where each 8-bit integer is the offset from the center of the screen.
      */
     fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, DifficultyMenuOptionIter> {
         (0..Self::COUNT as u8).zip(Self::iter()).into()
@@ -122,9 +121,9 @@ enum InGameMenuOption {
 
 impl InGameMenuOption {
     /**
-     * Returns a zipped iterator associating an 8-bit integer with each InGameMenuOption variant.
-     * This helps in determining the offset for displaying the options in the terminal window
-     * where each 8-bit integer is the offset from the center of the screen.
+     * Returns a zipped iterator associating an 8-bit integer with each InGameMenuOption
+     * variant. This helps in determining the offset for displaying the options in the terminal
+     * window where each 8-bit integer is the offset from the center of the screen.
      */
     fn enumerate () -> std::iter::Zip<std::ops::Range<u8>, InGameMenuOptionIter> {
         (0..Self::COUNT as u8).zip(Self::iter()).into()
@@ -136,14 +135,15 @@ pub trait Menu {
     fn menu (&self) -> MenuOption;
 
     /**
-     * Resets the terminal settings to their previous state from before the NCurses environment was
-     * initialized.
+     * Resets the terminal settings to their previous state from before the NCurses environment
+     * was initialized.
      */
     fn SIGINT_handler () {
         display::tui_end();
         std::process::exit(0);
-        /* TODO: Look into a cleaner way to do this. This might not be needed, but no destructors
-         *       will get called for any objects still on the stack. This works for now, though.
+        /* TODO: Look into a cleaner way to do this. This might not be needed, but no
+         *       destructors will get called for any objects still on the stack. This works for
+         *       now, though.
          * TODO: Change this to use display::SIGINT_handler. The above TODO is probably not
          *       important anymore.
          */
@@ -167,11 +167,12 @@ pub struct MainMenu {
 
 impl Menu for MainMenu {
     /**
-     * Displays the main menu. The currently selected option is always highlighted. The main menu is
-     * re-rendered each time the user uses the Up/Down keys to highlight a different option.
+     * Displays the main menu. The currently selected option is always highlighted. The main
+     * menu is re-rendered each time the user uses the Up/Down keys to highlight a different
+     * option.
      *
-     *      MAX -> Bottom right corner cell of the terminal window. Signifies the max number of lines
-     *             and columns in the window.
+     *      MAX -> Bottom right corner cell of the terminal window. Signifies the max number of
+     *             lines and columns in the window.
      *      OPT -> The currently selected main menu option.
      */
     fn display_menu (&self, MAX: &Cell, OPT: &MenuOption) {
@@ -231,16 +232,18 @@ impl Menu for MainMenu {
             input = display::getch();
             opt =
                 match input {
-                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => match opt {
-                        MainMenuOption::EXIT => MainMenuOption::SHOW_STATS,
-                        MainMenuOption::SHOW_STATS => MainMenuOption::RESUME_GAME,
-                        _ => MainMenuOption::NEW_GAME,
-                    },
-                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => match opt {
-                        MainMenuOption::NEW_GAME => MainMenuOption::RESUME_GAME,
-                        MainMenuOption::RESUME_GAME => MainMenuOption::SHOW_STATS,
-                        _ => MainMenuOption::EXIT,
-                    },
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
+                        => match opt {
+                            MainMenuOption::EXIT => MainMenuOption::SHOW_STATS,
+                            MainMenuOption::SHOW_STATS => MainMenuOption::RESUME_GAME,
+                            _ => MainMenuOption::NEW_GAME,
+                        },
+                    Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
+                        => match opt {
+                            MainMenuOption::NEW_GAME => MainMenuOption::RESUME_GAME,
+                            MainMenuOption::RESUME_GAME => MainMenuOption::SHOW_STATS,
+                            _ => MainMenuOption::EXIT,
+                        },
                     Some(display::Input::KeyEnter) => {
                         opt
                     },
@@ -257,11 +260,11 @@ impl Menu for MainMenu {
 
 impl MainMenu {
     /**
-     * Initializes the NCurses environment and global NCurses settings. Returns a MainMenu object with
-     * the remainder of the padding space set for the terminal window display.
+     * Initializes the NCurses environment and global NCurses settings. Returns a MainMenu
+     * object with the remainder of the padding space set for the terminal window display.
      *
-     *      use_in_game_menu -> Indicating whether the in-game menu is disabled or not. This affects
-     *                          the enforced size of the terminal window.
+     *      use_in_game_menu -> Indicating whether the in-game menu is disabled or not. This
+     *                          affects the enforced size of the terminal window.
      */
     pub fn new (use_in_game_menu: bool) -> MainMenu {
         let _ = unsafe {
@@ -280,13 +283,15 @@ impl MainMenu {
     }
 
     /**
-     * Sets the number of lines and columns the terminal window must be in order to play. This size is
-     * dependent on whether the in-game menu is enabled.
+     * Sets the number of lines and columns the terminal window must be in order to play. This
+     * size is dependent on whether the in-game menu is enabled.
      */
     unsafe fn set_WINDOW_REQ (&self) {
         display::WINDOW_REQ = Cell::new(
-            display::TOP_PADDING + display::PUZZLE_SPACE + self.RESULT_MSG_SPACE + self.BOTTOM_PADDING,
-            display::LEFT_PADDING + display::PUZZLE_SPACE + display::VERTICAL_DIVIDER + display::IN_GAME_MENU_DISPLAY_SPACING + self.RIGHT_PADDING,
+            display::TOP_PADDING + display::PUZZLE_SPACE + self.RESULT_MSG_SPACE +
+                self.BOTTOM_PADDING,
+            display::LEFT_PADDING + display::PUZZLE_SPACE + display::VERTICAL_DIVIDER +
+                display::IN_GAME_MENU_DISPLAY_SPACING + self.RIGHT_PADDING,
         )
     }
 }
@@ -299,33 +304,32 @@ impl Drop for MainMenu {
     }
 }
 
-/* The use of RefCell was a workaround during the port from the pure C++ version.
- * There's probably a better way to handle this that doesn't involve use of RefCells,
- * but that would require a much deeper refactoring than I'm willing to give it at this 
- * point.
+/* The use of RefCell was a workaround during the port from the pure C++ version. There's
+ * probably a better way to handle this that doesn't involve use of RefCells, but that would
+ * require a much deeper refactoring than I'm willing to give it at this point.
  */
 /// Provides the functionality to allow a player to load and resume a saved game.
 pub struct SavedGameMenu {
     /**
-     * The list of saved games to be displayed to the screen. Each will appear as an
-     * option the user can choose from.
+     * The list of saved games to be displayed to the screen. Each will appear as an option the
+     * user can choose from.
      */
     saved_games: Vec<String>,
     /// The matrix used to read a saved game into. This later becomes the display matrix.
     saved_game: RefCell<SavedPuzzle>,
     /**
-     * The currently highlighted game from the displayed list. If the user presses Enter,
-     * this becomes the game loaded.
+     * The currently highlighted game from the displayed list. If the user presses Enter, this
+     *  becomes the game loaded.
      */
     selection: RefCell<String>,
 }
 
 impl SavedGameMenu {
     /**
-     * Returns an instance of a SavedGameMenu containing a list of the current saved
-     * games. The saved game to be used will be initially be set to a "blank" 
-     * SavedPuzzle object. The current selection from the `saved_games` list will be
-     * preset to the first file in the list.
+     * Returns an instance of a SavedGameMenu containing a list of the current saved games. The
+     * saved game to be used will be initially be set to a "blank" SavedPuzzle object. The
+     * current selection from the `saved_games` list will be preset to the first file in the
+     * list.
      */
     pub fn new () -> Self {
         let saved_games: Vec<String> = Self::generate_saved_games_list();
@@ -333,25 +337,23 @@ impl SavedGameMenu {
         Self {
             saved_games: saved_games,
             saved_game: RefCell::new(SavedPuzzle::new()),
-            selection: RefCell::new(selection), //NOTE: This contains the CSV extension
+            selection: RefCell::new(selection), // NOTE: This contains the CSV extension
         }
     }
 
     /**
-     * Creates the list of saved games from the names of available CSV files in the 
-     * ~/.tsudoku directory. This entries in this list are what will be displayed to the 
-     * player. The entries are stored without the ".csv" file extension. Text files with 
-     * extension ".txt" are ignored so as to avoid adding the completed games file to 
-     * the list.
+     * Creates the list of saved games from the names of available CSV files in the ~/.tsudoku
+     * directory. This entries in this list are what will be displayed to the player. The
+     * entries are stored without the ".csv" file extension. Text files with extension ".txt"
+     * are ignored so as to avoid adding the completed games file to the list.
      */
     fn generate_saved_games_list () -> Vec<String> {
         let mut saved_games: Vec<String> = match fs::read_dir(common::DIR()) {
             Ok(list) => list.filter(
                 |item| {
-                    fs::metadata(
-                        item.as_ref().unwrap().path().display().to_string()
-                    ).unwrap()
-                    .is_dir()
+                    fs::metadata(item.as_ref().unwrap().path().display().to_string())
+                        .unwrap()
+                        .is_dir()
                 }
             )
             .map(|item| item.unwrap().file_name().to_str().unwrap().to_string())
@@ -366,14 +368,13 @@ impl SavedGameMenu {
     }
 
     /**
-     * Controls iterating through the list from player input and highlighting the name 
-     * of the current game that will be loaded once the player presses Enter. If there 
-     * are no saved games, the player will instead be notified as much and then prompted
-     * to continue.
+     * Controls iterating through the list from player input and highlighting the name of the
+     * current game that will be loaded once the player presses Enter. If there are no saved
+     * games, the player will instead be notified as much and then prompted to continue.
      */
     fn select_saved_game (&self) -> bool {
         let mut input: Option<display::Input> = None;
-        display::curs_set(CURSOR_VISIBILITY::NONE);  //Turn off cursor while in menu
+        display::curs_set(CURSOR_VISIBILITY::NONE);  // NOTE: Turn off cursor while in menu
         display::timeout(250);
         if self.saved_games.is_empty() {
             loop {
@@ -391,7 +392,9 @@ impl SavedGameMenu {
                             "Press ENTER to continue..."
                         );
                         display::refresh();
-                        //This next line needs to be here for the display to work correctly
+                        /* NOTE: This next line needs to be here for the display to work
+                         * correctly
+                         */
                         input = display::getch();
                         display::invalid_window_size_handler();
                     }
@@ -404,24 +407,26 @@ impl SavedGameMenu {
                     Some(display::Input::KeyEnter) => break,
                     _ => {
                         self.display_menu(
-                            &Cell::new(
-                                display::TOP_PADDING,
-                                display::LEFT_PADDING
-                            ),
+                            &Cell::new(display::TOP_PADDING, display::LEFT_PADDING),
                             &MenuOption::SAVED_GAME_MENU(SavedGameMenuOption::NONE)
                         );
 
                         input = display::getch();
                         let selection: String = self.selection.borrow().to_string();
-                        let i: usize = self.saved_games.binary_search(&selection.to_string()).unwrap();
+                        let i: usize = self.saved_games.binary_search(&selection.to_string())
+                            .unwrap();
                         match input {
                             Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
                                 => if selection.as_str() != self.saved_games.first().unwrap() {
-                                    *self.selection.borrow_mut() = self.saved_games.get(i - 1).unwrap().to_string();
+                                    *self.selection.borrow_mut() = self.saved_games.get(i - 1)
+                                        .unwrap()
+                                        .to_string();
                             },
                             Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
                                 => if selection.as_str() != self.saved_games.last().unwrap() {
-                                    *self.selection.borrow_mut() = self.saved_games.get(i + 1).unwrap().to_string();
+                                    *self.selection.borrow_mut() = self.saved_games.get(i + 1)
+                                        .unwrap()
+                                        .to_string();
                                 },
                             _ => {
                                 display::invalid_window_size_handler();
@@ -460,11 +465,18 @@ impl SavedGameMenu {
 
         let mut i: usize = 0;
         let mut j: usize = 0;
-        let mut game_data_numeric: [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
-            [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        let mut game_data_color_codes: [[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS] =
-            [[COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
-        for (row_numeric, row_color_code) in iter::zip(save_data_numeric, save_data_color_codes) {
+        let mut game_data_numeric: [
+            [u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
+        ] = [[0; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS];
+        let mut game_data_color_codes: [
+            [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
+        ] = [
+            [COLOR_PAIR::DEFAULT; display::DISPLAY_MATRIX_COLUMNS];
+            display::DISPLAY_MATRIX_ROWS];
+        for (row_numeric, row_color_code) in iter::zip(
+            save_data_numeric,
+            save_data_color_codes
+        ) {
             for (number, color_code) in iter::zip(row_numeric, row_color_code) {
                 game_data_numeric[i][j] = number;
                 game_data_color_codes[i][j] = match color_code {
@@ -489,9 +501,9 @@ impl SavedGameMenu {
     }
 
     /**
-     * Wraps the selected saved game value and color code matrices into a SavedPuzzle 
-     * object which is returned to the calling function. This makes passing around the 
-     * saved game information easier.
+     * Wraps the selected saved game value and color code matrices into a SavedPuzzle object
+     * which is returned to the calling function. This makes passing around the saved game
+     * information easier.
      */
     pub fn get_saved_game (&self) -> SavedPuzzle {
         self.saved_game.borrow().clone()
@@ -500,14 +512,14 @@ impl SavedGameMenu {
 
 impl Menu for SavedGameMenu {
     /**
-     * Displays the saved games menu. The options listed are saved games in CSV files 
-     * from the ~/.tsudoku directory. The currently selected option is always 
-     * highlighted. The saved games menu is re-rendered each time the player uses the 
-     * Up/Down keys to highlight a different option.
+     * Displays the saved games menu. The options listed are saved games in CSV files from the
+     * ~/.tsudoku directory. The currently selected option is always highlighted. The saved
+     * games menu is re-rendered each time the player uses the Up/Down keys to highlight a
+     * different option.
      * 
-     *      EDGE -> Starting cell the saved games menu will display at. The menu title 
-     *              should display on the line below the top padding and the column 
-     *              after the vertical divider.
+     *      EDGE -> Starting cell the saved games menu will display at. The menu title should
+     *              display on the line below the top padding and the column after the vertical
+     *              divider.
      *      unused MenuOption enum variant -> Required because of the function prototype 
      *                                        inherited from Menu.
      */
@@ -533,8 +545,8 @@ impl Menu for SavedGameMenu {
     }
 
     /**
-     * Coordinates generating the saved games list, displaying the list to the player in 
-     * menu form, and reading in the saved game chosen by the player.
+     * Coordinates generating the saved games list, displaying the list to the player in menu
+     * form, and reading in the saved game chosen by the player.
      */
     fn menu (&self) -> MenuOption {
         if self.select_saved_game() {
@@ -635,16 +647,18 @@ impl Menu for DifficultyMenu {
             input = display::getch();
             diff = 
                 match input {
-                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => match diff {
-                        DifficultyMenuOption::EXPERT => DifficultyMenuOption::HARD,
-                        DifficultyMenuOption::HARD => DifficultyMenuOption::MEDIUM,
-                        _ => DifficultyMenuOption::EASY,
-                    },
-                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => match diff {
-                        DifficultyMenuOption::EASY => DifficultyMenuOption::MEDIUM,
-                        DifficultyMenuOption::MEDIUM => DifficultyMenuOption::HARD,
-                        _ => DifficultyMenuOption::EXPERT,
-                    },
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
+                        => match diff {
+                            DifficultyMenuOption::EXPERT => DifficultyMenuOption::HARD,
+                            DifficultyMenuOption::HARD => DifficultyMenuOption::MEDIUM,
+                            _ => DifficultyMenuOption::EASY,
+                        },
+                        Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
+                        => match diff {
+                            DifficultyMenuOption::EASY => DifficultyMenuOption::MEDIUM,
+                            DifficultyMenuOption::MEDIUM => DifficultyMenuOption::HARD,
+                            _ => DifficultyMenuOption::EXPERT,
+                        },
                     Some(display::Input::KeyEnter) => {
                         diff
                     },
@@ -676,11 +690,15 @@ impl InGameMenu {
      */
     pub fn new (
         display_matrix: &[[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
-        color_codes: &[[COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
+        color_codes: &[
+            [COLOR_PAIR; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
+        ],
         save_file_name: &str,
     ) -> Self {
         Self {
-            //TODO: Might need to manually copy this over like in the C++ version if weird stuff happens
+            /* TODO: Might need to manually copy this over like in the C++ version if weird
+             *       stuff happens
+             */
             display_matrix: *display_matrix,
             color_codes: *color_codes,
             window_resized: RefCell::new(false),
@@ -704,8 +722,8 @@ impl InGameMenu {
     }
 
     /**
-     * Lets the caller know whether the window was resized while in the in-game
-     * menu. True indicates the window was resized.
+     * Lets the caller know whether the window was resized while in the in-game menu. True
+     * indicates the window was resized.
      */
     pub fn get_window_resized (&self) -> bool {
         *self.window_resized.borrow()
@@ -717,9 +735,7 @@ impl InGameMenu {
      *      EDGE -> Line and column to start clearing from.
      */
     fn clear (&self, EDGE: Cell) {
-        let in_game_menu_top_left: i32 = EDGE.y() as i32 +
-            InGameMenuOption::COUNT as i32 +
-            1;
+        let in_game_menu_top_left: i32 = EDGE.y() as i32 + InGameMenuOption::COUNT as i32 + 1;
         for y in in_game_menu_top_left..display::get_max_y() {
             display::mv(y, EDGE.x().into());
             display::clrtoeol();
@@ -737,9 +753,15 @@ impl InGameMenu {
 Sudoku is a puzzle game using the numbers 1-9. The puzzle board is a 9x9 grid that can be broken
 up evenly in 3 different ways: rows, columns, and 3x3 boxes. A completed sudoku puzzle is one
 where each cell contains a number, but with the following restrictions:");
-        let RULES_ROWS: String = String::from("1. Each row can only contain one each of the numbers 1-9");
-        let RULES_COLUMNS: String = String::from("2. Each column can only contain one each of the numbers 1-9");
-        let RULES_BOXES: String = String::from("3. Each 3x3 box can only contain one each of the numbers 1-9");
+        let RULES_ROWS: String = String::from(
+            "1. Each row can only contain one each of the numbers 1-9"
+        );
+        let RULES_COLUMNS: String = String::from(
+            "2. Each column can only contain one each of the numbers 1-9"
+        );
+        let RULES_BOXES: String = String::from(
+            "3. Each 3x3 box can only contain one each of the numbers 1-9"
+        );
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 1;
 
         display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
@@ -752,8 +774,8 @@ where each cell contains a number, but with the following restrictions:");
 
     /**
      * Prints string of text to the screen in a nicely formatted way that makes it easy to read.
-     * This function parses the input string by spaces and determines when to start printing on a
-     * new line (i.e. if adding another word would overlap with the window border and ruin the
+     * This function parses the input string by spaces and determines when to start printing on
+     * a new line (i.e. if adding another word would overlap with the window border and ruin the
      * sudoku board display).
      * 
      *      EDGE -> Line and column to start the display at.
@@ -772,7 +794,8 @@ where each cell contains a number, but with the following restrictions:");
             }
             else {
                 display_str.pop();  // NOTE: Pop the unnecessary extra space
-                display::mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
+                display::mvprintw(
+                    (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
                     EDGE.x().into(),
                     &display_str
                 );
@@ -782,7 +805,8 @@ where each cell contains a number, but with the following restrictions:");
             }
         }
         if !display_str.is_empty() {
-            display::mvprintw((EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
+            display::mvprintw(
+                (EDGE.y() + self.IN_GAME_MENU_TITLE_SPACING) as i32 + *display_offset,
                 EDGE.x().into(),
                 &display_str
             );
@@ -813,14 +837,22 @@ Entering a number in a '?' occupied cell will also erase your notes in the eight
 cells. This action cannot be undone.");
         let MANUAL_M: String = String::from("m/M -> Enter/Exit the in-game manual");
         let MANUAL_Q: String = String::from("q/Q -> Quit the game without saving");
-        let MANUAL_DIR_KEYS: String = String::from("Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board");
-        let MANUAL_NUM: String = String::from("1-9 -> Places number in cell highlighted by cursor");
-        let MANUAL_ENTER: String = String::from("Enter -> Evaluate the puzzle. Analysis will appear below puzzle.");
+        let MANUAL_DIR_KEYS: String = String::from(
+            "Up/w/W, Down/s/S, Left/a/A, Right/d/D -> Navigate the sudoku board"
+        );
+        let MANUAL_NUM: String = String::from(
+            "1-9 -> Places number in cell highlighted by cursor"
+        );
+        let MANUAL_ENTER: String = String::from(
+            "Enter -> Evaluate the puzzle. Analysis will appear below puzzle."
+        );
         let mut display_offset: i32 = InGameMenuOption::COUNT as i32 + 1;
 
         display::mvprintw(EDGE.y() as i32 + display_offset, EDGE.x() as i32, TITLE);
         display_offset += 1;
-        for string in [MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS, MANUAL_NUM, MANUAL_ENTER] {
+        for string in [
+            MANUAL_INTRO, MANUAL_M, MANUAL_Q, MANUAL_DIR_KEYS, MANUAL_NUM, MANUAL_ENTER
+        ] {
             display_offset += 1;
             self.screen_reader(EDGE, &string, &mut display_offset);
         }
@@ -871,9 +903,10 @@ cells. This action cannot be undone.");
      * different files. The name the user entered is returned to the calling function.
      */
     pub fn save_game (&self) -> String {
-        let NAME_SIZE: usize = 16;                      //NOTE: NAME_SIZE limited by window
-        let mut name: String = self.save_file_name();   //      width requirements of no in-game
-        display::nodelay(false);                        //      menu mode
+        // NOTE: NAME_SIZE limited by window width requirements of no in-game menu mode
+        let NAME_SIZE: usize = 16;
+        let mut name: String = self.save_file_name();
+        display::nodelay(false);
         display::echo();
         display::getnstr(&mut name, NAME_SIZE - 1);
         display::noecho();
@@ -882,6 +915,7 @@ cells. This action cannot be undone.");
         /* NOTE: Only save the file if the player was able to enter any text first. The success
          *       message will be handled by the calling function.
          */
+        // TODO: Does COLOR_PAIR::DEFAULT need to be handled here?
         if !name.is_empty() {
             let mut color_codes: Vec<[char; display::DISPLAY_MATRIX_ROWS]> = Vec::new();
             for row in self.color_codes {
@@ -914,10 +948,11 @@ impl Menu for InGameMenu {
     /**
      * Displays the in-game menu. The currently selected option is always highlighted. The
      * in-game menu is re-rendered each time the user uses the Up/Down keys to highlight a 
-     * ifferent option.
+     * different option.
      * 
-     *      EDGE -> Starting cell the in-game menu will display at. The menu title should display
-     *              on the line below the top padding and the column after the vertical divider.
+     *      EDGE -> Starting cell the in-game menu will display at. The menu title should
+     *              display on the line below the top padding and the column after the vertical
+     *              divider.
      *      OPT -> The currently highlighted main menu option.
      */
     fn display_menu (&self, EDGE: &Cell, OPT: &MenuOption) {
