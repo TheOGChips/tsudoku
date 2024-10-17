@@ -29,12 +29,6 @@ pub mod sudoku;
 const SAVE_FILE_NAME: &str = "completed-puzzles.txt";
 
 fn main() -> Result<(), &'static str> {
-    /* TODO: The best way to handle removing all save game data is probably via a new command
-     *       line argument. If that argument is detected, then $HOME/.tsudoku gets removed and
-     *       the program immediately ends. It should probably ask for double confirmation as
-     *       well.
-     *       v2.1.0
-     */
     let matches = clap::command!()
         .arg(
             clap::arg!(-n --"no-in-game-menu"
@@ -68,8 +62,7 @@ fn main() -> Result<(), &'static str> {
     
     if delete_saved_games {
         // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
-        //TODO: Change "dir" to "saved_games"
-        let dir = match fs::read_dir(game_dir()) {
+        let saved_games = match fs::read_dir(game_dir()) {
             Ok(list) => list.filter(
                 |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
             ),
@@ -78,8 +71,8 @@ fn main() -> Result<(), &'static str> {
                 std::process::exit(1);
             },
         };
-        for file in dir {
-            let _ = fs::remove_file(file.unwrap().path());
+        for dir in saved_games {
+            let _ = fs::remove_file(dir.unwrap().path());
         }
     }
 
