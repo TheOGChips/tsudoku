@@ -152,6 +152,9 @@ pub struct MainMenu {
 
     /// Whether the in-game menu is able to be displayed.
     in_game_menu_enabled: bool,
+
+    /// ID of the sigint_handler function when registered via `signal_hook::register`.
+    sig_id: signal_hook::SigId,
 }
 
 impl Menu for MainMenu {
@@ -256,7 +259,7 @@ impl MainMenu {
      *                          affects the enforced size of the terminal window.
      */
     pub fn new (use_in_game_menu: bool) -> MainMenu {
-        let _ = unsafe {
+        let sig_id: signal_hook::SigId = unsafe {
             low_level::register(consts::SIGINT, || Self::sigint_handler())
         }.expect("Error: Signal not found");
 
@@ -268,6 +271,7 @@ impl MainMenu {
             right_padding: display::LEFT_PADDING,
             result_msg_space: 3,
             in_game_menu_enabled: use_in_game_menu,
+            sig_id: sig_id,
         }
     }
 
@@ -289,7 +293,7 @@ impl Drop for MainMenu {
     /// Unsets the NCurses environment once the user chooses to exit the program.
     fn drop (&mut self) {
         display::tui_end();
-        //TODO: Probably unnecessary, but consider unregistering the SIGINT handler function.
+        low_level::unregister(self.sig_id);
     }
 }
 
