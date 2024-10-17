@@ -190,7 +190,7 @@ pub mod display {
      * Resets the terminal settings to their previous state from before the pancurses environment
      * was initialized, then terminates the program.
      */
-    fn sigint_handler () {
+    pub fn sigint_handler () {
         tui_end();
         std::process::exit(0);
     }

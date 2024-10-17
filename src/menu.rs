@@ -135,14 +135,7 @@ pub trait Menu {
      * was initialized.
      */
     fn sigint_handler () {
-        display::tui_end();
-        std::process::exit(0);
-        /* TODO: Look into a cleaner way to do this. This might not be needed, but no
-         *       destructors will get called for any objects still on the stack. This works for
-         *       now, though.
-         * TODO: Change this to use display::SIGINT_handler. The above TODO is probably not
-         *       important anymore.
-         */
+        display::sigint_handler();
     }
 }
 
