@@ -661,7 +661,7 @@ impl Sudoku {
             Some(display::Input::Character('W')) => {
                 if self.cursor_pos.y() > display::ORIGIN.y() {
                     let pos: Cell = Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x());
-                    if self.is_box_border(pos) {
+                    if self.is_block_border(pos) {
                         Cell::new(self.cursor_pos.y() - 2, self.cursor_pos.x())
                     }
                     else {
@@ -676,7 +676,7 @@ impl Sudoku {
             Some(display::Input::Character('S')) => {
                 if self.cursor_pos.y() < max_yboundary {
                     let pos: Cell = Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x());
-                    if self.is_box_border(pos) {
+                    if self.is_block_border(pos) {
                         Cell::new(self.cursor_pos.y() + 2, self.cursor_pos.x())
                     }
                     else {
@@ -691,7 +691,7 @@ impl Sudoku {
             Some(display::Input::Character('A')) => {
                 if self.cursor_pos.x() > display::ORIGIN.x() {
                     let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() - 1);
-                    if self.is_box_border(pos) {
+                    if self.is_block_border(pos) {
                         Cell::new(self.cursor_pos.y(), self.cursor_pos.x() - 2)
                     }
                     else {
@@ -706,7 +706,7 @@ impl Sudoku {
             Some(display::Input::Character('D')) => {
                 if self.cursor_pos.x() < max_xboundary {
                     let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() + 1);
-                    if self.is_box_border(pos) {
+                    if self.is_block_border(pos) {
                         Cell::new(self.cursor_pos.y(), self.cursor_pos.x() + 2)
                     }
                     else {
@@ -726,12 +726,12 @@ impl Sudoku {
     }
 
     /**
-     * Evaluates whether a particular cell contains a character representing a sudoku box
+     * Evaluates whether a particular cell contains a character representing a sudoku block
      * border. Returns `true` if so and `false` otherwise.
      * 
      *      coords -> Terminal cell to evaluate.
      */
-    fn is_box_border (&self, coords: Cell) -> bool {
+    fn is_block_border (&self, coords: Cell) -> bool {
         let ch: pc::chtype = display::mvinch(coords.y().into(), coords.x().into());
         let ch: u32 = display::decode_char(ch);
         ['|' as pc::chtype, '-' as pc::chtype].contains(&ch)
@@ -739,12 +739,12 @@ impl Sudoku {
 
     /**
      * Places or removes a value in the display matrix with the appropriate coloring if the
-     * cursor's curent position is a valid cell for input. The appropriate Row, Column, and Box
-     * from the internal Grid member is updated with the value if the cursor's position is over
-     * a guess cell (i.e. a cell that is also mapped by the Grid's own internal map).
+     * cursor's curent position is a valid cell for input. The appropriate Row, Column, and
+     * Block from the internal Grid member is updated with the value if the cursor's position
+     *  is over a guess cell (i.e. a cell that is also mapped by the Grid's own internal map).
      * 
      *      value -> The value to be placed into the display matrix and (possibly) the
-     *               appropriate Row, Column, and Box of this game's Grid member variable. If
+     *               appropriate Row, Column, and Block of this game's Grid member variable. If
      *               the value corresponds to that of the Delete or Backspace keys, this
      *               function performs a removal instead.
      */
@@ -762,7 +762,7 @@ impl Sudoku {
          *      then place value in display matrix
          *      clear 8 surrounding cells
          *      refresh
-         *      place value into appropriate spot in appropriate row, column, and box
+         *      place value into appropriate spot in appropriate row, column, and block
          */
 
         if self.do_nothing() {
@@ -899,7 +899,7 @@ impl Sudoku {
     }
 
     /**
-     * Calls the Grid member to evaluate its Rows, Columns, and Boxes for validity (i.e. a
+     * Calls the Grid member to evaluate its Rows, Columns, and Blocks for validity (i.e. a
      * valid solution or solved puzzle). Returns `true` only if the puzzle currently has a
      * valid solution.
      */
@@ -913,7 +913,7 @@ struct Grid {
     known_positions: [bool; GRID_SIZE as usize],
     rows: [Row; CONTAINER_SIZE as usize],
     columns: [Column; CONTAINER_SIZE as usize],
-    boxes: [Box; CONTAINER_SIZE as usize],
+    blocks: [Block; CONTAINER_SIZE as usize],
 }
 
 impl Grid {
@@ -941,15 +941,15 @@ impl Grid {
             array::from_fn(|_| Row::new(CONTAINER::Row, [unk; CONTAINER_SIZE as usize]));
         let columns: [Column; NUM_CONTAINERS as usize] =
             array::from_fn(|_| Column::new(CONTAINER::Column, [unk; CONTAINER_SIZE as usize]));
-        let boxes: [Box; NUM_CONTAINERS as usize] =
-            array::from_fn(|_| Box::new(CONTAINER::Box, [unk; CONTAINER_SIZE as usize]));
+        let blocks: [Block; NUM_CONTAINERS as usize] =
+            array::from_fn(|_| Block::new(CONTAINER::Block, [unk; CONTAINER_SIZE as usize]));
         
         Self {
             _grid_map: grid_map,
             known_positions: known_positions,
             rows: rows,
             columns: columns,
-            boxes: boxes,
+            blocks: blocks,
         }
     }
     
@@ -1014,7 +1014,6 @@ impl Grid {
      * solvable puzzle. The puzzle is generated randomly using a Mersenne-Twister engine.
      */
     fn generate_solved_puzzle (&mut self) -> [u8; GRID_SIZE as usize] {
-        //TODO: Is there an easy way to "flatten" a matrix into an array (2D -> 1D)?
         let mut soln: [u8; GRID_SIZE as usize] = [0; GRID_SIZE as usize];
 
         //NOTE: Initialize the solution matrix with '?' placeholders
@@ -1030,7 +1029,7 @@ impl Grid {
         let _ = Uniform::new_inclusive(1, CONTAINER_SIZE + 1);
         let mut values: [u8; CONTAINER_SIZE as usize] = array::from_fn(|i| i as u8 + 1);
 
-        /* NOTE: Fill in boxes along the diagonal first.On an empty puzzle, boxes 1, 5, and 9
+        /* NOTE: Fill in blocks along the diagonal first.On an empty puzzle, blocks 1, 5, and 9
          *       are independent of each other, and can be randomly filled in a more trivial
          *       manner.
          */
@@ -1048,15 +1047,15 @@ impl Grid {
             i += 3;
         }
 
-        /* NOTE: Create row, column, and box objects from partial solution matrix. These arrays
-         *       will be used to finish solving the sudoku puzzle recursively.
+        /* NOTE: Create row, column, and block objects from partial solution matrix. These
+         *       arrays will be used to finish solving the sudoku puzzle recursively.
          */
         let mut soln_rows: [Row; NUM_CONTAINERS as usize] =
             array::from_fn(|i| Row::new(CONTAINER::Row, soln_matrix[i]));
         let mut soln_columns: [Column; NUM_CONTAINERS as usize] = array::from_fn(
             |i| Column::new(CONTAINER::Column, array::from_fn(|j| soln_matrix[j][i]))
         );
-        let mut soln_boxes: [Box; NUM_CONTAINERS as usize] = array::from_fn(
+        let mut soln_blocks: [Block; NUM_CONTAINERS as usize] = array::from_fn(
             |i| {
                 let (j, k): (usize, usize) = if i == 0 { (1, 1) }
                     else if i == 1 { (1, 4) }
@@ -1079,11 +1078,11 @@ impl Grid {
                     soln_matrix[j+1][k],
                     soln_matrix[j+1][k+1],
                 ];
-                Box::new(CONTAINER::Box, arr)
+                Block::new(CONTAINER::Block, arr)
             }
         );
 
-        let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_boxes);
+        let _: bool = self.solve(1, 1, &mut soln_rows, &mut soln_columns, &mut soln_blocks);
 
         for i in 0..NUM_CONTAINERS as usize {
             for j in 0..NUM_CONTAINERS as usize {
@@ -1102,50 +1101,50 @@ impl Grid {
     }
 
     /* Bowman's Bingo Algorithm:
-     * args <- box # [1-3, 5-7], value # [1-9], row array, column array, box array
+     * args <- block # [1-3, 5-7], value # [1-9], row array, column array, block array
      * queue <- available positions on board [0-80]
      * do next_pos <- queue.pop() while recursive call <- false
-     *    add value to next_pos in appropriate row, column, and box if possible     STEP 1
-     *    return true if box=7, value=9, queue not empty                            STEP 2
+     *    add value to next_pos in appropriate row, column, and block if possible   STEP 1
+     *    return true if block=7, value=9, queue not empty                          STEP 2
      *    return false otherwise (queue empty)                                      STEP 3
-     *    next_box <- 5 if box=3                                                    STEP 4
-     *             <- 1 if box=7
-     *             <- box+1 otherwise
-     *    next_value <- value+1 if box=7                                            STEP 5
+     *    next_block <- 5 if block=3                                                STEP 4
+     *             <- 1 if block=7
+     *             <- block+1 otherwise
+     *    next_value <- value+1 if block=7                                          STEP 5
      *               <- same otherwise
-     *    remove value from row, column, and box if recursive call <- false         STEP 6
+     *    remove value from row, column, and block if recursive call <- false       STEP 6
      * end do-while
      */
     /**
      * Recursively generates a solved sudoku puzzle using the Bowman's Bingo technique. The
-     * algorithm recursively focuses on placing the same value into each box before working to
-     * place the next value (i.e. each box is iterated through placing a 1 in a valid position,
+     * algorithm recursively focuses on placing the same value into each block before working to
+     * place the next value (i.e. each block is iterated through placing a 1 in a valid position,
      * then the same is done for 2, followed by 3, etc.). Even though it is technically possible
      * for false to be returned up the recursive chain to generate_solved_puzzle, indicating
      * that a solved puzzle couldn't be generated, this logically should never happen (i.e.
      * this function always returns a solved puzzle). The solved puzzle is "returned" in the
-     * sense that the Row, Column, and Box parameters will be filled after this function
+     * sense that the Row, Column, and Block parameters will be filled after this function
      * successfully returns. The algorithm for this is described below the parameters list, but
      * like all good algorithms is coded in practice slightly out of order.
      * 
-     *      r#box -> Box number of the current recursive iteration.
-     *      VALUE -> The numerical value 1-9 being placed in the current Box.
+     *      block -> Block number of the current recursive iteration.
+     *      VALUE -> The numerical value 1-9 being placed in the current Block.
      *      rows -> Array of Row objects each representing a row of the solved puzzle. All
      *              recursive iterations have access to the same array.
      *      columns -> Array of Column objects each representing a column of the solved puzzle.
      *                 All recursive iterations have access to the same array.
-     *      boxes -> Array of Box objects each representing a box of the solved puzzle. All
+     *      blocks -> Array of Block objects each representing a block of the solved puzzle. All
      *               recursive iterations have access to the same array.
      */
     fn solve (
         &mut self,
-        r#box: u8,
+        block: u8,
         value: u8,
         rows: &mut [Row; NUM_CONTAINERS as usize],
         columns: &mut [Column; NUM_CONTAINERS as usize],
-        boxes: &mut [Box; NUM_CONTAINERS as usize]
+        blocks: &mut [Block; NUM_CONTAINERS as usize]
     ) -> bool {
-        /* NOTE: Figure out positions in box based on box number.
+        /* NOTE: Figure out positions in block based on block number.
          *       Start with upper right.
          *
          * 0   | 3   | 6
@@ -1163,19 +1162,19 @@ impl Grid {
         let mut available_pos: Queue<u8> = Queue::new();
         let mut positions: [u8; CONTAINER_SIZE as usize] = [0; CONTAINER_SIZE as usize];
 
-        let mut i = r#box;
+        let mut i = block;
         while i >= 3 {
             positions[0] += 27;
             i -= 3;
         }
-        positions[0] += 3 * (r#box % 3);
+        positions[0] += 3 * (block % 3);
 
-        // NOTE: Figure out the remaining 8 positions in box
+        // NOTE: Figure out the remaining 8 positions in block
         for i in 1..CONTAINER_SIZE {
             positions[i as usize] = positions[0] + CONTAINER_SIZE * (i / 3) + i % 3;
         }
 
-        /* NOTE: Figure out positions VALUE can and can't be placed. Map row and column (box
+        /* NOTE: Figure out positions VALUE can and can't be placed. Map row and column (block
          *       shouldn't be needed).
          */
         for i in 0..CONTAINER_SIZE as usize {
@@ -1188,7 +1187,7 @@ impl Grid {
             }
         }
 
-        /* NOTE: set_value cannot be used here because the rows, columns, and boxes being used
+        /* NOTE: set_value cannot be used here because the rows, columns, and blocks being used
          *       are not the Grid's internal Containers. They belong to the solution matrix and
          *       are completely separate. Interesting things happened when I tested that out
          *       before I realized why it wouldn't work.
@@ -1202,32 +1201,32 @@ impl Grid {
 
             let next_available_pos = available_pos.peek()
                 .expect("Error retrieving next position while solving...");
-            let (row_number, column_number, box_number): (usize, usize, usize) =
+            let (row_number, column_number, block_number): (usize, usize, usize) =
                 Self::map_containers(next_available_pos);
-            let (row_index, column_index, box_index): (usize, usize, usize) =
+            let (row_index, column_index, block_index): (usize, usize, usize) =
                 Self::get_container_indeces(next_available_pos);
             
             rows[row_number].set_value(row_index, value);                   //NOTE: STEP 1
             columns[column_number].set_value(column_index, value);
-            boxes[box_number].set_value(box_index, value);
+            blocks[block_number].set_value(block_index, value);
             self.known_positions[next_available_pos as usize] = true;
 
-            if r#box == 7 && value == 9 {                                   //NOTE: STEP 2
+            if block == 7 && value == 9 {                                   //NOTE: STEP 2
                 return true;
             }
 
-            let next_box: u8 = if      r#box == 3 { 5 }                     //NOTE: STEP 4
-                               else if r#box == 7 { 1 }
-                               else               { r#box + 1 };
-            let next_value: u8 = if r#box == 7 { value + 1 }                //NOTE: STEP 5
+            let next_block: u8 = if    block == 3 { 5 }                     //NOTE: STEP 4
+                               else if block == 7 { 1 }
+                               else               { block + 1 };
+            let next_value: u8 = if block == 7 { value + 1 }                //NOTE: STEP 5
                                  else          { value };
 
-            soln = self.solve(next_box, next_value, rows, columns, boxes);
+            soln = self.solve(next_block, next_value, rows, columns, blocks);
             if soln { stop = true; }
             else {
                 rows[row_number].set_value(row_index, '?' as u8);           //NOTE: STEP 6
                 columns[column_number].set_value(column_index, '?' as u8);
-                boxes[box_number].set_value(box_index, '?' as u8);
+                blocks[block_number].set_value(block_index, '?' as u8);
                 self.known_positions[next_available_pos as usize] = false;
                 let _ = available_pos.remove();
             }
@@ -1255,16 +1254,16 @@ impl Grid {
     }
 
     /**
-     * Returns the box number based on the grid position. This function is reliant on the row
-     * and column having been mapped prior to being called. This simplifies mapping the box
+     * Returns the block number based on the grid position. This function is reliant on the row
+     * and column having been mapped prior to being called. This simplifies mapping the block
      * number as the row and column numbers aren't calculated a second time, and is logically
-     * sound since there is never a situation where boxes are mapped independently of rows and
+     * sound since there is never a situation where blocks are mapped independently of rows and
      * columns.
      * 
-     *      row -> Previously mapped row number 0-8 used to map the appropriate box.
-     *      column -> Previously mapped column number 0-8 used to map the appropriate box.
+     *      row -> Previously mapped row number 0-8 used to map the appropriate block.
+     *      column -> Previously mapped column number 0-8 used to map the appropriate block.
      */
-    fn map_box (row: usize, column: usize) -> usize {
+    fn map_block (row: usize, column: usize) -> usize {
         /* NOTE: Side-by-side numbering of array-like positions and matrix-like positions
          * 
          *           NUMBERED (0-80)                NUMBERED (ROW x COLUMN)
@@ -1298,14 +1297,14 @@ impl Grid {
     }
 
     /**
-     * Returns the row, column, and box numbers based on the grid position.
+     * Returns the row, column, and block numbers based on the grid position.
      * 
-     *      pos -> Grid position 0-80 used to map the appropriate row, column, and box numbers.
+     *      pos -> Grid position 0-80 used to map the appropriate row, column, and block numbers.
      */
     fn map_containers (pos: u8) -> (usize, usize, usize) {
         let row_number: usize = Self::map_row(pos);
         let column_number: usize = Self::map_column(pos);
-        (row_number, column_number, Self::map_box(row_number, column_number))
+        (row_number, column_number, Self::map_block(row_number, column_number))
     }
 
     /**
@@ -1352,25 +1351,25 @@ impl Grid {
     }
 
     /**
-     * Returns the index of a Box object based on the grid position. This function can't benefit
-     * in a similar manner as map_box since there are times when box indeces are needed
+     * Returns the index of a Block object based on the grid position. This function can't benefit
+     * in a similar manner as map_block since there are times when block indeces are needed
      * independent of rows and columns.
      * 
-     *      pos -> Grid position 0-80 used to map the appropriate Box index.
+     *      pos -> Grid position 0-80 used to map the appropriate Block index.
      */
-    fn get_box_index (pos: u8) -> usize {
+    fn get_block_index (pos: u8) -> usize {
         let row: usize = Self::get_row_index(pos);
         let column: usize = Self::get_column_index(pos);
         3 * (column % 3) + row % 3
     }
 
     /**
-     * Returns the indeces of a Row, Column, and Box objects based on the grid position.
+     * Returns the indeces of a Row, Column, and Block objects based on the grid position.
      * 
-     *      pos -> Grid position 0-80 used to map the appropriate Row, Column, and Box indeces.
+     *      pos -> Grid position 0-80 used to map the appropriate Row, Column, and Block indeces.
      */
     fn get_container_indeces (pos: u8) -> (usize, usize, usize) {
-        (Self::get_row_index(pos), Self::get_column_index(pos), Self::get_box_index(pos))
+        (Self::get_row_index(pos), Self::get_column_index(pos), Self::get_block_index(pos))
     }
 
     /**
@@ -1396,14 +1395,14 @@ impl Grid {
     }
 
     /**
-     * Returns an address to the Box Container from this Grid's internal Box array. This allows
-     * the Box object to be mutable from the Grid when an input is passed from the Sudoku
+     * Returns an address to the Block Container from this Grid's internal Block array. This allows
+     * the Block object to be mutable from the Grid when an input is passed from the Sudoku
      * object.
      * 
-     *      index -> The index to return from the Grid's internal Box array.
+     *      index -> The index to return from the Grid's internal Block array.
      */
-    fn _get_box (&self, index: usize) -> &Box {
-        &self.boxes[index]
+    fn _get_block (&self, index: usize) -> &Block {
+        &self.blocks[index]
     }
 
     /**
@@ -1429,18 +1428,18 @@ impl Grid {
     }
 
     /**
-     * Returns a mutable address to the Box Container from this Grid's internal Box array. This
-     * allows the Box object to be mutable from the Grid when an input is passed from the Sudoku
+     * Returns a mutable address to the Block Container from this Grid's internal Block array. This
+     * allows the Block object to be mutable from the Grid when an input is passed from the Sudoku
      * object.
      * 
-     *      index -> The index to return from the Grid's internal Box array.
+     *      index -> The index to return from the Grid's internal Block array.
      */
-    fn get_box_mut (&mut self, index: usize) -> &mut Box {
-        &mut self.boxes[index]
+    fn get_block_mut (&mut self, index: usize) -> &mut Block {
+        &mut self.blocks[index]
     }
 
     /**
-     * Places a value into the correct position (row, column, and box) in the grid.
+     * Places a value into the correct position (row, column, and block) in the grid.
      * 
      *      pos -> The grid position 0-80 where the value will be placed.
      *      value -> The value to be placed in the grid.
@@ -1448,12 +1447,12 @@ impl Grid {
     fn set_value (&mut self, pos: u8, value: u8) {
         let row_number: usize = Self::map_row(pos);
         let column_number: usize = Self::map_column(pos);
-        let box_number: usize = Self::map_box(row_number, column_number);
-        let (index_row, index_column, index_box): (usize, usize, usize) =
+        let block_number: usize = Self::map_block(row_number, column_number);
+        let (index_row, index_column, index_block): (usize, usize, usize) =
             Self::get_container_indeces(pos);
 
         /*
-         * NOTE: Check the row, column, and box for the value and add value from solved puzzle
+         * NOTE: Check the row, column, and block for the value and add value from solved puzzle
          *       to empty puzzle.
          */
         let row: &mut Row = self.get_row_mut(row_number);
@@ -1462,13 +1461,13 @@ impl Grid {
         let column: &mut Column = self.get_column_mut(column_number);
         column.set_value(index_column, value);
 
-        let r#box: &mut Box = self.get_box_mut(box_number);
-        r#box.set_value(index_box, value);
+        let block: &mut Block = self.get_block_mut(block_number);
+        block.set_value(index_block, value);
     }
 
     /**
      * Returns the value at a given index from the Grid. This can be done using Rows, Columns,
-     * or Boxes. Only one type of container needs to return the value, although all three have
+     * or Blocks. Only one type of container needs to return the value, although all three have
      * been tested for correctness.
      * 
      *      index -> Index of the grid to return the value from.
@@ -1476,7 +1475,7 @@ impl Grid {
     fn at (&self, index: u8) -> u8 {
         self.get_row(Self::map_row(index)).at(Self::get_row_index(index))
         //self.get_column(self.map_column(index)).at(self.get_column_index(index))
-        //self.get_box(self.map_box_index(index)).at(self.get_box_index(index))
+        //self.get_block(self.map_block_index(index)).at(self.get_block_index(index))
     }
 
     /**
@@ -1487,7 +1486,7 @@ impl Grid {
      */
     fn evaluate (&self) -> bool {
         let mut completed: bool = true;
-        for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.boxes) {
+        for (r, c, b) in itertools::izip!(&self.rows, &self.columns, &self.blocks) {
             completed &= r.evaluate() && c.evaluate() && b.evaluate();
         }
         completed
@@ -1522,14 +1521,13 @@ impl From<[[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]> for Grid {
 enum CONTAINER {
     Row,
     Column,
-    Box,
+    Block,
 }
 
 //use Container as House;
 use Container as Row;
 use Container as Column;
-//TODO: Consider calling these Blocks instead of Boxes (because of Rust's Box mechanism)
-use Container as Box;
+use Container as Block;
 struct Container {
     _container_type: CONTAINER,
     arr: [u8; CONTAINER_SIZE as usize],
@@ -1541,7 +1539,7 @@ impl Container {
      * 
      *      container_type -> Whether this container is a `ROW`, `COLUMN`, or `BOX`.
      *      arr -> An array representing the contents of this Container on the Grid. Rows are
-     *             intended to be read left-to-right, Columns up-to-down, and Boxes a
+     *             intended to be read left-to-right, Columns up-to-down, and Blocks a
      *             combination of both.
      */
     pub fn new (container_type: CONTAINER, arr: [u8; CONTAINER_SIZE as usize]) -> Self {
