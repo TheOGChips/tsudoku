@@ -1,7 +1,5 @@
 sudoku.code-workspace
 test_puzzle.png
-lib
-tsudoku
 .vscode
 
 # Added by cargo
