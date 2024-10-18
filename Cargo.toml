@@ -15,7 +15,6 @@ categories = ["command-line-utilities", "games"]
 exclude = ["include/*.hpp", "src/*.cpp", "Makefile"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-# TODO: Get rid of unused packages
 # TODO: Update the README (on main and rust-port branches)
 [dependencies]
 clap = { version = "4.4.4", features = ["cargo"] }
@@ -26,7 +25,3 @@ queues = "1.1.0"
 rand = "0.8.5"
 signal-hook = "0.3.17"
 strum = { version = "0.26.1", features = ["derive"] }
-
-[build-dependencies]
-bindgen = "0.69.2"
-regex = "1.10.2"
