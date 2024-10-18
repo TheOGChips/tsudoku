@@ -360,9 +360,9 @@ pub mod display {
      *         `Some(Input::KeyEnter)`.
      */
     pub fn getch () -> Option<Input> {
-        //TODO: Return KeyEnter on \r, too
         match WINDOW.getch() {
-            Some(pc::Input::Character('\n')) | Some(pc::Input::KeyEnter) => Some(Input::KeyEnter),
+            Some(pc::Input::Character('\n')) | Some(pc::Input::Character('\r')) |
+                Some(pc::Input::KeyEnter) => Some(Input::KeyEnter),
             Some(pc::Input::Character(ch)) => Some(Input::Character(ch)),
             Some(pc::Input::KeyUp) => Some(Input::KeyUp),
             Some(pc::Input::KeyDown) => Some(Input::KeyDown),
