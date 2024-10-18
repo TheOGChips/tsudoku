@@ -2,7 +2,7 @@
 name = "tsudoku"
 # TODO: Add install of necessary packages to a shell script
 # TODO: Remove all source code except for the shell script from main branch
-version = "2.1.0"
+version = "2.1.1"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"
@@ -11,8 +11,6 @@ repository = "https://github.com/TheOGChips/tsudoku"
 license = "GPL-3.0-or-later"
 keywords = ["sudoku", "TUI", "games", "puzzle"]
 categories = ["command-line-utilities", "games"]
-# TODO: Can probably get rid of this once the Makefile is gone
-exclude = ["include/*.hpp", "src/*.cpp", "Makefile"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # TODO: Update the README (on main and rust-port branches)
