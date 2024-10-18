@@ -139,10 +139,10 @@ pub mod display {
         let (mut y_max, mut x_max): (i32, i32) = WINDOW.get_max_yx();
         
         unsafe {
-            if y_max == WINDOW_REQ.y() as i32 && x_max == WINDOW_REQ.x() as i32 {
+            if y_max >= WINDOW_REQ.y() as i32 && x_max >= WINDOW_REQ.x() as i32 {
                 return false
             }
-            while y_max != WINDOW_REQ.y() as i32 || x_max != WINDOW_REQ.x() as i32 {
+            while y_max < WINDOW_REQ.y() as i32 || x_max < WINDOW_REQ.x() as i32 {
                 WINDOW.clear();
                 let msg1: &str = "The current window size is incorrect.";
                 let msg2: String = format!("Required dimensions: {} x {}",
