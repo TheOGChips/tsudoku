@@ -415,6 +415,10 @@ impl Sudoku {
                     display::color_set(&ColorPair::Default);
                     display::clrtoeol();
 
+                    // NOTE: Update the game's save filename before looping again
+                    self.save_file_name.borrow_mut().clear();
+                    self.save_file_name.borrow_mut().push_str(&in_game_menu.save_file_name());
+
                     display::refresh();
                     self.cursor_pos = saved_pos;
                     self.reset_cursor();
@@ -492,12 +496,10 @@ impl Sudoku {
 
     /**
      * Moves the cursor to its offset position for the initial printing of the display matrix
-     * from Sudoku::printw. This is necessary so that the the display matrix offset can be
-     * mapped correctly.
+     * from Sudoku::printw.
      * 
      *      coords -> Pre-offset display line and column numbers.
      */
-    //TODO: Come up with a better name for this function
     fn mv (&mut self, coords: Cell) {
         let offset: Cell = *self.actual2offset.get(&coords)
             .expect("Problem getting offset in Sudoku::mv");
@@ -601,9 +603,6 @@ impl Sudoku {
         display::clrtoeol();
         display::addstr("Enter save file name: ");
 
-        /* TODO: The name of the saved game isn't printed out the first time after exiting and
-         *       re-entering the in-game menu.
-         */
         let new_name: String = self.save_game();
 
         // NOTE: Display whether the game was saved successfully or not
@@ -614,6 +613,9 @@ impl Sudoku {
             format!(
                 "{} saved!",
                 if !new_name.is_empty() {
+                    // NOTE: Update the current game's save filename if not empty
+                    self.save_file_name.borrow_mut().clear();
+                    self.save_file_name.borrow_mut().push_str(&new_name);
                     new_name
                 }
                 else {
