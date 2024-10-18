@@ -4,15 +4,14 @@
 
 tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
 
-## Supported systems
+## Supported/Tested systems
 
-The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported.
+The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported without much hindrance. The new Rust version should also work in Windows thanks to the use of the `pancurses` library, although you will likely need a Curses library compatible with Windows (e.g. `pdcurses`).
 
 >\- Debian Linux  
->\- MacOS  
 >\- WSL (Windows Subsystem for Linux)
 
-**Note for MacOS users**: It's possible that certain (e.g. the Makefile and this README) will be marked as executable during the install process and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
+**Note for MacOS users**: It's possible that this README will be marked as executable if you clone this repo directly and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
 
 >`$ less README.md`  
 >`$ view README.md`  
@@ -26,33 +25,27 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 This can also be found in `tsudoku.bat`, which is also provided for Windows/WSL users. Double-clicking on this batch file should open up a Windows Terminal and automatically start tsudoku. Note that quitting tsudoku will also automatically close the instance/tab in Windows Terminal.
 
-**Note for PowerShell users**: It's recommended to add the following function to your PowerShell profile. This file can be found by running `> $env:USERPROFILE` at a PowerShell prompt. This will allow you to run tsudoku directly from PowerShell in one step. Note that you will have to start a new instance of PowerShell after adding this to your PowerShell profile.
+**Note for PowerShell users**: An alternative method to get a shortcut to `tsudoku` is to add the following function to your PowerShell profile. This file can be found by running `> $env:USERPROFILE` at a PowerShell prompt. This will allow you to run tsudoku directly from PowerShell in one step. Note that you will have to start a new instance of PowerShell after adding this to your PowerShell profile.
 
->`function { wsl.exe '~/.local/tsudoku' }`
+>`function tsudoku { wsl.exe '~/.local/tsudoku' }`
 
 ## Prerequisites
 
-NOTE: These are likely already installed depending on your operating system. If not, you should be able to download them easily using your OS's package manager (see **Prerequisites Installation** section).
+>\- The Rust compiler: `rustc`
 
->\- The Clang C++ compiler `clang++` (tsudoku compiles using the C++17 standard)  
->\- NCurses C API
->\- GNU Make
->\- The `unzip` utility
+>\- The Rust package manager: `cargo`
 
-## Prerequisites Installation
+>\- A C compiler: `gcc` via `build-essential`
 
-If either of the prerquisites are not pre-installed by your operating system, you can install them from your package manager. The following example assumes Debian or a Debian-based OS using the APT package manager.
+>\- A C-based TUI library: `libncurses-dev`
 
->`$ sudo apt install clang++`  
->`$ sudo apt install libncurses-dev`
->`$ sudo apt install make`
->`$ sudo apt install unzip`
-
-**Note for MacOS Users**: The best option for a MacOS package manager is Homebrew and is relatively similar to a Linux package manager such as that found on Linux and WSL. MacOS should come pre-installed with `clang++`, which should also be mapped to `g++`. You can use this instead if you wish. Homebrew's version of an NCurses package is likely just called `ncurses`.
+>\- `curl`
 
 ## Installation
 
-### From source
+### From GitHub (recommended)
+
+Because `tsudoku` requires a few external dependencies, the recommended (and most streamlined) way to install `tsudoku` is via the shell script `tsudoku.sh`. This script will automatically install the required dependencies as well as `tsudoku`. This shell script can also be used to upgrade and uninstall `tsudoku`. For those that wish to be more involved in the install process, continue on to the **From crates.io** subsection.
 
 #### Step 1: Clone the project from Github.
 
@@ -66,15 +59,13 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`
 
-#### Step 2: Compile the source code using the provided makefile. Performing any of the three methods above should have already placed you inside the *tsudoku* directory of the cloned source code.
+#### Step 2: Compile the source code using the provided shell script. Performing any of the three methods above should have already placed you inside the *tsudoku* directory of the cloned repository.
 
->`$ make`
+>`$ ./tsudoku.sh install`
 
-#### Step 3: Source your shell's RC file to allow running *tsudoku* in the current shell instance.
+### From crates.io
 
-- Examples:
->`$ source ~/.bashrc    # if using bash`  
->`$ source ~/.zshrc     # if using zsh`
+See the README at the `rust-port` branch at https://github.com/TheOGChips/tsudoku/tree/rust-port .
 
 ## Usage
 
@@ -100,24 +91,45 @@ If either of the prerquisites are not pre-installed by your operating system, yo
 
 ## Updates
 
-### From source
+### From GitHub
 
 #### If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the *tsudoku* directory, then perform the following steps:
 
 >`$ git pull`  
->`$ make upgrade`
+>`$ tsudoku.sh upgrade`
 
-#### If installed via direct downloaded (option 3), delete the *tsudoku* directory and repeat the installation process as described in the **Installation** section again.
+#### If installed via direct download (option 3), delete the *tsudoku* directory and repeat the installation process as described in the **Installation** section again.
 
 >`$ rm -rf tsudoku`  
 >`$ wget https://github.com/TheOGChips/tsudoku/archive/refs/heads/main.zip -O tsudoku.zip`  
 >`$ unzip tsudoku.zip && mv tsudoku-main tsudoku && cd tsudoku`  
->`$ make`
+>`$ tsudoku.sh install`
 
-## Status update: 18 May 2024
+### From Crates.io
 
-Current release version: 1.0.8
+See the README at the `rust-port` branch at https://github.com/TheOGChips/tsudoku/tree/rust-port .
 
-tsudoku is now ready for official release! Barring any potential future bug fixes (except for a handy couple of additions for you WSL users in the near future), this will be the last update for the C++ version until the Rust port is finished. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net .
+## Uninstallation
 
-If you have played tsudoku and enjoyed your experience, and you feel obligated to compensate me for my time working on this, you can also email me to ask about setting up a one-time donation. Have fun playing!
+### From GitHub
+
+#### If installed using Git via HTTPS or SSH (options 1 or 2), navigate to the *tsudoku* directory, then perform the following steps:
+
+>`$ tsudoku.sh remove`
+
+#### If installed via direct download (option 3), delete the *tsudoku* directory after performing the same step for options 1 and 2 above.
+
+### From Crates.io
+
+See the README at the `rust-port` branch at https://github.com/TheOGChips/tsudoku/tree/rust-port .
+
+## Status Update: 18 October 2024
+
+### Current release version: 2.1.2
+
+Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net . If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
+
+### What happened to v1.x?
+
+If you're wondering what happened to v1.x, that is the original C++ version. Since all that work wasn't tracked in crates.io, it will look like v1.x is missing; however, anyone who wants to see the v1.x source code can still find it on this project's Github page.
+
