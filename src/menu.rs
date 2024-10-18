@@ -224,18 +224,18 @@ impl Menu for MainMenu {
             input = display::getch();
             opt =
                 match input {
-                    Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
-                        => match opt {
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) |
+                    Some(display::Input::Character('W')) => match opt {
                             MainMenuOption::Exit => MainMenuOption::ShowStats,
                             MainMenuOption::ShowStats => MainMenuOption::ResumeGame,
                             _ => MainMenuOption::NewGame,
-                        },
-                    Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
-                        => match opt {
+                    },
+                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) |
+                    Some(display::Input::Character('S')) => match opt {
                             MainMenuOption::NewGame => MainMenuOption::ResumeGame,
                             MainMenuOption::ResumeGame => MainMenuOption::ShowStats,
                             _ => MainMenuOption::Exit,
-                        },
+                    },
                     Some(display::Input::KeyEnter) => {
                         opt
                     },
@@ -409,13 +409,15 @@ impl SavedGameMenu {
                         let i: usize = self.saved_games.binary_search(&selection.to_string())
                             .unwrap();
                         match input {
-                            Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
+                            Some(display::Input::KeyUp) | Some(display::Input::Character('w')) |
+                            Some(display::Input::Character('W'))
                                 => if selection.as_str() != self.saved_games.first().unwrap() {
                                     *self.selection.borrow_mut() = self.saved_games.get(i - 1)
                                         .unwrap()
                                         .to_string();
                             },
-                            Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
+                            Some(display::Input::KeyDown) | Some(display::Input::Character('s')) |
+                            Some(display::Input::Character('S'))
                                 => if selection.as_str() != self.saved_games.last().unwrap() {
                                     *self.selection.borrow_mut() = self.saved_games.get(i + 1)
                                         .unwrap()
@@ -640,18 +642,18 @@ impl Menu for DifficultyMenu {
             input = display::getch();
             diff = 
                 match input {
-                    Some(display::Input::KeyUp) | Some(display::Input::Character('w'))
-                        => match diff {
+                    Some(display::Input::KeyUp) | Some(display::Input::Character('w')) |
+                    Some(display::Input::Character('W')) => match diff {
                             DifficultyMenuOption::Expert => DifficultyMenuOption::Hard,
                             DifficultyMenuOption::Hard => DifficultyMenuOption::Medium,
                             _ => DifficultyMenuOption::Easy,
-                        },
-                        Some(display::Input::KeyDown) | Some(display::Input::Character('s'))
-                        => match diff {
+                    },
+                    Some(display::Input::KeyDown) | Some(display::Input::Character('s')) |
+                    Some(display::Input::Character('S')) => match diff {
                             DifficultyMenuOption::Easy => DifficultyMenuOption::Medium,
                             DifficultyMenuOption::Medium => DifficultyMenuOption::Hard,
                             _ => DifficultyMenuOption::Expert,
-                        },
+                    },
                     Some(display::Input::KeyEnter) => {
                         diff
                     },

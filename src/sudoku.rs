@@ -381,7 +381,6 @@ impl Sudoku {
                 Some(display::Input::Character('Q')) => quit_game = true,
                 Some(display::Input::Character('m')) |
                 Some(display::Input::Character('M')) => if use_in_game_menu {
-                    //TODO: Make this reusable somehow like in the C++ version...
                     let in_game_menu: InGameMenu = InGameMenu::new(
                         &self.display_matrix,
                         &self.color_codes,
@@ -425,9 +424,6 @@ impl Sudoku {
                     self.save_game_prompt(delay);
                     self.reset_cursor();
                 },
-                /* TODO: The upper case letters don't seem to be registering for some reason
-                 *       v2.2.0
-                 */
                 Some(display::Input::KeyUp)          | Some(display::Input::Character('w')) |
                 Some(display::Input::KeyDown)        | Some(display::Input::Character('s')) |
                 Some(display::Input::KeyLeft)        | Some(display::Input::Character('a')) |
@@ -664,7 +660,8 @@ impl Sudoku {
         let max_xboundary: u8 = display::ORIGIN.x() + display::DISPLAY_MATRIX_COLUMNS as u8 + 1;
 
         let new_pos: Cell = match direction {
-            Some(display::Input::KeyUp) | Some(display::Input::Character('w')) => {
+            Some(display::Input::KeyUp) | Some(display::Input::Character('w')) |
+            Some(display::Input::Character('W')) => {
                 if self.cursor_pos.y() > display::ORIGIN.y() {
                     let pos: Cell = Cell::new(self.cursor_pos.y() - 1, self.cursor_pos.x());
                     if self.is_box_border(pos) {
@@ -678,7 +675,8 @@ impl Sudoku {
                     self.cursor_pos
                 }
             },
-            Some(display::Input::KeyDown) | Some(display::Input::Character('s')) => {
+            Some(display::Input::KeyDown) | Some(display::Input::Character('s')) |
+            Some(display::Input::Character('S')) => {
                 if self.cursor_pos.y() < max_yboundary {
                     let pos: Cell = Cell::new(self.cursor_pos.y() + 1, self.cursor_pos.x());
                     if self.is_box_border(pos) {
@@ -692,7 +690,8 @@ impl Sudoku {
                     self.cursor_pos
                 }
             },
-            Some(display::Input::KeyLeft) | Some(display::Input::Character('a')) => {
+            Some(display::Input::KeyLeft) | Some(display::Input::Character('a')) |
+            Some(display::Input::Character('A')) => {
                 if self.cursor_pos.x() > display::ORIGIN.x() {
                     let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() - 1);
                     if self.is_box_border(pos) {
@@ -706,7 +705,8 @@ impl Sudoku {
                     self.cursor_pos
                 }
             },
-            Some(display::Input::KeyRight) | Some(display::Input::Character('d')) => {
+            Some(display::Input::KeyRight) | Some(display::Input::Character('d')) |
+            Some(display::Input::Character('D')) => {
                 if self.cursor_pos.x() < max_xboundary {
                     let pos: Cell = Cell::new(self.cursor_pos.y(), self.cursor_pos.x() + 1);
                     if self.is_box_border(pos) {
