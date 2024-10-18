@@ -31,11 +31,6 @@ use queues::{
     IsQueue,
 };
 
-extern "C" {
-    /// This is C's `time.h` library called via FFI.
-    fn time (_: i32) -> i32;
-}
-
 const GRID_SIZE: u8 = 81;
 const NUM_CONTAINERS: u8 = 9;
 const CONTAINER_SIZE: u8 = 9;
@@ -958,8 +953,6 @@ impl Grid {
         }
     }
     
-    //TODO: use from_save for the name in place of the third constructor
-
     /**
      * Creates a mapping of all 81 grid positions to a 9x9 matrix.
      */
@@ -988,12 +981,7 @@ impl Grid {
      *                       menu.
      */
     fn set_starting_positions (&mut self, diff: DifficultyMenuOption) {
-        // TODO: Get rid of this seed variable if no longer needed
-        let seed: i32 = unsafe {
-            time(0x0)
-        };
-        let solved_puzzle = self.generate_solved_puzzle(&seed);
-        //Self::generate_solved_puzzle(unsafe { time(0x0) }); // NOTE: This will also work
+        let solved_puzzle = self.generate_solved_puzzle();
 
         // NOTE: Randomly shuffle the locations in the Grid
         let mut generator = thread_rng();
@@ -1024,10 +1012,8 @@ impl Grid {
     /**
      * Generates and returns a solved sudoku puzzle. This puzzle is later used to created a
      * solvable puzzle. The puzzle is generated randomly using a Mersenne-Twister engine.
-     * 
-     *      unused `&i32` -> Seed for the pseudo-random number sequence
      */
-    fn generate_solved_puzzle (&mut self, _: &i32) -> [u8; GRID_SIZE as usize] {
+    fn generate_solved_puzzle (&mut self) -> [u8; GRID_SIZE as usize] {
         //TODO: Is there an easy way to "flatten" a matrix into an array (2D -> 1D)?
         let mut soln: [u8; GRID_SIZE as usize] = [0; GRID_SIZE as usize];
 
