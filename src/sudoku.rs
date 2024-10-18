@@ -897,8 +897,6 @@ impl Sudoku {
         let surrounding: [Cell; NeighborCells::num_border_positions()] =
             self.get_surrounding_cells();
         for cell in surrounding {
-            // TODO: Will this work (and be simpler) by just calling print?
-            // display::mvprintw(cell.y().into(), cell.x().into(), " ");
             let actual: Cell = self.offset2actual[&cell];
             self.display_matrix[actual.y() as usize][actual.x() as usize] = ' ' as u8;
             self.color_codes[actual.y() as usize][actual.x() as usize] = ColorPair::Default;
@@ -931,7 +929,7 @@ impl Grid {
      *      diff -> Enum value of difficulty level chosen by the user from the main menu.
      */
     pub fn new (diff: DifficultyMenuOption) -> Self {
-        let mut grid: Grid = Self::init(diff);
+        let mut grid: Grid = Self::init();
         grid.set_starting_positions(diff);
         grid
     }
@@ -939,12 +937,8 @@ impl Grid {
     /**
      * Creates an empty Sudoku grid. This helps facilitate some of the later setup functions in
      * `Grid::new`.
-     * 
-     *      unused DifficultyMenuOption -> Enum value of difficulty level chosen by the user
-     *                                     from the main menu.
      */
-    //TODO: Get rid of the DifficultyMenuOption parameter if not needed
-    fn init (_: DifficultyMenuOption) -> Self {
+    fn init () -> Self {
         let grid_map: HashMap<u8, Cell> = Self::create_map();
         let known_positions: [bool; GRID_SIZE as usize] = Self::init_known_positions();
         let unk: u8 = '?' as u8;
@@ -1521,7 +1515,7 @@ impl From<[[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]> for Grid {
      *      mat -> A 9x9 matrix representing a sudoku grid.
      */
     fn from(mat: [[u8; NUM_CONTAINERS as usize]; NUM_CONTAINERS as usize]) -> Self {
-        let mut grid: Grid = Self::init(DifficultyMenuOption::Easy);
+        let mut grid: Grid = Self::init();
         let mut count: u8 = 0;
         for row in mat {
             for val in row {
