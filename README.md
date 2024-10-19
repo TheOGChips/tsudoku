@@ -2,7 +2,7 @@
 
 ## Description
 
-tsudoku (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
+`tsudoku` (both short for "terminal sudoku" and inspired phonetically by other Japanese words such as "tsunami") is a user-friendly implementation of the classic game of sudoku that you can play in your terminal.
 
 ## Supported/Tested systems
 
@@ -21,13 +21,13 @@ The below operating systems have been tested for working condition. Other Unix-b
 
 - Ex: Running tsudoku from Windows Command Prompt or PowerShell.
 
->`> wsl.exe '~/.local/tsudoku'`
+>`> wsl.exe '~/.cargo/bin/tsudoku'`
 
 This can also be found in `tsudoku.bat`, which is also provided for Windows/WSL users. Double-clicking on this batch file should open up a Windows Terminal and automatically start tsudoku. Note that quitting tsudoku will also automatically close the instance/tab in Windows Terminal.
 
 **Note for PowerShell users**: An alternative method to get a shortcut to `tsudoku` is to add the following function to your PowerShell profile. This file can be found by running `> $env:USERPROFILE` at a PowerShell prompt. This will allow you to run tsudoku directly from PowerShell in one step. Note that you will have to start a new instance of PowerShell after adding this to your PowerShell profile.
 
->`function tsudoku { wsl.exe '~/.local/tsudoku' }`
+>`function tsudoku { wsl.exe '~/.cargo/bin/tsudoku' }`
 
 ## Prerequisites
 
@@ -123,9 +123,9 @@ See the README at the `rust-port` branch at https://github.com/TheOGChips/tsudok
 
 See the README at the `rust-port` branch at https://github.com/TheOGChips/tsudoku/tree/rust-port .
 
-## Status Update: 18 October 2024
+## Status Update: 19 October 2024
 
-### Current release version: 2.1.2
+### Current release version: 2.1.3
 
 Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net . If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
 
