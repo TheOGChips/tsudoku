@@ -24,9 +24,7 @@ use crate::{
     sudoku::SavedPuzzle,
 };
 use std::{
-    fs,
-    cell::RefCell,
-    iter,
+    cell::RefCell, fs, io::Write, iter
 };
 
 /// A wrapper enum to enforce a certain type of MenuOption be used
@@ -330,7 +328,7 @@ impl SavedGameMenu {
         Self {
             saved_games: saved_games,
             saved_game: RefCell::new(SavedPuzzle::new()),
-            selection: RefCell::new(selection), // NOTE: This contains the CSV extension
+            selection: RefCell::new(selection),
         }
     }
 
@@ -457,6 +455,18 @@ impl SavedGameMenu {
             .iter()
             .map(|row| row.iter().map(|byte| *byte as char).collect())
             .collect();
+        let save_data_difficulty: DifficultyMenuOption = match fs::read_to_string(
+            common::game_dir().join(self.selection.borrow().to_string())
+                .join(common::DIFFICULTY_DATA_FILENAME)
+            ).expect(
+                format!("Error: Unable to read from {}...", common::DIFFICULTY_DATA_FILENAME)
+                    .as_str()
+            ).as_str() {
+                "expert" => DifficultyMenuOption::Expert,
+                "hard" => DifficultyMenuOption::Hard,
+                "medium" => DifficultyMenuOption::Medium,
+                _ => DifficultyMenuOption::Easy,
+            };
 
         let mut i: usize = 0;
         let mut j: usize = 0;
@@ -492,6 +502,7 @@ impl SavedGameMenu {
         puzzle.set_puzzle(game_data_numeric);
         puzzle.set_color_codes(game_data_color_codes);
         puzzle.set_filename(self.selection.borrow().as_str());
+        puzzle.set_difficulty(save_data_difficulty);
         *self.saved_game.borrow_mut() = puzzle;
     }
 
@@ -674,6 +685,7 @@ pub struct InGameMenu {
     in_game_menu_left_edge: u8,
     in_game_menu_title_spacing: u8,
     save_file_name: RefCell<String>,
+    difficulty: DifficultyMenuOption,
 }
 
 impl InGameMenu {
@@ -689,6 +701,7 @@ impl InGameMenu {
             [ColorPair; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS
         ],
         save_file_name: &str,
+        difficulty: DifficultyMenuOption,
     ) -> Self {
         Self {
             display_matrix: *display_matrix,
@@ -699,6 +712,7 @@ impl InGameMenu {
                 unsafe { display::VERTICAL_DIVIDER },
             in_game_menu_title_spacing: 1,
             save_file_name: RefCell::new(String::from(save_file_name)),
+            difficulty: difficulty,
         }
     }
 
@@ -924,6 +938,23 @@ cells. This action cannot be undone.");
             csv::write(&name, common::NUMERIC_DATA_FILENAME, &self.display_matrix.to_vec());
             csv::write(&name, common::COLOR_DATA_FILENAME, &color_codes);
             self.save_file_name.replace(name.clone());
+
+            // NOTE: Write difficulty setting to a file
+            let diff_path: std::path::PathBuf = common::game_dir()
+                .join(self.save_file_name())
+                .join(common::DIFFICULTY_DATA_FILENAME);
+            let mut outfile: fs::File = fs::OpenOptions::new().create(true)
+                .truncate(true)
+                .write(true)
+                .open(&diff_path)
+                .expect(format!("Unable to create or open {}", diff_path.display()).as_str());
+            outfile.write_all(match self.difficulty {
+                    DifficultyMenuOption::Easy => "easy".as_bytes(),
+                    DifficultyMenuOption::Medium => "medium".as_bytes(),
+                    DifficultyMenuOption::Hard => "hard".as_bytes(),
+                    DifficultyMenuOption::Expert => "expert".as_bytes(),
+                })
+                .expect(format!("Unable to write to {}...", diff_path.display()).as_str());
         }
         name
     }

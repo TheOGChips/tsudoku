@@ -10,6 +10,7 @@ use menu::{
     MainMenuOption,
     SavedGameMenu,
     SavedGameMenuOption,
+    DifficultyMenuOption,
 };
 use common::game_dir;
 use sudoku::{
@@ -26,7 +27,11 @@ pub mod terminal;
 pub mod common;
 pub mod sudoku;
 
-const SAVE_FILE_NAME: &str = "completed-puzzles.txt";
+const SAVE_FILENAME_TOTAL: &str = "completed-puzzles.txt";
+const SAVE_FILENAME_EASY: &str = "completed-easy.txt";
+const SAVE_FILENAME_MEDIUM: &str = "completed-medium.txt";
+const SAVE_FILENAME_HARD: &str = "completed-hard.txt";
+const SAVE_FILENAME_EXPERT: &str = "completed-expert.txt";
 
 fn main() -> Result<(), &'static str> {
     let matches = clap::command!()
@@ -88,7 +93,7 @@ fn main() -> Result<(), &'static str> {
                 MainMenuOption::NewGame => {
                     let mut puzzle: Sudoku = Sudoku::new(None);
                     if puzzle.start_game(use_in_game_menu) {
-                        increment_completed_games();
+                        increment_completed_games(puzzle.difficulty());
                     }
                 },
                 MainMenuOption::ResumeGame => {
@@ -98,7 +103,7 @@ fn main() -> Result<(), &'static str> {
                             let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
                             let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
                             if puzzle.start_game(use_in_game_menu) {
-                                increment_completed_games();
+                                increment_completed_games(puzzle.difficulty());
                                 fs::remove_dir_all(game_dir().join(puzzle.filename()))
                                     .expect("Error: Issue removing save game files");
                             }
@@ -120,21 +125,51 @@ fn main() -> Result<(), &'static str> {
  * that information to the screen in the terminal window.
  */
 fn display_completed_puzzles () {
-    let num_completed: Result<String, _> = fs::read_to_string(game_dir().join(SAVE_FILE_NAME));
-    let prompt1: String = format!(
-        "Completed Sudoku puzzles: {}",
-        match num_completed {
+    let title: &str = "Completed Sudoku puzzles:";
+    let display_strs: [String; 5] = [
+        format!("TOTAL:  {}", match fs::read_to_string(game_dir().join(SAVE_FILENAME_TOTAL)) {
             Ok(num) => num,
             Err(_) => String::from("0"),
-        }
-    );
-    let prompt2: &str = "Press Enter to continue";
+        }),
+        format!("EASY:   {}", match fs::read_to_string(game_dir().join(SAVE_FILENAME_EASY)) {
+            Ok(num) => num,
+            Err(_) => String::from("0"),
+        }),
+        format!("MEDIUM: {}", match fs::read_to_string(game_dir().join(SAVE_FILENAME_MEDIUM)) {
+            Ok(num) => num,
+            Err(_) => String::from("0"),
+        }),
+        format!("HARD:   {}", match fs::read_to_string(game_dir().join(SAVE_FILENAME_HARD)) {
+            Ok(num) => num,
+            Err(_) => String::from("0"),
+        }),
+        format!("EXPERT: {}", match fs::read_to_string(game_dir().join(SAVE_FILENAME_EXPERT)) {
+            Ok(num) => num,
+            Err(_) => String::from("0"),
+        }),
+    ];
+    let prompt: &str = "Press Enter to continue";
+
     let (y_max, x_max): (i32, i32) = display::get_max_yx();
+
+    let max_length: i32 = *std::array::from_fn::<i32, 5, _>(|i| display_strs[i].len() as i32)
+        .iter()
+        .reduce(|max, i| max.max(i))
+        .unwrap();
 
     display::curs_set(CursorVisibility::None);
     display::clear();
-    display::mvprintw(y_max/2, x_max/2 - (prompt1.len() as i32 - 1)/2, &prompt1);
-    display::mvprintw(y_max/2 + 2, x_max/2 - prompt2.len() as i32/2, prompt2);
+    display::mvprintw(y_max/2, x_max/2 - (title.len() as i32 - 1)/2, title);
+    let mut count: i32 = 0;
+    for string in &display_strs {
+        display::mvprintw(
+            y_max/2 + 2 + count,
+            x_max/2 - (max_length as i32 - 1)/2,
+            &string
+        );
+        count += 1;
+    }
+    display::mvprintw(y_max/2 + 3 + count, x_max/2 - (prompt.len() as i32 - 1)/2, prompt);
     display::refresh();
 
     loop {
@@ -150,15 +185,24 @@ fn display_completed_puzzles () {
  * Increments the number of completed games recorded by 1. This is only called once the user has
  * solved the current puzzle.
  */
-fn increment_completed_games () {
-    let path: PathBuf = game_dir().join(SAVE_FILE_NAME);
-    let num_completed: Result<String, _> = fs::read_to_string(path.clone());
-    let num_completed: u128 = match num_completed {
-        Ok(num) => num.trim_end().parse()
-                        .expect("Error: Unable to parse number of completed puzzles"),
-        Err(_) => 0,
-    };
-
-    fs::write(path, format!("{}\n", num_completed + 1))
-        .expect("Error: Unable to update # completed puzzles");
+fn increment_completed_games (difficulty: DifficultyMenuOption) {
+    let paths: [PathBuf; 2] = [
+        game_dir().join(SAVE_FILENAME_TOTAL),
+        match difficulty {
+            DifficultyMenuOption::Easy => game_dir().join(SAVE_FILENAME_EASY),
+            DifficultyMenuOption::Medium => game_dir().join(SAVE_FILENAME_MEDIUM),
+            DifficultyMenuOption::Hard => game_dir().join(SAVE_FILENAME_HARD),
+            DifficultyMenuOption::Expert => game_dir().join(SAVE_FILENAME_EXPERT),
+        },
+    ];
+    for path in paths {
+        let num_completed: Result<String, _> = fs::read_to_string(path.clone());
+        let num_completed: u128 = match num_completed {
+            Ok(num) => num.trim_end().parse()
+                            .expect("Error: Unable to parse number of completed puzzles"),
+            Err(_) => 0,
+        };
+        fs::write(path, format!("{}\n", num_completed + 1))
+            .expect("Error: Unable to update # completed puzzles");
+    }
 }

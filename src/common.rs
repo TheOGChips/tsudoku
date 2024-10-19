@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 pub const NUMERIC_DATA_FILENAME: &str = "numbers.csv";
 pub const COLOR_DATA_FILENAME: &str = "colors.csv";
+pub const DIFFICULTY_DATA_FILENAME: &str = "difficulty.txt";
 
 /// Returns the path of the hidden directory where game data is stored for `tsudoku`.
 pub fn game_dir () -> PathBuf {

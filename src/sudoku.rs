@@ -61,6 +61,8 @@ pub struct SavedPuzzle {
     color_codes: [[ColorPair; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
     /// The name of the file the puzzle is saved under
     filename: String,
+    /// Difficulty setting of the saved puzzle
+    difficulty: DifficultyMenuOption,
 }
 
 impl SavedPuzzle {
@@ -73,6 +75,7 @@ impl SavedPuzzle {
                 display::DISPLAY_MATRIX_ROWS
             ],
             filename: String::new(),
+            difficulty: DifficultyMenuOption::Easy,
         }
     }
 
@@ -94,6 +97,11 @@ impl SavedPuzzle {
     /// Sets the filename the saved puzzle has been stored in.
     pub fn set_filename (&mut self, filename: &str) {
         self.filename = String::from(filename);
+    }
+
+    /// Sets the difficulty the saved puzzle was created at.
+    pub fn set_difficulty (&mut self, difficulty: DifficultyMenuOption) {
+        self.difficulty = difficulty;
     }
 
     /// Returns the filename of the saved game.
@@ -143,6 +151,7 @@ pub struct Sudoku {
     offset2actual: HashMap<Cell, Cell>,
     actual2offset: HashMap<Cell, Cell>,
     save_file_name: RefCell<String>,
+    difficulty: DifficultyMenuOption,
 }
 
 impl Sudoku {
@@ -153,7 +162,7 @@ impl Sudoku {
     pub fn new (saved_puzzle: Option<SavedPuzzle>) -> Self {
         display::init_color_pairs();
         let (grid2display, display2grid) = Self::create_maps();
-        let (display_matrix, color_codes, grid) =
+        let (display_matrix, color_codes, grid, difficulty) =
             Self::init_display_matrix(&saved_puzzle, &grid2display);
         let (offset2actual, actual2offset) = Self::map_display_matrix_offset();
         
@@ -170,12 +179,18 @@ impl Sudoku {
                 Some(puzzle) => puzzle.filename.clone(),
                 None => String::new(),
             }),
+            difficulty: difficulty,
         }
     }
 
     /// Returns the save filename of the sudoku game
     pub fn filename (&self) -> String {
         self.save_file_name.borrow().to_string()
+    }
+
+    /// Returns the difficulty level of the current game
+    pub fn difficulty (&self) -> DifficultyMenuOption {
+        self.difficulty
     }
 
     /**
@@ -225,6 +240,7 @@ impl Sudoku {
         [[u8; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
         [[ColorPair; display::DISPLAY_MATRIX_COLUMNS]; display::DISPLAY_MATRIX_ROWS],
         Grid,
+        DifficultyMenuOption,
     ) {
         /* This is a display matrix indeces "cheat sheet", with Grid cells mapped out. This
          * will display as intended if looking at it full screen with 1920x1080 screen
@@ -279,7 +295,7 @@ impl Sudoku {
                 }
                 let grid: Grid = Grid::from(grid);
 
-                (mat, color_codes, grid)
+                (mat, color_codes, grid, puzzle.difficulty)
             },
             None => {
                 let mut mat:
@@ -313,7 +329,7 @@ impl Sudoku {
                     };
                 }
 
-                (mat, color_codes, grid)
+                (mat, color_codes, grid, diff_menu.get_difficulty_level())
             },
         }
     }
@@ -380,6 +396,7 @@ impl Sudoku {
                         &self.display_matrix,
                         &self.color_codes,
                         &self.save_file_name.borrow(),
+                        self.difficulty,
                     );
 
                     display::color_set(&ColorPair::MenuSelection);
@@ -638,6 +655,7 @@ impl Sudoku {
             &self.display_matrix,
             &self.color_codes,
             &self.save_file_name.borrow(),
+            self.difficulty,
         );
         let new_name: String = in_game_menu.save_game();
         if !new_name.is_empty() {
