@@ -69,7 +69,7 @@ fn main() -> Result<(), &'static str> {
         // Deletes all saved games from the tsudoku environment directory at ~/.tsudoku.
         let saved_games = match fs::read_dir(game_dir()) {
             Ok(list) => list.filter(
-                |file| file.as_ref().unwrap().path().display().to_string().contains(".csv")
+                |entry| !entry.as_ref().unwrap().path().display().to_string().contains(".txt")
             ),
             Err(msg) => {
                 eprintln!("{}", msg.to_string());
@@ -77,46 +77,49 @@ fn main() -> Result<(), &'static str> {
             },
         };
         for dir in saved_games {
-            let _ = fs::remove_file(dir.unwrap().path());
+            fs::remove_dir_all(dir.unwrap().path())
+                .expect("Error: Unable to remove all saved game data...");
         }
     }
+    else {    
+       /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if
+        * it doesn't already exist.
+        */
+        let _ = fs::create_dir(game_dir());
 
-    /* Creates the tsudoku environment directory in the user's home directory at ~/.tsudoku if
-     * it doesn't already exist.
-     */
-    let _ = fs::create_dir(game_dir());
-
-    let main_menu = MainMenu::new(use_in_game_menu);
-    loop {
-        if let MenuOption::MainMenu(main_menu_option) = main_menu.menu() {
-            match main_menu_option {
-                MainMenuOption::NewGame => {
-                    let mut puzzle: Sudoku = Sudoku::new(None);
-                    if puzzle.start_game(use_in_game_menu) {
-                        increment_completed_games(puzzle.difficulty());
-                    }
-                },
-                MainMenuOption::ResumeGame => {
-                    let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
-                    if let MenuOption::SavedGameMenu(SavedGameMenuOption::SaveReady) =
-                        saved_game_menu.menu() {
-                            let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
-                            let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
-                            if puzzle.start_game(use_in_game_menu) {
-                                increment_completed_games(puzzle.difficulty());
-                                fs::remove_dir_all(game_dir().join(puzzle.filename()))
-                                    .expect("Error: Issue removing save game files");
-                            }
+        let main_menu = MainMenu::new(use_in_game_menu);
+        loop {
+            if let MenuOption::MainMenu(main_menu_option) = main_menu.menu() {
+                match main_menu_option {
+                    MainMenuOption::NewGame => {
+                        let mut puzzle: Sudoku = Sudoku::new(None);
+                        if puzzle.start_game(use_in_game_menu) {
+                            increment_completed_games(puzzle.difficulty());
                         }
-                },
-                MainMenuOption::ShowStats => display_completed_puzzles(),
-                MainMenuOption::Exit => break,
+                    },
+                    MainMenuOption::ResumeGame => {
+                        let saved_game_menu: SavedGameMenu = SavedGameMenu::new();
+                        if let MenuOption::SavedGameMenu(SavedGameMenuOption::SaveReady) =
+                            saved_game_menu.menu() {
+                                let saved_puzzle: SavedPuzzle = saved_game_menu.get_saved_game();
+                                let mut puzzle: Sudoku = Sudoku::new(Some(saved_puzzle));
+                                if puzzle.start_game(use_in_game_menu) {
+                                    increment_completed_games(puzzle.difficulty());
+                                    fs::remove_dir_all(game_dir().join(puzzle.filename()))
+                                        .expect("Error: Issue removing save game files");
+                                }
+                            }
+                    },
+                    MainMenuOption::ShowStats => display_completed_puzzles(),
+                    MainMenuOption::Exit => break,
+                }
             }
         }
+        
+        display::clear();
+        display::tui_end();
     }
-    
-    display::clear();
-    display::tui_end();
+
     Ok(())
 }
 
