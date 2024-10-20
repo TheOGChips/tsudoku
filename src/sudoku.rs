@@ -25,6 +25,7 @@ use rand::{
     thread_rng,
     distributions::Uniform,
     seq::SliceRandom,
+    Rng,
 };
 use queues::{
     Queue,
@@ -1006,13 +1007,14 @@ impl Grid {
         let mut positions: [u8; GRID_SIZE as usize] = array::from_fn(|i| i as u8);
         positions.shuffle(&mut generator);
 
-        // TODO: These should be a random value from a range dependent on the difficulty chosen
-        let num_positions: usize = match diff {
-            DifficultyMenuOption::Easy => 60,   // TODO: 50-60
-            DifficultyMenuOption::Medium => 45, // TODO: 39-49
-            DifficultyMenuOption::Hard => 30,   // TODO: 28-38
-            DifficultyMenuOption::Expert => 17, // TODO: 17-27
-        };
+        let num_positions: usize = generator.gen_range(
+            match diff {
+                DifficultyMenuOption::Easy => 50..=60,
+                DifficultyMenuOption::Medium => 39..=49,
+                DifficultyMenuOption::Hard => 28..=38,
+                DifficultyMenuOption::Expert => 17..=27,
+            }
+        );
         for i in 0..num_positions {
             let pos: u8 = positions[i];
             self.set_value(pos, solved_puzzle[pos as usize]);
