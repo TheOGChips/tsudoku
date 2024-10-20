@@ -17,17 +17,17 @@ The below operating systems have been tested for working condition. Other Unix-b
 >`$ view README.md`  
 >`$ nano -v README.md`
 
-**Note for inexperienced WSL users**: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running `wsl.exe` at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference https://learn.microsoft.com/en-us/windows/wsl/install . It's recommended to install on Debian Bullseye or newer.
+**Note for inexperienced WSL users**: tsudoku will not be compilable or playable unless a WSL shell is opened first. A WSL shell should be easily accessible from either a PowerShell or Windows Command Prompt by running `wsl.exe` at the current terminal prompt. Also see the example below. If you are unsure how to install or setup WSL, please reference [Microsoft's instructions](https://learn.microsoft.com/en-us/windows/wsl/install). It's recommended to install on Debian Bullseye or newer.
 
 - Ex: Running tsudoku from Windows Command Prompt or PowerShell.
 
 >`> wsl.exe '~/.cargo/bin/tsudoku'`
 
-This can also be found in `tsudoku.bat` on the main branch (https://github.com/TheOGChips/tsudoku), which is also provided for Windows/WSL users. Double-clicking on this batch file should open up a Windows Terminal and automatically start tsudoku. Note that quitting tsudoku will also automatically close the instance/tab in Windows Terminal.
+This can also be found in `tsudoku.bat` on the [`main`](https://github.com/TheOGChips/tsudoku) branch, which is also provided for Windows/WSL users. Double-clicking on this batch file should open up a Windows Terminal and automatically start tsudoku. Note that quitting tsudoku will also automatically close the instance/tab in Windows Terminal.
 
 **Note for PowerShell users**: An alternative method to get a shortcut to `tsudoku` is to add the following function to your PowerShell profile. This file can be found by running `> $env:USERPROFILE` at a PowerShell prompt. This will allow you to run tsudoku directly from PowerShell in one step. Note that you will have to start a new instance of PowerShell after adding this to your PowerShell profile.
 
->`function tsudoku { wsl.exe '~/.cargo/bin//tsudoku' }`
+>`function tsudoku { wsl.exe '~/.cargo/bin/tsudoku' }`
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ This can also be found in `tsudoku.bat` on the main branch (https://github.com/T
 
 ### From GitHub (recommended)
 
-See the README at the `main` branch at https://github.com/TheOGChips/tsudoku .
+See the README at the [`main`](https://github.com/TheOGChips/tsudoku) branch.
 
 ### From crates.io
 
@@ -55,7 +55,7 @@ NOTE: The following example assumes Debian or a Debian-based OS using the APT pa
 
 >`$ sudo apt install build-essential libncurses-dev curl`
 
->\- For `rustc` and `cargo`, follow the instructions at the official Rust website here: https://www.rust-lang.org/tools/install . The standard installation will work just fine for installing `tsudoku`. Follow the instructions after installing for sourcing `cargo` in the current terminal shell (closing out of the terminal and starting a new instance should also work).
+>\- For `rustc` and `cargo`, follow the [instructions](https://www.rust-lang.org/tools/install) at the official Rust website. The standard installation will work just fine for installing `tsudoku`. Follow the instructions after installing for sourcing `cargo` in the current terminal shell (closing out of the terminal and starting a new instance should also work).
 
 NOTE: Source your shell's RC file to allow running *tsudoku* in the current shell instance.
 
@@ -93,7 +93,7 @@ NOTE: Source your shell's RC file to allow running *tsudoku* in the current shel
 
 ### From GitHub
 
-See the README at the `main` branch at https://github.com/TheOGChips/tsudoku .
+See the README at the [`main`](https://github.com/TheOGChips/tsudoku) branch.
 
 ### From Crates.io
 
@@ -105,7 +105,7 @@ See the README at the `main` branch at https://github.com/TheOGChips/tsudoku .
 
 ### From GitHub
 
-See the README at the `main` branch at https://github.com/TheOGChips/tsudoku .
+See the README at the [`main`](https://github.com/TheOGChips/tsudoku) branch.
 
 ### From Crates.io
 
@@ -118,7 +118,7 @@ See the README at the `main` branch at https://github.com/TheOGChips/tsudoku .
 
 ### Current release version: 2.1.3
 
-Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by email at: github.spokesman589@passmail.net . If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
+Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by [email](github.spokesman589@passmail.net). If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
 
 ### What happened to v1.x?
 
