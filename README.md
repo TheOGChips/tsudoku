@@ -47,7 +47,7 @@ This can also be found in `tsudoku.bat` on the [`main`](https://github.com/TheOG
 
 See the README at the [`main`](https://github.com/TheOGChips/tsudoku) branch.
 
-### From crates.io
+### From [Crates.io](https://crates.io/crates/tsudoku)
 
 #### Prerequisites Installation
 
@@ -122,5 +122,5 @@ Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready
 
 ### What happened to v1.x?
 
-If you're wondering what happened to v1.x, that is the original C++ version. Since all that work wasn't tracked in crates.io, it will look like v1.x is missing; however, anyone who wants to see the v1.x source code can still find it on this project's Github page.
+If you're wondering what happened to v1.x, that is the original C++ version. Since all that work wasn't tracked in [Crates.io](https://crates.io/crates/tsudoku), it will look like v1.x is missing; however, anyone who wants to see the v1.x source code can still find it on this project's Github page.
 
