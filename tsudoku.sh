@@ -104,15 +104,22 @@ Reminder: You might need to source your shell's RC file (e.g. .bashrc or .zshrc)
           You can do so via 'source ~/.bashrc', etc.
 "
 
-elif [ "$1" = 'upgrade' ]
-    then upgrade
+else which tsudoku
+    if [ "$?" -ne 0 ]
+        then echo "
+Error: Cannot $1 tsudoku. It doesn't appear to be installed.
+"
 
-elif [ "$1" = 'uninstall' ]
-    then uninstall
+    elif [ "$1" = 'upgrade' ]
+        then upgrade
 
-elif [ "$1" = 'purge' ]
-    then purge
+    elif [ "$1" = 'uninstall' ]
+        then uninstall
 
-else echo -e '\nError: Invalid argument.'
-    help_menu
+    elif [ "$1" = 'purge' ]
+        then purge
+
+    else echo -e '\nError: Invalid argument.'
+        help_menu
+    fi
 fi
