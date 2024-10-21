@@ -1,4 +1,5 @@
 bin_name=$(basename "$0")
+tgt=$(basename "$0" | awk -F '.' '{print $1}')
 
 function help_menu {
     echo "
@@ -7,10 +8,10 @@ Usage: $bin_name <OPTION>
 Valid OPTIONs:
 
     --help    -> Display this help menu
-    install   -> Install tsudoku and dependencies (requires sudo priveleges)
-    upgrade   -> Upgrade tsudoku
-    uninstall -> Uninstall tsudoku
-    purge     -> Uninstall tsudoku and remove all game data
+    install   -> Install $tgt and dependencies (requires sudo priveleges)
+    upgrade   -> Upgrade $tgt
+    uninstall -> Uninstall $tgt
+    purge     -> Uninstall $tgt and remove all game data
 "
 }
 
@@ -31,11 +32,11 @@ function install_deps {
         then ncurses_pkg=ncurses-devel
         "$pkg_mgr" list installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
     
-    else echo '
+    else echo "
 Error: Unknown type of package manager. Unable to install missing required
        packages. Submit a bug fix to add your package manager by emailing the
-       author of tsudoku.
-'
+       author of $tgt.
+"
         exit 1
     fi
 
@@ -71,7 +72,7 @@ NOTE: You are missing Rust and Cargo. Attempting to install them now...
 }
 
 function install {
-    cargo install tsudoku
+    cargo install $tgt
 }
 
 function upgrade {
@@ -80,12 +81,12 @@ function upgrade {
 }
 
 function uninstall {
-    cargo uninstall tsudoku
+    cargo uninstall $tgt
 }
 
 function purge {
     uninstall
-    rm -rf "$HOME"/.tsudoku
+    rm -rf "$HOME"/.$tgt
 }
 
 if [ "$#" -ne 1 ]
@@ -100,14 +101,14 @@ elif [ "$1" = 'install' ]
     install
     echo "
 Reminder: You might need to source your shell's RC file (e.g. .bashrc or .zshrc)
-          before you can run 'tsudoku' if you're installing it for the first time.
+          before you can run '$tgt' if you're installing it for the first time.
           You can do so via 'source ~/.bashrc', etc.
 "
 
-else which tsudoku
+else which $tgt
     if [ "$?" -ne 0 ]
         then echo "
-Error: Cannot $1 tsudoku. It doesn't appear to be installed.
+Error: Cannot $1 $tgt. It doesn't appear to be installed.
 "
 
     elif [ "$1" = 'upgrade' ]
