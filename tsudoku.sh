@@ -39,13 +39,13 @@ Error: Unknown type of package manager. Unable to install missing required
     fi
 
     if [ "$?" -ne 0 ]
-        then pkgs+="$ncurses_pkg"
+        then pkgs+=("$ncurses_pkg")
     fi
 
     for pkg in gcc curl
         do $pkg --version &> /dev/null
         if [ "$?" -ne 0 ]
-            then pkgs+=$pkg
+            then pkgs+=($pkg)
         fi
     done
     
