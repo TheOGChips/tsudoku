@@ -1,5 +1,6 @@
 bin_name=$(basename "$0")
 tgt=$(basename "$0" | awk -F '.' '{print $1}')
+sleep_time=2
 
 function help_menu {
     echo "
@@ -56,6 +57,7 @@ Error: Unknown type of package manager. Unable to install missing required
 NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempting to install
       them now...
 "
+        sleep $sleep_time
         sudo $pkg_mgr update
         sudo $pkg_mgr install "${pkgs[@]}"
     fi
@@ -66,6 +68,7 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
         then echo '
 NOTE: You are missing Rust and Cargo. Attempting to install them now...
 '
+        sleep $sleep_time
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         source "$HOME"/.cargo/env
     fi
@@ -98,6 +101,10 @@ elif [ "$1" = '--help' ]
 
 elif [ "$1" = 'install' ]
     then install_deps
+    echo "
+Installing $tgt...
+"
+    sleep $sleep_time
     install
     echo "
 Reminder: You might need to source your shell's RC file (e.g. .bashrc or .zshrc)
