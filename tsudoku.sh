@@ -59,7 +59,7 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
 "
         sleep $sleep_time
         sudo $pkg_mgr update
-        sudo $pkg_mgr install "${pkgs[@]}"
+        sudo $pkg_mgr install -y "${pkgs[@]}"
     fi
 
     # Check if Rust and Cargo are already installed and skip if it is
@@ -69,7 +69,7 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
 NOTE: You are missing Rust and Cargo. Attempting to install them now...
 '
         sleep $sleep_time
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         source "$HOME"/.cargo/env
     fi
 }
