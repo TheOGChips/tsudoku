@@ -6,6 +6,7 @@ Usage: $bin_name <OPTION>
 
 Valid OPTIONs:
 
+    --help    -> Display this help menu
     install   -> Install tsudoku and dependencies (requires sudo priveleges)
     upgrade   -> Upgrade tsudoku
     uninstall -> Uninstall tsudoku
