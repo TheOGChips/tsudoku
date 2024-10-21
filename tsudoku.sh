@@ -15,7 +15,8 @@ Valid OPTIONs:
 
 function install_deps {
     for mgr in apt dnf yum
-        do if [ "$(which $mgr)" -eq 0 ]
+        which $mgr
+        do if [ "$?" -eq 0 ]
             then pkg_mgr=$mgr
         fi
     done
