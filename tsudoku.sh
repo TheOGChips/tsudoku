@@ -50,14 +50,21 @@ Error: Unknown type of package manager. Unable to install missing required
     done
     
     if [ "${#pkgs[@]}" -gt 0 ]
-        then sudo $pkg_mgr update
+        then echo "
+NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempting to install
+      them now...
+"
+        sudo $pkg_mgr update
         sudo $pkg_mgr install "${pkgs[@]}"
     fi
 
     # Check if Rust and Cargo are already installed and skip if it is
     cargo --version &> /dev/null
     if [ "$?" -ne 0 ]
-        then curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        then echo '
+NOTE: You are missing Rust and Cargo. Attempting to install them now...
+'
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
         source "$HOME"/.cargo/env
     fi
 }
