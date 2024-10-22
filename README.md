@@ -36,8 +36,8 @@ This can also be found in `tsudoku.bat`, which is also provided for Windows/WSL 
 
 - The Rust compiler: `rustc`
 - The Rust package manager: `cargo`
-- A C compiler: `gcc` via `build-essential`
-- A C-based TUI library: `libncurses-dev`
+- A C compiler: `gcc` or `clang`
+- A C-based TUI library: `ncurses`
 - `curl`
 
 ## Installation
