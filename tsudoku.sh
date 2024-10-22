@@ -17,7 +17,7 @@ Valid OPTIONs:
 }
 
 function install_deps {
-    for mgr in apt dnf yum
+    for mgr in apt dnf yum pkg
         do which $mgr &> /dev/null
         if [ "$?" -eq 0 ]
             then pkg_mgr=$mgr
@@ -25,14 +25,23 @@ function install_deps {
     done
 
     pkgs=()
+    cmds=("$pkg_mgr")
     if [ "$pkg_mgr" = 'apt' ]
         then ncurses_pkg=libncurses-dev
-        apt list --installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
+        #apt list --installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
+        cmds+=(list)
+        cmds+=(--installed)
     
     elif [ "$pkg_mgr" = 'dnf' ] || [ "$pkg_mgr" = 'yum' ]
         then ncurses_pkg=ncurses-devel
-        "$pkg_mgr" list installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
+        #"$pkg_mgr" list installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
+        cmds+=(list)
+        cmds+=(installed)
     
+    elif [ "$pkg_mgr" = 'pkg' ]
+        then ncurses_pkg=ncurses
+        cmds+=(info)
+
     else echo "
 Error: Unknown type of package manager. Unable to install missing required
        packages. Submit a bug fix to add your package manager by emailing the
@@ -41,6 +50,7 @@ Error: Unknown type of package manager. Unable to install missing required
         exit 1
     fi
 
+    "${cmds[@]}" "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
     if [ "$?" -ne 0 ]
         then pkgs+=("$ncurses_pkg")
     fi
