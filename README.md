@@ -128,6 +128,10 @@ See the README at the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/r
 
 Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by [email](github.spokesman589@passmail.net). If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
 
+### Dude, where's your source code?
+
+The `tsudoku` source code is also on GitHub! Head on over to the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/rust-port) branch to see it if that's your thing.
+
 ### What happened to v1.x?
 
 If you're wondering what happened to v1.x, that is the original C++ version. Since all that work wasn't tracked in [Crates.io](https://crates.io/crates/tsudoku), it will look like v1.x is missing; however, anyone who wants to see the v1.x source code can still find it on this project's Github page.
