@@ -8,8 +8,11 @@
 
 The below operating systems have been tested for working condition. Other Unix-based OSs are also likely to also be supported without much hindrance. The new Rust version should also work in Windows thanks to the use of the `pancurses` library, although you will likely need a Curses library compatible with Windows (e.g. `pdcurses`).
 
->\- Debian Linux  
->\- WSL (Windows Subsystem for Linux)
+- Debian Linux
+- Rocky Linux
+- openSUSE Tumbleweed
+- FreeBSD
+- WSL (Windows Subsystem for Linux)
 
 **Note for MacOS users**: It's possible that this README will be marked as executable if you clone this repo directly and prevent you from easily viewing the file in a text editor. Alternative ways to view the files marked this way include the Unix command line utility `less` or terminal-based text editors such as `vim`/`view` or `nano`. The easiest and simplest to use is `less`. Examples are below:
 
@@ -31,15 +34,11 @@ This can also be found in `tsudoku.bat` on the [`main`](https://github.com/TheOG
 
 ## Prerequisites
 
->\- The Rust compiler: `rustc`
-
->\- The Rust package manager: `cargo`
-
->\- A C compiler: `gcc` via `build-essential`
-
->\- A C-based TUI library: `libncurses-dev`
-
->\- `curl`
+- The Rust compiler: `rustc`
+- The Rust package manager: `cargo`
+- A C compiler: `gcc` or `clang`
+- A C-based TUI library: `ncurses`
+- `curl`
 
 ## Installation
 
@@ -114,9 +113,9 @@ See the README at the [`main`](https://github.com/TheOGChips/tsudoku) branch.
 >`$ rm -rf ~/.tsudoku`
 >`$ cargo uninstall tsudoku`
 
-## Status Update: 20 October 2024
+## Status Update: 22 October 2024
 
-### Current release version: 2.2.3
+### Current release version: 2.2.4
 
 Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by [email](github.spokesman589@passmail.net). If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
 
