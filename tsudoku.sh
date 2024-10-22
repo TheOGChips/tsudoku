@@ -18,7 +18,7 @@ Valid OPTIONs:
 
 function install_deps {
     for mgr in apt dnf yum
-        do which $mgr
+        do which $mgr &> /dev/null
         if [ "$?" -eq 0 ]
             then pkg_mgr=$mgr
         fi
@@ -112,7 +112,7 @@ Reminder: You might need to source your shell's RC file (e.g. .bashrc or .zshrc)
           You can do so via 'source ~/.bashrc', etc.
 "
 
-else which $tgt
+else which $tgt &> /dev/null
     if [ "$?" -ne 0 ]
         then echo "
 Error: Cannot $1 $tgt. It doesn't appear to be installed.
