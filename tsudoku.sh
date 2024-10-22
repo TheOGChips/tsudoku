@@ -17,7 +17,7 @@ Valid OPTIONs:
 }
 
 function install_deps {
-    for mgr in apt yum dnf pkg
+    for mgr in apt yum dnf pkg zypper
         do which $mgr &> /dev/null
         if [ "$?" -eq 0 ]
             then pkg_mgr=$mgr
@@ -28,19 +28,22 @@ function install_deps {
     cmds=("$pkg_mgr")
     if [ "$pkg_mgr" = 'apt' ]
         then ncurses_pkg=libncurses-dev
-        #apt list --installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
         cmds+=(list)
         cmds+=(--installed)
     
     elif [ "$pkg_mgr" = 'dnf' ] || [ "$pkg_mgr" = 'yum' ]
         then ncurses_pkg=ncurses-devel
-        #"$pkg_mgr" list installed "$ncurses_pkg" | grep "$ncurses_pkg" &> /dev/null
         cmds+=(list)
         cmds+=(installed)
     
     elif [ "$pkg_mgr" = 'pkg' ]
         then ncurses_pkg=ncurses
         cmds+=(info)
+
+    elif [ "$pkg_mgr" = 'zypper' ]
+        then ncurses_pkg=ncurses-devel
+        cmds+=(search)
+        cmds+=(--installed-only)
 
     else echo "
 Error: Unknown type of package manager. Unable to install missing required
