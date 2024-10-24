@@ -93,6 +93,7 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
 
         else cmds+=(install)
             cmds+=(-y)
+        fi
         sudo "${cmds[@]}" "${pkgs[@]}"
     fi
 
