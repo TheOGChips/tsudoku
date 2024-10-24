@@ -79,7 +79,8 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
         # Update/upgrade packages
         cmds=("$pkg_mgr")
         if [ "$pkg_mgr" = 'pacman' ]
-            then cmds+=('-Syu')
+            then cmds+=(-Syu)
+                cmds+=(--noconfirm)
             else cmds+=(update)
         fi
         sudo "${cmds[@]}"
