@@ -80,8 +80,8 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
         cmds=("$pkg_mgr")
         if [ "$pkg_mgr" = 'pacman' ]
             then cmds+=(-Syu)
-                cmds+=(--noconfirm)
-            else cmds+=(update)
+            cmds+=(--noconfirm)
+        else cmds+=(update)
         fi
         sudo "${cmds[@]}"
         
