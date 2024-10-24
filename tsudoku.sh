@@ -17,7 +17,7 @@ Valid OPTIONs:
 }
 
 function install_deps {
-    for mgr in apt yum dnf pkg zypper
+    for mgr in apt yum dnf pkg zypper pacman
         do which $mgr &> /dev/null
         if [ "$?" -eq 0 ]
             then pkg_mgr=$mgr
@@ -44,6 +44,10 @@ function install_deps {
         then ncurses_pkg=ncurses-devel
         cmds+=(search)
         cmds+=(--installed-only)
+    
+    elif [ "$pkg_mgr" = 'pacman' ]
+        then ncurses_pkg=ncurses
+        cmds+=(-Q)
 
     else echo "
 Error: Unknown type of package manager. Unable to install missing required
@@ -71,8 +75,24 @@ NOTE: You are missing the following prerequisite packages: ${pkgs[@]} . Attempti
       them now...
 "
         sleep $sleep_time
-        sudo $pkg_mgr update
-        sudo $pkg_mgr install -y "${pkgs[@]}"
+
+        # Update/upgrade packages
+        cmds=("$pkg_mgr")
+        if [ "$pkg_mgr" = 'pacman' ]
+            then cmds+=('-Syu')
+            else cmds+=(update)
+        fi
+        sudo "${cmds[@]}"
+        
+        # Install missing dependencies
+        cmds=("$pkg_mgr")
+        if [ "$pkg_mgr" = 'pacman' ]
+            then cmds+=(-S)
+            cmds+=(--noconfirm)
+
+        else cmds+=(install)
+            cmds+=(-y)
+        sudo "${cmds[@]}" "${pkgs[@]}"
     fi
 
     # Check if Rust and Cargo are already installed and skip if it is
