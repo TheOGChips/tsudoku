@@ -95,6 +95,7 @@ fn main() -> Result<(), &'static str> {
                         let mut puzzle: Sudoku = Sudoku::new(None);
                         if puzzle.start_game(use_in_game_menu) {
                             increment_completed_games(puzzle.difficulty());
+                            let _ = fs::remove_dir_all(game_dir().join(puzzle.filename()));
                         }
                     },
                     MainMenuOption::ResumeGame => {
