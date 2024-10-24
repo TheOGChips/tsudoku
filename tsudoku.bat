@@ -19,11 +19,11 @@ if %input%==N (goto :disabled)
 goto :try_again
 
 :enabled
-wsl.exe '~/.cargo/bin/tsudoku'
+wsl.exe ~/.cargo/bin/tsudoku
 goto :fin
 
 :disabled
-wsl.exe '~/.cargo/bin/tsudoku -n'
+wsl.exe ~/.cargo/bin/tsudoku -n
 goto :fin
 
 :: Notify the player of invalid input, then loop back up to get input again
