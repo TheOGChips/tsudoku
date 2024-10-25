@@ -1,9 +1,5 @@
-sudoku.code-workspace
-test_puzzle.png
-.vscode
 
 # Added by cargo
 
 /target
 Cargo.lock
-
