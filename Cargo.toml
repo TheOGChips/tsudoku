@@ -1,11 +1,12 @@
 [package]
 name = "tsudoku"
-version = "2.2.6"
+version = "2.2.7"
 edition = "2021"
 authors = ["Chris Swindell <crates.io.plausibly761@passmail.net>"]
 description = "A terminal-friendly version of sudoku"
 readme = "README.md"
 repository = "https://github.com/TheOGChips/tsudoku"
+documentation = "https://docs.rs/crate/tsudoku"
 license = "GPL-3.0-or-later"
 keywords = ["sudoku", "TUI", "games", "puzzle"]
 categories = ["command-line-utilities", "games"]
