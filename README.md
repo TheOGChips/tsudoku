@@ -123,7 +123,7 @@ See the README at the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/r
 
 See the README at the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/rust-port) branch.
 
-## Status Update: 24 October 2024
+## Status Update: 26 October 2024
 
 ### Current release version: 2.2.7
 
