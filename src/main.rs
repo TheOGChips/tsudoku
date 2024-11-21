@@ -62,7 +62,7 @@ fn main() -> Result<(), &'static str> {
     };
 
     if num_clargs > 1 {
-        return Err("\nError: Too many arguments. Only one argument can be accepted.\n");
+        return Err("Too many arguments. Only one argument can be accepted.");
     }
 
     if delete_saved_games {
