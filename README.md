@@ -123,9 +123,9 @@ See the README at the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/r
 
 See the README at the [`rust-port`](https://github.com/TheOGChips/tsudoku/tree/rust-port) branch.
 
-## Status Update: 31 October 2024
+## Status Update: 21 November 2024
 
-### Current release version: 2.2.8
+### Current release version: 2.2.9
 
 Good news! The Rust port of `tsudoku` is now complete, fully playable, and ready for an official v2.0.0 release! This means that the original C++ version will no longer be maintained, and as the porting process revealed it was a bit of a buggy mess anyway. Anyone is welcome to notify me of a bug fix by [email](github.spokesman589@passmail.net). If you have played `tsudoku` and enjoyed your experience, please let me know via email as well; I'd love to hear about it! Have fun playing!
 
